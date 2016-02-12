@@ -7,9 +7,22 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,c
 
 body {width: 1000px; margin: auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial;}
 
-#app  { width: 500px; margin: auto; border: 1px solid #666; height: 800px; margin-top: 200px; padding-top: 10px;}
+#app  { width: 500px; margin: auto; margin-top: 200px; }
 
-.post { width: 70%; margin-left: 2%; margin-bottom: 20px;}
+#app #top { 
+	height: 10px;
+	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#86247e+0,cc5e38+100 */
+	background: #86247e; /* Old browsers */
+	background: -moz-linear-gradient(left,  #86247e 0%, #cc5e38 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(left,  #86247e 0%,#cc5e38 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to right,  #86247e 0%,#cc5e38 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#86247e', endColorstr='#cc5e38',GradientType=1 ); /* IE6-9 */
+}
+
+#app #main {border: 1px solid #ccc; border-top: none; height: 800px; padding-top: 10px; position: relative;}
+	#app #main button { position: absolute; bottom: 0; left: 0; width: 100%; height: 30px;}
+
+.post { width: 70%; margin-left: 3%; margin-bottom: 20px;}
 	.post .top {overflow: auto; margin-bottom: 10px;}
 		.post .top .avatar { float: left; margin-right: 15px;}
 			.post .top .avatar img { border-radius: 16px; width: 32px; height: 32px;}
@@ -19,6 +32,8 @@ body {width: 1000px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 	.post .content.first { border-radius: 0 6px 6px 6px;}
 	.post .content.text { padding: 8px;}
 	.post .content.image img { width: 100%;}
+
+	.post .comments { color:#999; }
 
 	.post .location { color:#86247E; }
 	.post .location img { vertical-align: middle;}
