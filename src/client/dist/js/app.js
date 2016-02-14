@@ -19334,21 +19334,116 @@ module.exports = require('./lib/React');
 'use strict';
 
 var Dispatcher = require('./Dispatcher');
-var React = window.React = require('react');
-var ReactDOM = window.ReactDOM = require('react-dom');
+
+var React = window.React = require('react'),
+    ReactDOM = window.ReactDOM = require('react-dom');
+
+var PostActionsCircle = require('./components/PostActionsCircle.jsx');
 
 window.App = React.createClass({
 	displayName: 'App',
+	getInitialState: function getInitialState() {
+		return {
+			postActionsCircleShown: true
+		};
+	},
 	render: function render() {
+		var button = this.state.postActionsCircleShown ? React.createElement(PostActionsCircle, null) : null;
+
 		return React.createElement(
 			'div',
-			null,
-			'Ok'
+			{ id: 'app' },
+			React.createElement(
+				'div',
+				{ className: 'post' },
+				React.createElement(
+					'div',
+					{ className: 'top' },
+					React.createElement(
+						'div',
+						{ className: 'avatar' },
+						React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+					),
+					React.createElement(
+						'p',
+						{ className: 'time' },
+						'9 hours ago'
+					)
+				),
+				React.createElement(
+					'p',
+					{ className: 'text content first' },
+					'Really cool spot'
+				),
+				React.createElement(
+					'div',
+					{ className: 'image content main' },
+					React.createElement('img', { src: 'dist/img/skate.jpg' })
+				),
+				React.createElement(
+					'p',
+					{ className: 'comments' },
+					'24 comments'
+				),
+				React.createElement(
+					'p',
+					{ className: 'location' },
+					'Located ',
+					React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
+					' 4 km away'
+				)
+			),
+			React.createElement(
+				'div',
+				{ className: 'post' },
+				React.createElement(
+					'div',
+					{ className: 'top' },
+					React.createElement(
+						'div',
+						{ className: 'avatar' },
+						React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+					),
+					React.createElement(
+						'p',
+						{ className: 'time' },
+						'9 hours ago'
+					)
+				),
+				React.createElement(
+					'p',
+					{ className: 'text content first' },
+					'Really cool spot'
+				),
+				React.createElement(
+					'div',
+					{ className: 'image content main' },
+					React.createElement('img', { src: 'dist/img/skate.jpg' })
+				),
+				React.createElement(
+					'p',
+					{ className: 'comments' },
+					'24 comments'
+				),
+				React.createElement(
+					'p',
+					{ className: 'location' },
+					'Located ',
+					React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
+					' 4 km away'
+				)
+			),
+			React.createElement(
+				'button',
+				null,
+				'Share a post'
+			),
+			button
 		);
 	}
 });
 
-},{"./Dispatcher":161,"react":159,"react-dom":30}],161:[function(require,module,exports){
+},{"./Dispatcher":161,"./components/PostActionsCircle.jsx":162,"react":159,"react-dom":30}],161:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19373,4 +19468,25 @@ var Dispatcher = function (_EventEmitter) {
 
 module.exports = new Dispatcher();
 
-},{"events":1}]},{},[160]);
+},{"events":1}],162:[function(require,module,exports){
+"use strict";
+
+var React = require('react');
+
+var PostActionsCircle = React.createClass({
+	displayName: "PostActionsCircle",
+	render: function render() {
+		return React.createElement(
+			"div",
+			{ className: "circle" },
+			React.createElement("div", { className: "inner-circle" }),
+			React.createElement("div", { className: "inner-line tilted-left up-left" }),
+			React.createElement("div", { className: "inner-line tilted-right up-right" }),
+			React.createElement("div", { className: "inner-line tilted-middle bottom-middle" })
+		);
+	}
+});
+
+module.exports = PostActionsCircle;
+
+},{"react":159}]},{},[160]);

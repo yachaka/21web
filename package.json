@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx -v -o src/client/dist/js/app.js",
-    "build": "browserify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx | uglifyjs -mc warnings=false > src/client/dist/js/app.js"
+    "build": "browserify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx | uglifyjs -vmc warnings=false > src/client/dist/js/app.js"
   },
   "repository": {
     "type": "git",
