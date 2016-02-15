@@ -5,54 +5,30 @@
 	<script type="text/javascript" src="dist/js/app.js"></script>
 </head>
 <body>
-
-	<div id="screen">
-
-		<div id="top"></div>
+	<div id="app">
 		
-		<div id="appholder">
+		<div id="sharer">
 		</div>
-		<!-- <div id="main">
-			<div class="post">
-				<div class="top">
-					<div class="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
-					<p class="time">9 hours ago</p>
-				</div>
-				<p class="text content first">
-					Really cool spot
-				</p>
-				<div class="image content main">
-					<img src="dist/img/skate.jpg"/>
-				</div>
 
-				<p class="comments">24 comments</p>
-				<p class="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"> 4 km away</p>
+		<div id="feed">
+			<div id="top"></div>
+			
+			<div id="feedHolder">
 			</div>
 
-			<div class="post">
-				<div class="top">
-					<div class="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
-					<p class="time">9 hours ago</p>
-				</div>
-				<p class="text content first">
-					Really cool spot
-				</p>
-				<div class="image content main">
-					<img src="dist/img/skate.jpg"/>
-				</div>
+		</div>
 
-				<p class="comments">24 comments</p>
-				<p class="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"> 4 km away</p>
-			</div>
-
-			<button>Share a post</button>
-		</div> -->
 
 	</div>
 	<script>
 		ReactDOM.render(
-			React.createElement(App),
-			document.getElementById('appholder')
+			React.createElement(AppFeed),
+			document.getElementById('feedHolder')
+		);
+
+		ReactDOM.render(
+			React.createElement(AppSharer),
+			document.getElementById('sharer')
 		);
 	</script>
 </body>

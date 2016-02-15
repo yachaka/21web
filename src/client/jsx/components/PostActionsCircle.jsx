@@ -5,7 +5,7 @@ var PostActionsCircle = React.createClass({
 
 	render() {
 		return (
-			<div className="circle">
+			<div className="circle" style={{left: (this.props.coords) ? this.props.coords[0] : 0, top: (this.props.coords) ? this.props.coords[1] : 0, position: 'absolute'}}>
 				<div className="inner-circle"></div>
 
 				<div className="inner-line tilted-left up-left"></div>
