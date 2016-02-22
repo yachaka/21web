@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "watchify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/components/AppFeed.jsx src/client/jsx/components/AppSharer.jsx -v -o src/client/dist/js/app.js",
-    "build": "browserify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/components/AppFeed.jsx src/client/jsx/components/AppSharer.jsx | uglifyjs -vmc warnings=false > src/client/dist/js/app.js",
+    "watch": "watchify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx -v -o src/client/dist/js/app.js",
+    "build": "browserify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx | uglifyjs -vmc warnings=false > src/client/dist/js/app.js",
     "server": "nodemon src/server/index.js"
   },
   "repository": {
@@ -20,11 +20,17 @@
   },
   "homepage": "https://github.com/yachaka/21web#readme",
   "dependencies": {
+    "body-parser": "^1.15.0",
     "express": "^4.13.4",
+    "google-maps": "^3.2.1",
     "knex": "^0.9.0",
+    "mysql": "^2.10.2",
     "objection": "^0.4.0",
     "react": "^0.14.7",
+    "react-addons-css-transition-group": "^0.14.7",
+    "react-addons-transition-group": "^0.14.7",
     "react-dom": "^0.14.7",
+    "reqwest": "^2.0.5",
     "twitter": "^1.2.5"
   },
   "devDependencies": {

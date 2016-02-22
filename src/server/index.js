@@ -1,32 +1,51 @@
 
-var express = require('express')()
-	, Twitter = require('twitter');
+var path = require('path');
 
-var TwitterConfig = require('./config/Twitter');
+var expressS = require('express')
+	, express = expressS()
+	, bodyParser = require('body-parser')
 
-/**
-* Twitter Application Token
-*/
-var TwitterToken = null;
-express.use(function (req, res, next) {
-	if (TwitterToken)
-		return next();
-	var client = new Twitter({
-		consumer_key: TwitterConfig.key,
-		consumer_secret: TwitterConfig.secret
-	});
-	client.get('statuses/show', {id: '699190872844406784'}, function (error, tweet, response) {
-		console.log(error);
-		console.log(tweet);
-		// console.log(response);
-	});
-	next();
-})
+	, Model = require('objection').Model
+	, Knex = require('knex');
+
+var Post = require('./models/Post');
+
+
+var knex = Knex({
+	client: 'mysql',
+	connection: {
+		host: 'climbing7.com',
+		user: 'arcodep',
+		password: '-TAPCLPuX4+6',
+		database: 'arcodep_21'
+	}
+});
+
+Model.knex(knex);
+
+express.use(expressS.static(path.join(__dirname, '../client/dist/')));
+express.use(bodyParser.urlencoded({ extended: false }));
 
 express.get('/', function (req, res) {
+	res.sendFile(path.join(__dirname, '../client/index.html'));
+});
 
-	res.send('Ok');
+express.post('/posts', function (req, res) {
+	var data = {
+		user_id: 1,
+		text: req.body.text,
+		lat: parseFloat(req.body.lat),
+		lng: parseFloat(req.body.lng)
+	};
 
+	Post.query()
+		.insert(data)
+		.then(function () {
+			res.send('Ok');
+		})
+		.catch(function (err) {
+			console.log(err.stack)
+		});
 });
 
 express.listen(8080);

@@ -4,10 +4,7 @@ var Dispatcher = require('../Dispatcher');
 var React = window.React = require('react')
 	, ReactDOM = window.ReactDOM = require('react-dom');
 
-var PostActionsCircle = require('./PostActionsCircle.jsx');
-
-
-window.AppFeed = React.createClass({
+var Feed = React.createClass({
 
 	getInitialState() {
 	    return {
@@ -28,7 +25,7 @@ window.AppFeed = React.createClass({
 		// var button = this.state.postActionsCircleShown ? <PostActionsCircle coords={this.state.postActionsCircleCoords} /> : null;
 
 		return (
-			<div id="main">
+			<div id="feed">
 				<div className="post">
 					<div className="top">
 						<div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
@@ -38,7 +35,7 @@ window.AppFeed = React.createClass({
 						Really cool spot
 					</p>
 					<div className="image content main">
-						<img src="dist/img/skate.jpg"/>
+						<img src="/img/skate.jpg"/>
 					</div>
 
 					<p className="comments">24 comments</p>
@@ -54,17 +51,16 @@ window.AppFeed = React.createClass({
 						Really cool spot
 					</p>
 					<div className="image content main">
-						<img src="dist/img/skate.jpg"/>
+						<img src="/img/skate.jpg"/>
 					</div>
 
 					<p className="comments">24 comments</p>
 					<p className="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"/> 4 km away</p>
 				</div>
-
-				<button onClick={this.sharePost}>Share a post</button>
-
 			</div>
 		);
 	}
 
 });
+
+module.exports = Feed;

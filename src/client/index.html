@@ -1,34 +1,26 @@
 <html>
 <head>
 	<title>21</title>
-	<link rel="stylesheet" type="text/css" href="dist/css/main.css"/>
-	<script type="text/javascript" src="dist/js/app.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/main.css"/>
+	<script type="text/javascript" src="/js/app.js"></script>
 </head>
 <body>
-	<div id="app">
-		
-		<div id="sharer">
-		</div>
 
-		<div id="feed">
-			<div id="top"></div>
-			
-			<div id="feedHolder">
-			</div>
+	<div id="appholder">
+	</div>
 
-		</div>
-
+	<div id="test"></div>
 
 	</div>
 	<script>
 		ReactDOM.render(
-			React.createElement(AppFeed),
-			document.getElementById('feedHolder')
+			React.createElement(App),
+			document.getElementById('appholder')
 		);
 
 		ReactDOM.render(
-			React.createElement(AppSharer),
-			document.getElementById('sharer')
+			React.createElement(Test),
+			document.getElementById('test')
 		);
 	</script>
 </body>
