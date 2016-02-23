@@ -30,6 +30,15 @@ express.get('/', function (req, res) {
 	res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
+express.get('/posts', function (req, res) {
+	Post.query()
+		.then(function (posts) {
+			console.log(posts)
+			res.json({
+				posts: posts
+			});
+		});
+});
 express.post('/posts', function (req, res) {
 	var data = {
 		user_id: 1,

@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx -v -o src/client/dist/js/app.js",
     "build": "browserify -t [ babelify --presets [ es2015 react ] ] src/client/jsx/App.jsx | uglifyjs -vmc warnings=false > src/client/dist/js/app.js",
-    "server": "nodemon src/server/index.js"
+    "server": "nodemon --watch ./src/server/ src/server/index.js"
   },
   "repository": {
     "type": "git",

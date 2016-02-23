@@ -20991,25 +20991,16 @@ window.App = React.createClass({
         };
     },
     componentDidMount: function componentDidMount() {
-        // reqwest({
-        //     url:'/posts',
-        //     method: 'post',
-        //     data: {text: 'http://www.facebook.com/ super site \\o/', lat: -33.8950781, lng: 151.2159195}
-        // })
-
-        // .then(function (res) {
-        //     console.log(res);
-        // }, function (err, msg) {
-        //     console.error(err, msg);
-        // });
+        Creator.fetchPosts();
 
         this.subscribeToEvent(ActionsType.GO_TO_SHARE_POST_STEP_1, this.wrappedSetState({ sharingPost: 1 }));
         this.subscribeToEvent(ActionsType.GO_TO_SHARE_POST_STEP_2, this.wrappedSetState({ sharingPost: 2 }));
         this.subscribeToEvent(ActionsType.SHARE_POST, this.wrappedSetState({ sharingPost: 0 }));
+        this.subscribeToEvent(ActionsType.CANCEL_SHARE_POST, this.wrappedSetState({ sharingPost: 0 }));
     },
     render: function render() {
         var sharingPostScreen = null;
-        if (this.state.sharingPost == 1) sharingPostScreen = React.createElement(ShareNewPost, { key: 'step1' });else if (this.state.sharingPost == 2) sharingPostScreen = [React.createElement(ShareNewPost, { key: 'step1' }), React.createElement(LocationChooser, { key: 'step2' })];
+        if (this.state.sharingPost == 1) sharingPostScreen = React.createElement(ShareNewPost, { key: 'step1' });else if (this.state.sharingPost == 2) sharingPostScreen = React.createElement(LocationChooser, { key: 'step2' });
 
         return React.createElement(
             'div',
@@ -21020,7 +21011,7 @@ window.App = React.createClass({
                 { id: 'content' },
                 React.createElement(
                     ReactCSSTransitionGroup,
-                    { component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 200 },
+                    { component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
                     sharingPostScreen
                 ),
                 React.createElement(Feed, null),
@@ -21095,7 +21086,7 @@ window.Test = React.createClass({
     }
 });
 
-},{"./Dispatcher":171,"./actions":173,"./actions/Creator":172,"./components/Feed.jsx":174,"./components/LocationChooser.jsx":175,"./components/PostActionsCircle.jsx":176,"./components/ShareNewPost.jsx":177,"./mixins/EventsSubscriberMixin":178,"react":168,"react-addons-css-transition-group":33,"reqwest":169}],171:[function(require,module,exports){
+},{"./Dispatcher":171,"./actions":173,"./actions/Creator":172,"./components/Feed.jsx":174,"./components/LocationChooser.jsx":175,"./components/PostActionsCircle.jsx":177,"./components/ShareNewPost.jsx":178,"./mixins/EventsSubscriberMixin":180,"react":168,"react-addons-css-transition-group":33,"reqwest":169}],171:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -21123,41 +21114,76 @@ module.exports = new Dispatcher();
 },{"events":2}],172:[function(require,module,exports){
 'use strict';
 
+var reqwest = require('reqwest');
+
 var Dispatcher = require('../Dispatcher'),
     ActionsType = require('./');
 
 module.exports = {
 
-	goToSharePostStep1: Dispatcher.emit.bind(Dispatcher, ActionsType.GO_TO_SHARE_POST_STEP_1),
-	goToSharePostStep2: Dispatcher.emit.bind(Dispatcher, ActionsType.GO_TO_SHARE_POST_STEP_2),
-	sharePost: Dispatcher.emit.bind(Dispatcher, ActionsType.SHARE_POST)
+  goToSharePostStep1: Dispatcher.emit.bind(Dispatcher, ActionsType.GO_TO_SHARE_POST_STEP_1),
+  goToSharePostStep2: Dispatcher.emit.bind(Dispatcher, ActionsType.GO_TO_SHARE_POST_STEP_2),
+  sharePost: Dispatcher.emit.bind(Dispatcher, ActionsType.SHARE_POST),
+  cancelSharePost: Dispatcher.emit.bind(Dispatcher, ActionsType.CANCEL_SHARE_POST),
+
+  fetchPosts: function fetchPosts() {
+    reqwest({
+      url: '/posts',
+      method: 'get',
+      type: 'json'
+    }).then(function (json) {
+      Dispatcher.emit(ActionsType.NEW_POSTS, json.posts);
+    }, function (err, msg) {
+      console.error(err, msg);
+    });
+  }
 
 };
 
-},{"../Dispatcher":171,"./":173}],173:[function(require,module,exports){
+},{"../Dispatcher":171,"./":173,"reqwest":169}],173:[function(require,module,exports){
 "use strict";
 
 module.exports = {
 	GO_TO_SHARE_POST_STEP_1: "GO_TO_SHARE_POST_STEP_1",
 	GO_TO_SHARE_POST_STEP_2: "GO_TO_SHARE_POST_STEP_2",
-	SHARE_POST: "SHARE_POST"
+	SHARE_POST: "SHARE_POST",
+	CANCEL_SHARE_POST: "CANCEL_SHARE_POST",
+
+	NEW_POSTS: "NEW_POSTS"
 };
 
 },{}],174:[function(require,module,exports){
 'use strict';
 
-var Dispatcher = require('../Dispatcher');
+var Dispatcher = require('../Dispatcher'),
+    DispatcherEventsSubscriber = require('../mixins/EventsSubscriberMixin')(Dispatcher),
+    ActionsTypes = require('../actions');
 
 var React = window.React = require('react'),
     ReactDOM = window.ReactDOM = require('react-dom');
 
+var Post = require('./Post.jsx');
+
 var Feed = React.createClass({
 	displayName: 'Feed',
+
+	mixins: [DispatcherEventsSubscriber],
+
 	getInitialState: function getInitialState() {
 		return {
 			postActionsCircleShown: true,
-			postActionsCircleCoords: null
+			postActionsCircleCoords: null,
+
+			posts: []
 		};
+	},
+	componentDidMount: function componentDidMount() {
+		this.subscribeToEvent(ActionsTypes.NEW_POSTS, function (posts) {
+			console.log('in setState', posts);
+			this.setState({
+				posts: this.state.posts.concat(posts)
+			});
+		}.bind(this));
 	},
 	sharePost: function sharePost(e) {
 		var app = document.getElementById('app');
@@ -21168,97 +21194,20 @@ var Feed = React.createClass({
 	},
 	render: function render() {
 		// var button = this.state.postActionsCircleShown ? <PostActionsCircle coords={this.state.postActionsCircleCoords} /> : null;
-
+		var posts = this.state.posts.map(function (post) {
+			return React.createElement(Post, { data: post });
+		});
 		return React.createElement(
 			'div',
 			{ id: 'feed' },
-			React.createElement(
-				'div',
-				{ className: 'post' },
-				React.createElement(
-					'div',
-					{ className: 'top' },
-					React.createElement(
-						'div',
-						{ className: 'avatar' },
-						React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
-					),
-					React.createElement(
-						'p',
-						{ className: 'time' },
-						'9 hours ago'
-					)
-				),
-				React.createElement(
-					'p',
-					{ className: 'text content first' },
-					'Really cool spot'
-				),
-				React.createElement(
-					'div',
-					{ className: 'image content main' },
-					React.createElement('img', { src: '/img/skate.jpg' })
-				),
-				React.createElement(
-					'p',
-					{ className: 'comments' },
-					'24 comments'
-				),
-				React.createElement(
-					'p',
-					{ className: 'location' },
-					'Located ',
-					React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
-					' 4 km away'
-				)
-			),
-			React.createElement(
-				'div',
-				{ className: 'post' },
-				React.createElement(
-					'div',
-					{ className: 'top' },
-					React.createElement(
-						'div',
-						{ className: 'avatar' },
-						React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
-					),
-					React.createElement(
-						'p',
-						{ className: 'time' },
-						'9 hours ago'
-					)
-				),
-				React.createElement(
-					'p',
-					{ className: 'text content first' },
-					'Really cool spot'
-				),
-				React.createElement(
-					'div',
-					{ className: 'image content main' },
-					React.createElement('img', { src: '/img/skate.jpg' })
-				),
-				React.createElement(
-					'p',
-					{ className: 'comments' },
-					'24 comments'
-				),
-				React.createElement(
-					'p',
-					{ className: 'location' },
-					'Located ',
-					React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
-					' 4 km away'
-				)
-			)
+			posts
 		);
 	}
 });
 
 module.exports = Feed;
 
-},{"../Dispatcher":171,"react":168,"react-dom":34}],175:[function(require,module,exports){
+},{"../Dispatcher":171,"../actions":173,"../mixins/EventsSubscriberMixin":180,"./Post.jsx":176,"react":168,"react-dom":34}],175:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -21318,7 +21267,35 @@ var LocationChooser = React.createClass({
 	render: function render() {
 		return React.createElement(
 			'div',
-			{ id: 'locateScreen', className: 'screen' },
+			{ id: 'locateScreen', className: 'screen fullscreen' },
+			React.createElement(
+				'div',
+				{ id: 'userPostInfos' },
+				React.createElement(
+					'button',
+					{ className: 'cancel', onClick: Creator.cancelSharePost.bind(Creator) },
+					'Cancel'
+				),
+				React.createElement(
+					'div',
+					{ className: 'user' },
+					React.createElement(
+						'div',
+						{ className: 'avatar' },
+						React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+					),
+					React.createElement(
+						'p',
+						{ className: 'username' },
+						'yachaka'
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'post-text' },
+					'https://www.facebook.com/ this site is so sick lol Ss!!'
+				)
+			),
 			React.createElement('div', { className: 'marker' }),
 			React.createElement('div', { id: 'map', ref: 'map' }),
 			React.createElement(
@@ -21333,6 +21310,61 @@ var LocationChooser = React.createClass({
 module.exports = LocationChooser;
 
 },{"../actions/Creator":172,"google-maps":32,"react":168}],176:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+var postTextParser = require('../helpers/PostTextParser');
+
+function htmlEntities(str) {
+				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+var Post = React.createClass({
+				displayName: 'Post',
+				render: function render() {
+								return React.createElement(
+												'div',
+												{ className: 'post' },
+												React.createElement(
+																'div',
+																{ className: 'top' },
+																React.createElement(
+																				'div',
+																				{ className: 'avatar' },
+																				React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+																),
+																React.createElement(
+																				'p',
+																				{ className: 'time' },
+																				'9 hours ago'
+																)
+												),
+												React.createElement('p', { className: 'text content first', dangerouslySetInnerHTML: { __html: postTextParser(htmlEntities(this.props.data.text)) } }),
+												React.createElement(
+																'div',
+																{ className: 'image content main' },
+																React.createElement('img', { src: '/img/skate.jpg' })
+												),
+												React.createElement(
+																'p',
+																{ className: 'comments' },
+																'24 comments'
+												),
+												React.createElement(
+																'p',
+																{ className: 'location' },
+																'Located ',
+																React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
+																' 4 km away'
+												)
+								);
+				}
+});
+
+module.exports = Post;
+
+},{"../helpers/PostTextParser":179,"react":168}],177:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -21353,7 +21385,7 @@ var PostActionsCircle = React.createClass({
 
 module.exports = PostActionsCircle;
 
-},{"react":168}],177:[function(require,module,exports){
+},{"react":168}],178:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -21366,6 +21398,11 @@ var ShareNewPost = React.createClass({
         return React.createElement(
             'div',
             { id: 'enterDescriptionScreen', className: 'screen' },
+            React.createElement(
+                'button',
+                { className: 'cancel', onClick: Creator.cancelSharePost.bind(Creator) },
+                'Cancel'
+            ),
             React.createElement(
                 'div',
                 { className: 'user-info' },
@@ -21380,7 +21417,8 @@ var ShareNewPost = React.createClass({
                     'yachaka'
                 )
             ),
-            React.createElement('textarea', { placeholder: 'Paste the URL of the post you want to locate' }),
+            React.createElement('input', { autoFocus: true, placeholder: 'URL of the post you want to locate', type: 'text' }),
+            React.createElement('textarea', { placeholder: 'What\'s fun in this post ?' }),
             React.createElement(
                 'button',
                 { onClick: Creator.goToSharePostStep2.bind(Creator), className: 'next' },
@@ -21392,7 +21430,21 @@ var ShareNewPost = React.createClass({
 
 module.exports = ShareNewPost;
 
-},{"../actions/Creator":172,"react":168}],178:[function(require,module,exports){
+},{"../actions/Creator":172,"react":168}],179:[function(require,module,exports){
+'use strict';
+
+module.exports = function (text) {
+	text = text.replace(/(https?:\/\/[^\s]+)/g, function (url) {
+		var ret = '<a href="' + url + '">';
+		if (url.length > 28) ret += url.substr(0, 20) + '...' + url.substr(-15, 15);else ret += url;
+		ret += '</a>';
+		return ret;
+	});
+	console.log(text);
+	return text;
+};
+
+},{}],180:[function(require,module,exports){
 "use strict";
 
 function EventsSubscriberMixin(eventEmitter) {

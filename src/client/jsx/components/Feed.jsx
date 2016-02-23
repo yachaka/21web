@@ -1,16 +1,32 @@
 
-var Dispatcher = require('../Dispatcher');
+var Dispatcher = require('../Dispatcher')
+	, DispatcherEventsSubscriber = require('../mixins/EventsSubscriberMixin')(Dispatcher)
+	, ActionsTypes = require('../actions');
 
 var React = window.React = require('react')
 	, ReactDOM = window.ReactDOM = require('react-dom');
 
+var Post = require('./Post.jsx');
+
 var Feed = React.createClass({
+	mixins: [DispatcherEventsSubscriber],
 
 	getInitialState() {
 	    return {
 	        postActionsCircleShown: true,
-	        postActionsCircleCoords: null
+	        postActionsCircleCoords: null,
+
+	        posts: []
 	    };
+	},
+
+	componentDidMount() {
+		this.subscribeToEvent(ActionsTypes.NEW_POSTS, function (posts) {
+			console.log('in setState', posts);
+			this.setState({
+				posts: this.state.posts.concat(posts)
+			});
+		}.bind(this));
 	},
 
 	sharePost(e) {
@@ -23,40 +39,12 @@ var Feed = React.createClass({
 
 	render() {
 		// var button = this.state.postActionsCircleShown ? <PostActionsCircle coords={this.state.postActionsCircleCoords} /> : null;
-
+		var posts = this.state.posts.map(function (post) {
+			return <Post data={post}/>;
+		});
 		return (
 			<div id="feed">
-				<div className="post">
-					<div className="top">
-						<div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
-						<p className="time">9 hours ago</p>
-					</div>
-					<p className="text content first">
-						Really cool spot
-					</p>
-					<div className="image content main">
-						<img src="/img/skate.jpg"/>
-					</div>
-
-					<p className="comments">24 comments</p>
-					<p className="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"/> 4 km away</p>
-				</div>
-
-				<div className="post">
-					<div className="top">
-						<div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
-						<p className="time">9 hours ago</p>
-					</div>
-					<p className="text content first">
-						Really cool spot
-					</p>
-					<div className="image content main">
-						<img src="/img/skate.jpg"/>
-					</div>
-
-					<p className="comments">24 comments</p>
-					<p className="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"/> 4 km away</p>
-				</div>
+				{posts}
 			</div>
 		);
 	}

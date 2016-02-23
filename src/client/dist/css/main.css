@@ -57,8 +57,8 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 		opacity: 1;
 	}
 
-	75% {
-		opacity: 0.01;
+	65% {
+		opacity: 0;
 	}
 
 	100% {
@@ -67,33 +67,69 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 	}
 }
 
-.screen { border: 1px solid #ddd; border-top: none; position: absolute; top: 10px; left: 0; background-color: white; width: 500px; height: 800px;}
+.screen { border: 1px solid #ddd; position: absolute; background-color: white; width: 500px; left: 0;}
 
-	.screen.screen-appear, .screen.screen-enter {left: 500px;}
-		.screen.screen-appear.screen-appear-active, .screen.screen-enter.screen-enter-active {left: 0; transition: left 500ms ease-out;}
-	.screen.screen-leave {opacity: 1;}
-		.screen.screen-leave-active { animation: screenDisappear 200ms ease-out;}
+.fullscreen { border-top: none; top: 10px; height: 800px;}
+
 
 /********
 * Enter description SCREEN
 **/
-#enterDescriptionScreen { z-index: 5; }
+#enterDescriptionScreen { z-index: 5; top: auto; bottom: 0; height: 350px; border-top: 1px solid #86247e;}
+	#enterDescriptionScreen button.cancel { float:right; width: 100px; font-size: 14px; color: #86247e; line-height: 62px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
+		#enterDescriptionScreen button.cancel:hover {background-color: #f4f4f4;}
+		#enterDescriptionScreen button.cancel:active {background-color: #e2e2e2;}
+
 	#enterDescriptionScreen .user-info { padding: 15px;}
 		#enterDescriptionScreen .user-info .avatar { float: left; margin-right: 15px;}
 			#enterDescriptionScreen .user-info .avatar img { border-radius: 16px; width: 32px; height: 32px;}
 		#enterDescriptionScreen .user-info .username { color: #777; line-height: 32px; font-size: 16px;}
-	#enterDescriptionScreen textarea {resize: none; position: absolute; top: 62px; left: 0; right: 0; bottom: 42px; width: 100%; font-size: 16px; padding: 20px; display: block; border: none;}
 
-	#enterDescriptionScreen .next { position: absolute; bottom: 0; left: 0; right: 0; height: 42px; width: 100%;}
+	#enterDescriptionScreen input { height: 42px; width: 100%; font-size: 16px; padding: 20px; border: 1px solid #ddd; border-left: none; border-right: none;}
+	#enterDescriptionScreen textarea {resize: none; width: 100%; font-size: 16px; padding: 20px; display: block; border: none; height: 160px;}
+
+	#enterDescriptionScreen .next {
+		height: 35px; width: 80%; margin: auto; display: block; margin-top: 24px;
+		background-color: transparent; border: 1px solid #86247e; color: #86247e; border-radius: 4px; font-size: 15px; cursor: pointer;
+	}
+	#enterDescriptionScreen .next:hover { color: #A83DA0; border-color: #A83DA0;}
+	#enterDescriptionScreen .next:active { background-color: #86247e; color: white; outline: 0;}
+
+	#enterDescriptionScreen.screen-appear, #enterDescriptionScreen.screen-enter {bottom: -350px;}
+		#enterDescriptionScreen.screen-appear.screen-appear-active, #enterDescriptionScreen.screen-enter.screen-enter-active {bottom: 0; transition: bottom 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#enterDescriptionScreen.screen-leave { bottom: 0;}
+		#enterDescriptionScreen.screen-leave-active { bottom: -350px; transition: bottom 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
 
 /********
 * Locate SCREEN
 **/
 #locateScreen { z-index: 6; background-color: grey;}
+
+	#locateScreen button.cancel { float:right; width: 100px; font-size: 14px; color: #CFC0CD; line-height: 24px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
+		#locateScreen button.cancel:hover {background-color: #f4f4f4; color: #86247e;}
+		#locateScreen button.cancel:active {background-color: #e2e2e2; color: #86247e;}
+
+	#locateScreen #userPostInfos { color: #bbb; position: absolute; top: 0; left: 0; right: 0; padding: 15px 20px 20px; padding-bottom: 60px; z-index: 10; /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+60,000000+92&0.65+0,0.5+60,0+92 */
+background: -moz-linear-gradient(top,  rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 92%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.5) 60%,rgba(0,0,0,0) 92%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.5) 60%,rgba(0,0,0,0) 92%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+
+
+}
+		#locateScreen #userPostInfos .user { overflow: auto; margin-bottom: 15px;}
+			#locateScreen #userPostInfos .user .avatar { float: left; margin-right: 15px;}
+				#locateScreen #userPostInfos .user .avatar img { border-radius: 16px; width: 32px; height: 32px;}
+			#locateScreen #userPostInfos .user .username { color: white; line-height: 32px; font-size: 16px;}
+
 	#locateScreen #map { position: absolute; bottom: 0; left: 0; right: 0; top:0; z-index: 6;}
 	#locateScreen .marker {position: absolute; top: 50%; left: 50%; margin-top: -40px; margin-left: -11px; z-index: 10;}
 	#locateScreen button.share { position: absolute; bottom: 40px; margin-left: -50px; left: 50%; width: 100px; height: 40px; z-index: 10;}
 
+	#locateScreen.screen-appear, #locateScreen.screen-enter {left: 500px;}
+		#locateScreen.screen-appear.screen-appear-active, #locateScreen.screen-enter.screen-enter-active {left: 0; transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#locateScreen.screen-leave {opacity: 1;}
+		#locateScreen.screen-leave-active { animation: screenDisappear 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
 /**
 ** MISCELLANOUS
 **

@@ -37,21 +37,12 @@ window.App = React.createClass({
     },
 
     componentDidMount() {
-        // reqwest({
-        //     url:'/posts',
-        //     method: 'post',
-        //     data: {text: 'http://www.facebook.com/ super site \\o/', lat: -33.8950781, lng: 151.2159195}
-        // })
-
-        // .then(function (res) {
-        //     console.log(res);
-        // }, function (err, msg) {
-        //     console.error(err, msg);
-        // });
+        Creator.fetchPosts();
 
         this.subscribeToEvent(ActionsType.GO_TO_SHARE_POST_STEP_1, this.wrappedSetState({sharingPost: 1}));
         this.subscribeToEvent(ActionsType.GO_TO_SHARE_POST_STEP_2, this.wrappedSetState({sharingPost: 2}));
         this.subscribeToEvent(ActionsType.SHARE_POST, this.wrappedSetState({sharingPost: 0}));
+        this.subscribeToEvent(ActionsType.CANCEL_SHARE_POST, this.wrappedSetState({sharingPost: 0}));
     },
 
     render() {
@@ -59,7 +50,7 @@ window.App = React.createClass({
         if (this.state.sharingPost == 1)
             sharingPostScreen = <ShareNewPost key="step1"/>;
         else if (this.state.sharingPost == 2)
-            sharingPostScreen = [<ShareNewPost key="step1"/>, <LocationChooser key="step2"/>];
+            sharingPostScreen = <LocationChooser key="step2"/>;
 
         return (
             <div id="app">
@@ -67,7 +58,7 @@ window.App = React.createClass({
      			<div id="top"></div>
 
                 <div id="content">
-                    <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={200}>
+                    <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
                         {sharingPostScreen}
                     </ReactCSSTransitionGroup>
 

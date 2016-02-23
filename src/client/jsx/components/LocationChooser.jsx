@@ -56,7 +56,19 @@ var LocationChooser = React.createClass({
 
     render() {
         return (
-            <div id="locateScreen" className="screen">
+            <div id="locateScreen" className="screen fullscreen">
+            	<div id="userPostInfos">
+		            <button className="cancel" onClick={Creator.cancelSharePost.bind(Creator)}>Cancel</button>
+            		<div className="user">
+						<div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
+						<p className="username">yachaka</p>
+					</div>
+
+					<div className="post-text">
+						https://www.facebook.com/ this site is so sick lol Ss!!
+					</div>
+				</div>
+
             	<div className="marker"></div>
             	<div id="map" ref="map">
             	</div>
