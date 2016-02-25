@@ -10,7 +10,7 @@ var LocationChooser = React.createClass({
     componentDidMount() {
     	GoogleMapsLoader.LIBRAIRIES = ['geometry'];
 	    GoogleMapsLoader.load(function(google) {
-			var map = new google.maps.Map(this.refs.map, {
+			var map = this.map = new google.maps.Map(this.refs.map, {
 				center: {lat: -33.8950781, lng: 151.2159195},
 				zoom: 14,
 				mapTypeControl: false,
@@ -54,6 +54,18 @@ var LocationChooser = React.createClass({
 		}.bind(this));
 	},
 
+	sharePost() {
+		Creator.sharePost({
+			user_id: 1,
+			url: this.props.postData.url,
+			text: this.props.postData.text,
+			lat: this.map.getCenter().lat,
+			lng: this.map.getCenter().lng,
+			date: new Date(),
+			pending: true
+		});
+	},
+
     render() {
         return (
             <div id="locateScreen" className="screen fullscreen">
@@ -65,7 +77,7 @@ var LocationChooser = React.createClass({
 					</div>
 
 					<div className="post-text">
-						https://www.facebook.com/ this site is so sick lol Ss!!
+						{this.props.postData.url} {this.props.postData.text}
 					</div>
 				</div>
 
@@ -73,7 +85,7 @@ var LocationChooser = React.createClass({
             	<div id="map" ref="map">
             	</div>
 
-            	<button className="share" onClick={Creator.sharePost.bind(Creator)}>Set location</button>
+            	<button className="share" onClick={this.sharePost}>Set location</button>
             </div>
         );
     }

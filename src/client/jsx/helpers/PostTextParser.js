@@ -9,6 +9,5 @@ module.exports = function (text) {
 		ret += '</a>';
 		return ret;
 	});
-	console.log(text);
 	return text;
 };

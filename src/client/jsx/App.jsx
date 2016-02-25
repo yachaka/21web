@@ -10,11 +10,13 @@ var Feed = require('./components/Feed.jsx')
 	, LocationChooser = require('./components/LocationChooser.jsx');
 
 var Dispatcher = require('./Dispatcher')
-    , DispatcherEventsSubscriber = require('./mixins/EventsSubscriberMixin')(Dispatcher)
+    , FluxContainerMixin = require('flux/utils').Mixin
 
     , ActionsType = require('./actions')
-    , Creator = require('./actions/Creator');
+    , Creator = require('./actions/Creator')
 
+    , PostsStore = require('./stores/PostsStore')
+    , SharingPostStore = require('./stores/SharingPostStore');
 /*
 <div id="enterDescriptionScreen" className="screen">
                             <div className="user-info">
@@ -26,31 +28,29 @@ var Dispatcher = require('./Dispatcher')
                             <button className="next">Next</button>
                         </div>
                         */
-window.App = React.createClass({
-    displayName: 'App',
-    mixins: [DispatcherEventsSubscriber],
-
-    getInitialState() {
-        return {
-            sharingPost: 0  
-        };
+var App = React.createClass({
+    mixins: [FluxContainerMixin([PostsStore, SharingPostStore])],
+    statics: {
+        calculateState: function (prevState) {
+            return {
+                posts: PostsStore.getAll(),
+                sharingPostScreenDisplayed: SharingPostStore.whichShareStep(),
+                sharingData: SharingPostStore.getShareData()
+            };
+        }
     },
 
     componentDidMount() {
+        console.log('Mounted');
         Creator.fetchPosts();
-
-        this.subscribeToEvent(ActionsType.GO_TO_SHARE_POST_STEP_1, this.wrappedSetState({sharingPost: 1}));
-        this.subscribeToEvent(ActionsType.GO_TO_SHARE_POST_STEP_2, this.wrappedSetState({sharingPost: 2}));
-        this.subscribeToEvent(ActionsType.SHARE_POST, this.wrappedSetState({sharingPost: 0}));
-        this.subscribeToEvent(ActionsType.CANCEL_SHARE_POST, this.wrappedSetState({sharingPost: 0}));
     },
 
     render() {
-        var sharingPostScreen = null;
-        if (this.state.sharingPost == 1)
-            sharingPostScreen = <ShareNewPost key="step1"/>;
-        else if (this.state.sharingPost == 2)
-            sharingPostScreen = <LocationChooser key="step2"/>;
+        var sharingPostScreenDisplayed = null;
+        if (this.state.sharingPostScreenDisplayed == 1)
+            sharingPostScreenDisplayed = <ShareNewPost key="step1"/>;
+        else if (this.state.sharingPostScreenDisplayed == 2)
+            sharingPostScreenDisplayed = <LocationChooser postData={this.state.sharingData} key="step2"/>;
 
         return (
             <div id="app">
@@ -59,10 +59,10 @@ window.App = React.createClass({
 
                 <div id="content">
                     <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
-                        {sharingPostScreen}
+                        {sharingPostScreenDisplayed}
                     </ReactCSSTransitionGroup>
 
-    				<Feed/>
+    				<Feed userSharingNewPost={this.state.sharingPostScreenDisplayed > 0}/>
 
                     <button className="startShare" onClick={Creator.goToSharePostStep1.bind(Creator)}>Share a post</button>
                 </div>
@@ -71,49 +71,4 @@ window.App = React.createClass({
     }
 });
 
-var Tested = React.createClass({
-
-	componentWillEnter(cb) {
-		console.log('enter', this.props.children);
-		cb();
-	},
-
-	componentWillAppear(cb) {
-		console.log('appear', this.props.children);
-		cb();
-	},
-
-	render() {
-		return (
-			<li className="test">{this.props.children}</li>
-		);
-	}
-});
-
-window.Test = React.createClass({
-    displayName: 'Test',
-
-    getInitialState() {
-        return {
-			items: [<Tested key="Ok">Ok</Tested>, <Tested key="rOk">Really ok</Tested>, <Tested key="notOk">Not okeeee</Tested>]
-        };
-    },
-
-    componentDidMount() {
-    	setTimeout(function() {
-    		var n = this.state.items.slice();
-    		n.push(<Tested key="NEW ONE">Testify</Tested>);
-    		this.setState({
-    			items: n
-    		});
-    	}.bind(this), 2000)
-    },
-
-    render() {
-        return (
-            <ReactCSSTransitionGroup transitionName="test" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500}>
-            	{this.state.items}
-            </ReactCSSTransitionGroup>
-        );
-    }
-});
+window.App = App;

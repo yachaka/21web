@@ -11,11 +11,12 @@ Post.tableName = 'posts';
 
 Post.jsonSchema = {
 	type: 'object',
-	required: ['user_id', 'text', 'lat', 'lng'],
+	required: ['user_id', 'url', 'text', 'lat', 'lng'],
 
 	properties: {
 		id: {type: 'integer'},
 		user_id: {type: 'integer'},
+		url: {type: 'string', minLength: 1},
 		text: {type: 'string', minLength: 1},
 		lat: {type: 'number'},
 		lng: {type: 'number'},

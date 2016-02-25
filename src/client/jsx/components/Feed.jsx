@@ -1,7 +1,9 @@
 
 var Dispatcher = require('../Dispatcher')
-	, DispatcherEventsSubscriber = require('../mixins/EventsSubscriberMixin')(Dispatcher)
-	, ActionsTypes = require('../actions');
+	, ActionsTypes = require('../actions')
+    , FluxContainerMixin = require('flux/utils').Mixin
+
+    , PostsStore = require('../stores/PostsStore');
 
 var React = window.React = require('react')
 	, ReactDOM = window.ReactDOM = require('react-dom');
@@ -9,41 +11,33 @@ var React = window.React = require('react')
 var Post = require('./Post.jsx');
 
 var Feed = React.createClass({
-	mixins: [DispatcherEventsSubscriber],
-
+	mixins: [FluxContainerMixin([PostsStore])],
+	statics: {
+        calculateState: function (prevState) {
+            return {
+                posts: PostsStore.getAll()
+            };
+        }
+    },
 	getInitialState() {
 	    return {
 	        postActionsCircleShown: true,
-	        postActionsCircleCoords: null,
-
-	        posts: []
+	        postActionsCircleCoords: null
 	    };
 	},
 
-	componentDidMount() {
-		this.subscribeToEvent(ActionsTypes.NEW_POSTS, function (posts) {
-			console.log('in setState', posts);
-			this.setState({
-				posts: this.state.posts.concat(posts)
-			});
-		}.bind(this));
-	},
-
-	sharePost(e) {
-		var app = document.getElementById('app');
-		console.log(app.offsetLef);
-		this.setState({
-			postActionsCircleCoords: [e.pageX - app.offsetLeft - 48, e.pageY - app.offsetTop - 48]
-		});
-	},
 
 	render() {
 		// var button = this.state.postActionsCircleShown ? <PostActionsCircle coords={this.state.postActionsCircleCoords} /> : null;
 		var posts = this.state.posts.map(function (post) {
 			return <Post data={post}/>;
-		});
+		}.bind(this));
+
+		var overlayActive = this.props.userSharingNewPost == true ? 'active' : '';
+
 		return (
 			<div id="feed">
+				<div id="blackOverlay" className={overlayActive}></div>
 				{posts}
 			</div>
 		);

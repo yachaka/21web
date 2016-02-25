@@ -1,8 +1,2 @@
 
-var EventEmitter = require('events');
-
-class Dispatcher extends EventEmitter {
-	
-}
-
-module.exports = new Dispatcher();
+module.exports = new (require('flux').Dispatcher)();

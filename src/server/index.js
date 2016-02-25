@@ -42,6 +42,7 @@ express.get('/posts', function (req, res) {
 express.post('/posts', function (req, res) {
 	var data = {
 		user_id: 1,
+		url: req.body.url,
 		text: req.body.text,
 		lat: parseFloat(req.body.lat),
 		lng: parseFloat(req.body.lng)
@@ -49,11 +50,16 @@ express.post('/posts', function (req, res) {
 
 	Post.query()
 		.insert(data)
-		.then(function () {
-			res.send('Ok');
+		.then(function (newPost) {
+			res.json({
+				success: true,
+				postId: newPost.id
+			});
 		})
 		.catch(function (err) {
-			console.log(err.stack)
+			res.json({
+				error: err
+			});
 		});
 });
 
