@@ -12,12 +12,13 @@ function htmlEntities(str) {
 <div className="image content main">
 					<img src="/img/skate.jpg"/>
 				</div>
+				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
     displayName: 'Post',
     render() {
 
-    	var className = classNames('post', {'my-post': this.props.data.user_id == 1, 'pending bounceIn': this.props.data.user_id == 1 && this.props.data.pending});
+    	var className = classNames('post', {'my-post': this.props.data.user_id == 1, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared});
 
         return (
             <div className={className}>
@@ -30,11 +31,8 @@ var Post = React.createClass({
 					<span dangerouslySetInnerHTML={{__html: postTextParser(htmlEntities(this.props.data.url))}} className="url"></span>
 					<br/>{this.props.data.text}
 				</p>
-				<div className="image content main">
-					<img src="/img/skate.jpg"/>
-				</div>
 
-				<p className="comments">24 comments</p>
+				
 				<p className="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"/> 4 km away</p>
 			</div>
         );

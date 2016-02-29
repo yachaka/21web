@@ -62,6 +62,7 @@ var LocationChooser = React.createClass({
 			lat: this.map.getCenter().lat,
 			lng: this.map.getCenter().lng,
 			date: new Date(),
+			justShared: true,
 			pending: true
 		});
 	},

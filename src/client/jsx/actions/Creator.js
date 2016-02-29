@@ -25,6 +25,8 @@ module.exports = {
         });
     },
 	sharePost: function (post) {
+        post._clientIdentifier = new Date().getTime();
+
         _dispatch(ActionsType.SHARE_POST)();
         Dispatcher.dispatch({
             type: ActionsType.NEW_POSTS,
@@ -41,7 +43,8 @@ module.exports = {
             if (json.success) {
                 Dispatcher.dispatch({
                     type: ActionsType.PENDING_POST_APPROVED,
-                    postId: json.postId
+                    postId: json.postId,
+                    _clientIdentifier: json._clientIdentifier
                 });
             } else {
                 console.log(json);

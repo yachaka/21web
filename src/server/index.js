@@ -3,14 +3,22 @@ var path = require('path');
 
 var expressS = require('express')
 	, express = expressS()
+	, session = require('express-session')
+	, cookieParser = require('cookie-parser')
 	, bodyParser = require('body-parser')
+
+	, passport = require('passport')
+	, AnonymousStrategy = require('./strategies/AnonymousStrategy')
 
 	, Model = require('objection').Model
 	, Knex = require('knex');
 
-var Post = require('./models/Post');
+var Post = require('./models/Post')
+	, User = require('./models/User');
 
-
+/**
+* KNEX Query Build: database connection
+**/
 var knex = Knex({
 	client: 'mysql',
 	connection: {
@@ -22,11 +30,51 @@ var knex = Knex({
 });
 
 Model.knex(knex);
+/*******/
 
+
+/*******
+* Authentification STRATEGIES
+*******/
+passport.serializeUser(function(user, done) {
+	done(null, user);
+});
+passport.deserializeUser(function(user, done) {
+	done(null, user);
+});
+
+passport.use(new AnonymousStrategy({}, function (anonymousToken, done) {
+	User.query()
+		.where({anonymous: true, anonymous_token: anonymousToken})
+		.then(function (users) {
+			done(null, users[0]);
+		})
+		.catch(done);
+}, function (ip, done) {
+	User.query()
+		.where({anonymous: true, last_ip_connected: ip})
+		.then(function (users) {
+			done(null, users[0]);
+		})
+		.catch(done);
+}));
+
+/********
+* MIDDLEWARES
+********/
 express.use(expressS.static(path.join(__dirname, '../client/dist/')));
+express.use(cookieParser());
 express.use(bodyParser.urlencoded({ extended: false }));
+express.use(session({secret: '21Locate sisi les potos', resave: false, saveUninitialized: true}));
+express.use(passport.initialize());
+express.use(passport.session());
+express.use(passport.authenticate('anonymous'));
+/*******************/
+
+
 
 express.get('/', function (req, res) {
+	console.log('user', req.user);
 	res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
@@ -53,7 +101,8 @@ express.post('/posts', function (req, res) {
 		.then(function (newPost) {
 			res.json({
 				success: true,
-				postId: newPost.id
+				postId: newPost.id,
+				_clientIdentifier: req.body._clientIdentifier
 			});
 		})
 		.catch(function (err) {

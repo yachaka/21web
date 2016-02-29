@@ -27360,6 +27360,8 @@ module.exports = {
         });
     },
     sharePost: function sharePost(post) {
+        post._clientIdentifier = new Date().getTime();
+
         _dispatch(ActionsType.SHARE_POST)();
         Dispatcher.dispatch({
             type: ActionsType.NEW_POSTS,
@@ -27374,7 +27376,8 @@ module.exports = {
             if (json.success) {
                 Dispatcher.dispatch({
                     type: ActionsType.PENDING_POST_APPROVED,
-                    postId: json.postId
+                    postId: json.postId,
+                    _clientIdentifier: json._clientIdentifier
                 });
             } else {
                 console.log(json);
@@ -27527,6 +27530,7 @@ var LocationChooser = React.createClass({
 			lat: this.map.getCenter().lat,
 			lng: this.map.getCenter().lng,
 			date: new Date(),
+			justShared: true,
 			pending: true
 		});
 	},
@@ -27593,12 +27597,13 @@ function htmlEntities(str) {
 <div className="image content main">
 					<img src="/img/skate.jpg"/>
 				</div>
+				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
 				displayName: 'Post',
 				render: function render() {
 
-								var className = classNames('post', { 'my-post': this.props.data.user_id == 1, 'pending bounceIn': this.props.data.user_id == 1 && this.props.data.pending });
+								var className = classNames('post', { 'my-post': this.props.data.user_id == 1, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared });
 
 								return React.createElement(
 												'div',
@@ -27624,16 +27629,6 @@ var Post = React.createClass({
 																React.createElement('span', { dangerouslySetInnerHTML: { __html: postTextParser(htmlEntities(this.props.data.url)) }, className: 'url' }),
 																React.createElement('br', null),
 																this.props.data.text
-												),
-												React.createElement(
-																'div',
-																{ className: 'image content main' },
-																React.createElement('img', { src: '/img/skate.jpg' })
-												),
-												React.createElement(
-																'p',
-																{ className: 'comments' },
-																'24 comments'
 												),
 												React.createElement(
 																'p',
@@ -27776,8 +27771,9 @@ var PostsStore = function (_FluxStore) {
 
 				case ActionsTypes.PENDING_POST_APPROVED:
 					for (var i = 0; i < this._posts.length; i++) {
-						if (this._posts[i].id == action.postId) {
+						if (this._posts[i]._clientIdentifier && this._posts[i]._clientIdentifier == action._clientIdentifier) {
 							this._posts[i].pending = false;
+							delete this._posts[i]._clientIdentifier;
 							break;
 						}
 					}

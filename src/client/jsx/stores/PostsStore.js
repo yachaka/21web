@@ -24,8 +24,9 @@ class PostsStore extends FluxStore {
 
 			case ActionsTypes.PENDING_POST_APPROVED:
 				for (var i = 0; i < this._posts.length; i++) {
-					if (this._posts[i].id == action.postId) {
+					if (this._posts[i]._clientIdentifier && this._posts[i]._clientIdentifier == action._clientIdentifier) {
 						this._posts[i].pending = false;
+						delete this._posts[i]._clientIdentifier;
 						break ;
 					}
 				}
