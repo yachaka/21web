@@ -1,0 +1,9 @@
+extends ./layouts/base.jade
+
+block content
+	div(id="appholder")
+	script.
+		ReactDOM.render(
+			React.createElement(App, {user: !{JSON.stringify(user)}}),
+			document.getElementById('appholder')
+		);
