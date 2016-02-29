@@ -28,15 +28,14 @@ AnonymousStrategy.prototype.authenticate = function (req) {
 	function verified(err, user) {
 		if (err) { self.fail(err); }
 		if (!user)
-			user = 'anonymous';
+			user = {anonymous: 1, newUser: true};
 		self.success(user);
 	}
 
 	if (req.cookies && req.cookies[this._anonymousTokenCookie]) {
 		this._verifyCookie(req.cookies[this._anonymousTokenCookie], verified);
-	}
-
-	this._verifyIp(req.ip, verified);
+	} else
+		this._verifyIp(req.ip, verified);
 };
 
 module.exports = AnonymousStrategy;

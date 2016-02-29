@@ -3,6 +3,7 @@ var path = require('path');
 
 var expressS = require('express')
 	, express = expressS()
+	, consolidate = require('consolidate')
 	, session = require('express-session')
 	, cookieParser = require('cookie-parser')
 	, bodyParser = require('body-parser')
@@ -30,8 +31,13 @@ var knex = Knex({
 });
 
 Model.knex(knex);
-/*******/
 
+/*******
+* View Engine configuration (MustacheJS)
+*******/
+express.engine('jade', consolidate.jade);
+express.set('view engine', 'jade');
+express.set('views', path.join(__dirname, '../client/views'));
 
 /*******
 * Authentification STRATEGIES
@@ -69,13 +75,18 @@ express.use(session({secret: '21Locate sisi les potos', resave: false, saveUnini
 express.use(passport.initialize());
 express.use(passport.session());
 express.use(passport.authenticate('anonymous'));
+express.use(function (req, res, next) {
+	res.locals.user = req.user;
+	next();
+});
 /*******************/
 
 
 
 express.get('/', function (req, res) {
 	console.log('user', req.user);
-	res.sendFile(path.join(__dirname, '../client/index.html'));
+	res.render('index');
+	// res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 express.get('/posts', function (req, res) {

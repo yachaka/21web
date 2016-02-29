@@ -27260,7 +27260,9 @@ var React = require('react'),
 var Feed = require('./components/Feed.jsx'),
     PostActionsCircle = require('./components/PostActionsCircle.jsx'),
     ShareNewPost = require('./components/ShareNewPost.jsx'),
-    LocationChooser = require('./components/LocationChooser.jsx');
+    LocationChooser = require('./components/LocationChooser.jsx'),
+    AnonymousUser = require('./components/AnonymousUser.jsx'),
+    RegisteredUser = require('./components/RegisteredUser.jsx');
 
 var Dispatcher = require('./Dispatcher'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -27294,16 +27296,18 @@ var App = React.createClass({
     },
 
     componentDidMount: function componentDidMount() {
-        console.log('Mounted');
         Creator.fetchPosts();
     },
     render: function render() {
         var sharingPostScreenDisplayed = null;
         if (this.state.sharingPostScreenDisplayed == 1) sharingPostScreenDisplayed = React.createElement(ShareNewPost, { key: 'step1' });else if (this.state.sharingPostScreenDisplayed == 2) sharingPostScreenDisplayed = React.createElement(LocationChooser, { postData: this.state.sharingData, key: 'step2' });
 
+        var loggedUser = this.props.user.newUser ? React.createElement(AnonymousUser, { user: this.props.user }) : React.createElement(RegisteredUser, { user: this.props.user });
+
         return React.createElement(
             'div',
             { id: 'app' },
+            loggedUser,
             React.createElement('div', { id: 'top' }),
             React.createElement(
                 'div',
@@ -27326,7 +27330,7 @@ var App = React.createClass({
 
 window.App = App;
 
-},{"./Dispatcher":189,"./actions":191,"./actions/Creator":190,"./components/Feed.jsx":192,"./components/LocationChooser.jsx":193,"./components/PostActionsCircle.jsx":195,"./components/ShareNewPost.jsx":196,"./stores/PostsStore":198,"./stores/SharingPostStore":199,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],189:[function(require,module,exports){
+},{"./Dispatcher":189,"./actions":191,"./actions/Creator":190,"./components/AnonymousUser.jsx":192,"./components/Feed.jsx":193,"./components/LocationChooser.jsx":194,"./components/PostActionsCircle.jsx":196,"./components/RegisteredUser.jsx":197,"./components/ShareNewPost.jsx":198,"./stores/PostsStore":200,"./stores/SharingPostStore":201,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],189:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -27419,6 +27423,48 @@ module.exports = {
 },{}],192:[function(require,module,exports){
 'use strict';
 
+var React = require('react');
+
+var AnonymousUser = React.createClass({
+    displayName: 'AnonymousUser',
+    render: function render() {
+        return React.createElement(
+            'div',
+            { id: 'loggedUser' },
+            React.createElement(
+                'div',
+                { className: 'avatar' },
+                React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+            ),
+            React.createElement(
+                'p',
+                { className: 'username' },
+                React.createElement(
+                    'span',
+                    { className: 'secondary' },
+                    'Logged in as'
+                ),
+                React.createElement('br', null),
+                'anonymous'
+            ),
+            React.createElement(
+                'div',
+                { className: 'actions' },
+                React.createElement(
+                    'a',
+                    { href: '#' },
+                    'Claim account'
+                )
+            )
+        );
+    }
+});
+
+module.exports = AnonymousUser;
+
+},{"react":186}],193:[function(require,module,exports){
+'use strict';
+
 var Dispatcher = require('../Dispatcher'),
     ActionsTypes = require('../actions'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -27465,7 +27511,7 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":189,"../actions":191,"../stores/PostsStore":198,"./Post.jsx":194,"flux/utils":48,"react":186,"react-dom":52}],193:[function(require,module,exports){
+},{"../Dispatcher":189,"../actions":191,"../stores/PostsStore":200,"./Post.jsx":195,"flux/utils":48,"react":186,"react-dom":52}],194:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -27581,7 +27627,7 @@ var LocationChooser = React.createClass({
 
 module.exports = LocationChooser;
 
-},{"../actions/Creator":190,"google-maps":49,"react":186}],194:[function(require,module,exports){
+},{"../actions/Creator":190,"google-maps":49,"react":186}],195:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -27643,7 +27689,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":197,"classnames":3,"react":186}],195:[function(require,module,exports){
+},{"../helpers/PostTextParser":199,"classnames":3,"react":186}],196:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -27664,7 +27710,40 @@ var PostActionsCircle = React.createClass({
 
 module.exports = PostActionsCircle;
 
-},{"react":186}],196:[function(require,module,exports){
+},{"react":186}],197:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+var RegisteredUser = React.createClass({
+    displayName: 'RegisteredUser',
+    render: function render() {
+        return React.createElement(
+            'div',
+            { id: 'loggedUser' },
+            React.createElement(
+                'div',
+                { className: 'avatar' },
+                React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+            ),
+            React.createElement(
+                'p',
+                { className: 'username' },
+                React.createElement(
+                    'span',
+                    { className: 'secondary' },
+                    'Logged in as'
+                ),
+                React.createElement('br', null),
+                'anonymous'
+            )
+        );
+    }
+});
+
+module.exports = RegisteredUser;
+
+},{"react":186}],198:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -27713,7 +27792,7 @@ var ShareNewPost = React.createClass({
 
 module.exports = ShareNewPost;
 
-},{"../actions/Creator":190,"react":186}],197:[function(require,module,exports){
+},{"../actions/Creator":190,"react":186}],199:[function(require,module,exports){
 'use strict';
 
 module.exports = function (text) {
@@ -27726,7 +27805,7 @@ module.exports = function (text) {
 	return text;
 };
 
-},{}],198:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -27788,7 +27867,7 @@ var PostsStore = function (_FluxStore) {
 
 module.exports = new PostsStore(Dispatcher);
 
-},{"../Dispatcher":189,"../actions":191,"flux/utils":48}],199:[function(require,module,exports){
+},{"../Dispatcher":189,"../actions":191,"flux/utils":48}],201:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

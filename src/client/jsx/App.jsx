@@ -7,7 +7,9 @@ var React = require('react')
 var Feed = require('./components/Feed.jsx')
 	, PostActionsCircle = require('./components/PostActionsCircle.jsx')
     , ShareNewPost = require('./components/ShareNewPost.jsx')
-	, LocationChooser = require('./components/LocationChooser.jsx');
+    , LocationChooser = require('./components/LocationChooser.jsx')
+    , AnonymousUser = require('./components/AnonymousUser.jsx')
+	, RegisteredUser = require('./components/RegisteredUser.jsx');
 
 var Dispatcher = require('./Dispatcher')
     , FluxContainerMixin = require('flux/utils').Mixin
@@ -41,7 +43,6 @@ var App = React.createClass({
     },
 
     componentDidMount() {
-        console.log('Mounted');
         Creator.fetchPosts();
     },
 
@@ -52,8 +53,12 @@ var App = React.createClass({
         else if (this.state.sharingPostScreenDisplayed == 2)
             sharingPostScreenDisplayed = <LocationChooser postData={this.state.sharingData} key="step2"/>;
 
+        var loggedUser = this.props.user.newUser ? <AnonymousUser user={this.props.user}/> : <RegisteredUser user={this.props.user}/>;
+
         return (
             <div id="app">
+
+                {loggedUser}
 
      			<div id="top"></div>
 
