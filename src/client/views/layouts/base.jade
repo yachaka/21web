@@ -6,6 +6,8 @@ html
 		block css
 			link(rel="stylesheet", type="text/css", href="/css/main.css")
 		block scripts
+			script.
+				var LOGGED_USER = !{JSON.stringify(user)};
 			script(type='text/javascript', src="/js/app.js")
 	body
 		block content

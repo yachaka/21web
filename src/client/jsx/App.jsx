@@ -18,7 +18,8 @@ var Dispatcher = require('./Dispatcher')
     , Creator = require('./actions/Creator')
 
     , PostsStore = require('./stores/PostsStore')
-    , SharingPostStore = require('./stores/SharingPostStore');
+    , SharingPostStore = require('./stores/SharingPostStore')
+    , UserStore = require('./stores/UserStore');
 /*
 <div id="enterDescriptionScreen" className="screen">
                             <div className="user-info">
@@ -31,13 +32,14 @@ var Dispatcher = require('./Dispatcher')
                         </div>
                         */
 var App = React.createClass({
-    mixins: [FluxContainerMixin([PostsStore, SharingPostStore])],
+    mixins: [FluxContainerMixin([PostsStore, SharingPostStore, UserStore])],
     statics: {
         calculateState: function (prevState) {
             return {
                 posts: PostsStore.getAll(),
-                sharingPostScreenDisplayed: SharingPostStore.whichShareStep(),
-                sharingData: SharingPostStore.getShareData()
+                sharingPostScreenDisplayed: 1,
+                sharingData: SharingPostStore.getShareData(),
+                loggedUser: UserStore.getLoggedUser()
             };
         }
     },
@@ -53,23 +55,26 @@ var App = React.createClass({
         else if (this.state.sharingPostScreenDisplayed == 2)
             sharingPostScreenDisplayed = <LocationChooser postData={this.state.sharingData} key="step2"/>;
 
-        var loggedUser = this.props.user.newUser ? <AnonymousUser user={this.props.user}/> : <RegisteredUser user={this.props.user}/>;
+        var loggedUser = this.state.loggedUser.newUser ? <AnonymousUser user={this.state.loggedUser}/> : <RegisteredUser user={this.state.loggedUser}/>;
 
         return (
             <div id="app">
 
                 {loggedUser}
 
-     			<div id="top"></div>
-
-                <div id="content">
+                <div id="phone">
                     <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
                         {sharingPostScreenDisplayed}
                     </ReactCSSTransitionGroup>
+                    
+                    <div id="top"></div>
 
-    				<Feed userSharingNewPost={this.state.sharingPostScreenDisplayed > 0}/>
+                    <div id="main">
 
-                    <button className="startShare" onClick={Creator.goToSharePostStep1.bind(Creator)}>Share a post</button>
+        				<Feed userSharingNewPost={this.state.sharingPostScreenDisplayed > 0}/>
+
+                        <button className="startShare" onClick={Creator.goToSharePostStep1.bind(Creator)}>Share a post</button>
+                    </div>
                 </div>
 			</div>
 		);

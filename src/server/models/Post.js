@@ -1,5 +1,6 @@
 
-var Model = require('objection').Model;
+var objection = require('objection')
+	, Model = require('objection').Model;
 
 function Post() {
 	Model.apply(this, arguments);
@@ -24,6 +25,14 @@ Post.jsonSchema = {
 	}
 };
 
+Post.prototype.$beforeValidate = function (jsonSchema, json, opt) {
+	if (json.url) {
+		if (!json.url.match(/(https?:\/\/[^\s]+)/))
+			throw new objection.ValidationError({url: 'Must be a valid URL'});
+	}
+
+	return jsonSchema;
+};
 
 Post.prototype.$beforeInsert = function () {
   this.date = new Date().toISOString();

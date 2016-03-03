@@ -6,7 +6,6 @@ var Dispatcher = require('../Dispatcher')
 class SharingPostStore extends FluxStore {
 
 	constructor(Dispatcher) {
-		console.log(Dispatcher);
 		super(Dispatcher);
 		this.shareStep = 0;
 		this.shareData = null;

@@ -2,10 +2,19 @@
 var React = require('react')
 	, GoogleMapsLoader = require('google-maps');
 
-var Creator = require('../actions/Creator');
+var Creator = require('../actions/Creator')
+	, FluxContainerMixin = require('flux/utils').Mixin
+	, UserStore = require('../stores/UserStore');
 
 var LocationChooser = React.createClass({
-    displayName: 'LocationChooser',
+    mixins: [FluxContainerMixin([UserStore])],
+    statics: {
+        calculateState: function (prevState) {
+            return {
+                loggedUser: UserStore.getLoggedUser()
+            };
+        }
+    },
 
     componentDidMount() {
     	GoogleMapsLoader.LIBRAIRIES = ['geometry'];
@@ -56,7 +65,7 @@ var LocationChooser = React.createClass({
 
 	sharePost() {
 		Creator.sharePost({
-			user_id: 1,
+			user_id: this.state.loggedUser.id,
 			url: this.props.postData.url,
 			text: this.props.postData.text,
 			lat: this.map.getCenter().lat,

@@ -27,10 +27,13 @@ User.jsonSchema = {
 };
 
 
-User.createAnonymousUser = function (fields) {
+User.createAnonymousUser = function (req, fields) {
 	if (!fields)
 		fields = {};
-	fields.anonymous_token = randomString({length: 32});
+	fields.unclaimed = true;
+	fields.username = 'anonymous'+Math.ceil(Math.random()*1000000);
+	fields.last_ip_connected = req.ip;
+	fields.connect_token = randomString({length: 32});
 	fields.claim_token = randomString({length: 32});
 	return User.query()
 			.insert(fields);

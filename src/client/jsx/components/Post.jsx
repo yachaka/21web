@@ -1,8 +1,11 @@
 
 var React = require('react');
 
-var postTextParser = require('../helpers/PostTextParser');
-var classNames = require('classnames');
+var postTextParser = require('../helpers/PostTextParser')
+	, classNames = require('classnames');
+
+var FluxContainerMixin = require('flux/utils').Mixin
+	, UserStore = require('../stores/UserStore');
 
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -15,10 +18,17 @@ function htmlEntities(str) {
 				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
-    displayName: 'Post',
-    render() {
+    mixins: [FluxContainerMixin([UserStore])],
+    statics: {
+        calculateState: function (prevState) {
+            return {
+                loggedUser: UserStore.getLoggedUser()
+            };
+        }
+    },
 
-    	var className = classNames('post', {'my-post': this.props.data.user_id == 1, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared});
+    render() {
+    	var className = classNames('post', {'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared});
 
         return (
             <div className={className}>

@@ -51,14 +51,14 @@ passport.deserializeUser(function(user, done) {
 
 passport.use(new AnonymousStrategy({}, function (anonymousToken, done) {
 	User.query()
-		.where({anonymous: true, anonymous_token: anonymousToken})
+		.where({unclaimed: true, connect_token: anonymousToken})
 		.then(function (users) {
 			done(null, users[0]);
 		})
 		.catch(done);
 }, function (ip, done) {
 	User.query()
-		.where({anonymous: true, last_ip_connected: ip})
+		.where({unclaimed: true, last_ip_connected: ip})
 		.then(function (users) {
 			done(null, users[0]);
 		})
@@ -84,39 +84,64 @@ express.use(function (req, res, next) {
 
 
 express.get('/', function (req, res) {
-	console.log('user', req.user);
+	console.log('Path ', req.path, ', user: ', req.user);
 	res.render('index');
+	// res.sendStatus(200);
 	// res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 express.get('/posts', function (req, res) {
 	Post.query()
 		.then(function (posts) {
-			console.log(posts)
+			// console.log(posts)
 			res.json({
 				posts: posts
 			});
 		});
 });
-express.post('/posts', function (req, res) {
+
+function needUserCreationMiddleware(req, res, next) {
+	if (!req.user.anonymous) {
+		next();
+		return;
+	}
+
+	User.createAnonymousUser(req)
+		.then(function (user) {
+			console.log('User was totally anonymous, needed creation, done');
+			req.userJustGotCreated = true;
+			req.login(user, function (err) {
+				if (err) { return next(err); }
+				next();
+			});
+		}, next);
+}
+
+express.post('/posts', needUserCreationMiddleware, function (req, res) {
+
 	var data = {
-		user_id: 1,
+		user_id: req.user.id,
 		url: req.body.url,
 		text: req.body.text,
 		lat: parseFloat(req.body.lat),
 		lng: parseFloat(req.body.lng)
 	};
-
 	Post.query()
 		.insert(data)
 		.then(function (newPost) {
-			res.json({
+			var json = {
 				success: true,
 				postId: newPost.id,
 				_clientIdentifier: req.body._clientIdentifier
-			});
+			};
+
+			if (req.userJustGotCreated)
+				json.newUser = req.user;
+
+			res.json(json);
 		})
 		.catch(function (err) {
+			console.log(err.stack);
 			res.json({
 				error: err
 			});

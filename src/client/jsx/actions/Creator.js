@@ -14,6 +14,18 @@ var _dispatch = function (ActionType) {
 
 module.exports = {
 
+    // fetchNewLoggedUserData: function () {
+    //     reqwest({
+    //         url: '/me',
+    //         method: 'get',
+    //         type: 'json'
+    //     })
+
+    //     .then(function (user) {
+    //         console.log('New user data:', user);
+    //     });
+    // },
+
 	goToSharePostStep1: _dispatch(ActionsType.GO_TO_SHARE_POST_STEP_1),
 	goToSharePostStep2: function (url, text) {
         Dispatcher.dispatch({
@@ -41,6 +53,12 @@ module.exports = {
 
         .then(function (json) {
             if (json.success) {
+                if (json.newUser)
+                    Dispatcher.dispatch({
+                        type: ActionsType.USER_LOGGED_IN,
+                        user: json.newUser
+                    });
+                
                 Dispatcher.dispatch({
                     type: ActionsType.PENDING_POST_APPROVED,
                     postId: json.postId,

@@ -6,7 +6,6 @@ var Dispatcher = require('../Dispatcher')
 class PostsStore extends FluxStore {
 
 	constructor(Dispatcher) {
-		console.log(Dispatcher);
 		super(Dispatcher);
 		this._posts = [];
 	}

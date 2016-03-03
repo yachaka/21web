@@ -38,12 +38,13 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#86247e', endColorstr='#cc5e38',GradientType=1 ); /* IE6-9 */
 }
 
-#app #content { border: 1px solid #ddd; border-top: none; overflow: hidden;}
+#app #phone { position: relative; }
+#app #main { border: 1px solid #ddd; border-top: none; overflow: hidden;}
 
 /********
 * SHARE Button
 **/
-#app #content button.startShare { position: absolute; bottom: 0; left: 0;}
+#app #main button.startShare { position: absolute; bottom: 0; left: 0;}
 
 /********	
 * FEED
@@ -102,7 +103,7 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 
 .screen { border: 1px solid #ddd; position: absolute; background-color: white; width: 500px; left: 0;}
 
-.fullscreen { border-top: none; top: 10px; height: 800px;}
+.fullscreen { border: none; top: 10px; height: 800px;}
 
 
 /********
@@ -150,7 +151,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', e
 
 
 }
-		#locateScreen #userPostInfos .user { overflow: auto; margin-bottom: 15px;}
+		#locateScreen #userPostInfos .user { overflow: hidden; margin-bottom: 15px;}
 			#locateScreen #userPostInfos .user .avatar { float: left; margin-right: 15px;}
 				#locateScreen #userPostInfos .user .avatar img { border-radius: 16px; width: 32px; height: 32px;}
 			#locateScreen #userPostInfos .user .username { color: white; line-height: 32px; font-size: 16px;}

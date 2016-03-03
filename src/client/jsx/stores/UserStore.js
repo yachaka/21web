@@ -6,9 +6,12 @@ var Dispatcher = require('../Dispatcher')
 class UserStore extends FluxStore {
 
 	constructor(Dispatcher) {
-		console.log(Dispatcher);
 		super(Dispatcher);
-		this._loggedUser = null;
+		this._loggedUser = window.LOGGED_USER;
+	}
+
+	getLoggedUser() {
+		return this._loggedUser;
 	}
 
 	isLogged() {
@@ -20,6 +23,10 @@ class UserStore extends FluxStore {
 
 	__onDispatch(action) {
 		switch (action.type) {
+			case ActionsTypes.USER_LOGGED_IN:
+				this._loggedUser = action.user;
+				this.__emitChange();
+				break;
 			// case ActionsTypes.NEW_POSTS:
 			// 	this._posts = this._posts.concat(action.posts);
 			// 	this.__emitChange();

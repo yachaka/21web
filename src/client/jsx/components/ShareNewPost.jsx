@@ -1,10 +1,12 @@
 var React = require('react');
 
-var Creator = require('../actions/Creator');
+var Creator = require('../actions/Creator')
+    , ValidateMixin = require('../mixins/ValidateMixin')
+    , validate = require('validate.js');
 
 
 var ShareNewPost = React.createClass({
-    displayName: 'ShareNewPost',
+    mixins: [ValidateMixin(validate)],
 
     goToStep2() {
         Creator.goToSharePostStep2(this.refs.url.value, this.refs.text.value);
