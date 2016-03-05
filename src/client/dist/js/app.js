@@ -28378,7 +28378,7 @@ var App = React.createClass({
         calculateState: function calculateState(prevState) {
             return {
                 posts: PostsStore.getAll(),
-                sharingPostScreenDisplayed: 1,
+                sharingPostScreenDisplayed: SharingPostStore.whichShareStep(),
                 sharingData: SharingPostStore.getShareData(),
                 loggedUser: UserStore.getLoggedUser()
             };
@@ -28398,6 +28398,11 @@ var App = React.createClass({
             'div',
             { id: 'app' },
             loggedUser,
+            React.createElement(
+                'p',
+                { id: 'title' },
+                '#skate'
+            ),
             React.createElement(
                 'div',
                 { id: 'phone' },
@@ -28424,7 +28429,7 @@ var App = React.createClass({
 
 window.App = App;
 
-},{"./Dispatcher":190,"./actions":192,"./actions/Creator":191,"./components/AnonymousUser.jsx":193,"./components/Feed.jsx":194,"./components/LocationChooser.jsx":195,"./components/PostActionsCircle.jsx":197,"./components/RegisteredUser.jsx":198,"./components/ShareNewPost.jsx":199,"./stores/PostsStore":202,"./stores/SharingPostStore":203,"./stores/UserStore":204,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],190:[function(require,module,exports){
+},{"./Dispatcher":190,"./actions":192,"./actions/Creator":191,"./components/AnonymousUser.jsx":193,"./components/Feed.jsx":194,"./components/LocationChooser.jsx":195,"./components/PostActionsCircle.jsx":197,"./components/RegisteredUser.jsx":198,"./components/ShareNewPost.jsx":199,"./stores/PostsStore":204,"./stores/SharingPostStore":205,"./stores/UserStore":206,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],190:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -28606,7 +28611,7 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":190,"../actions":192,"../stores/PostsStore":202,"./Post.jsx":196,"flux/utils":48,"react":186,"react-dom":52}],195:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"../stores/PostsStore":204,"./Post.jsx":196,"flux/utils":48,"react":186,"react-dom":52}],195:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -28733,7 +28738,7 @@ var LocationChooser = React.createClass({
 
 module.exports = LocationChooser;
 
-},{"../actions/Creator":191,"../stores/UserStore":204,"flux/utils":48,"google-maps":49,"react":186}],196:[function(require,module,exports){
+},{"../actions/Creator":191,"../stores/UserStore":206,"flux/utils":48,"google-maps":49,"react":186}],196:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28807,7 +28812,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":200,"../stores/UserStore":204,"classnames":3,"flux/utils":48,"react":186}],197:[function(require,module,exports){
+},{"../helpers/PostTextParser":202,"../stores/UserStore":206,"classnames":3,"flux/utils":48,"react":186}],197:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28877,15 +28882,30 @@ var React = require('react');
 
 var Creator = require('../actions/Creator'),
     ValidateMixin = require('../mixins/ValidateMixin'),
-    validate = require('validate.js');
+    FluxContainerMixin = require('flux/utils').Mixin,
+    ErrorDisplayer = require('./common/ErrorDisplayer.jsx'),
+    Input = require('./common/Input.jsx'),
+    Validator = require('validate.js'),
+    UserStore = require('../stores/UserStore');
 
+var PostSchema = require('../../../shared/schemas/PostSchema');
+// <ErrorDisplayer errors={this.errors('url')}>
+//     <input ref="url" autoFocus placeholder="URL of the post you want to locate" type="text" defaultValue={this.state.validationData.url}/>
+// </ErrorDisplayer>
 var ShareNewPost = React.createClass({
     displayName: 'ShareNewPost',
 
-    mixins: [ValidateMixin(validate)],
+    mixins: [ValidateMixin(Validator), FluxContainerMixin([UserStore])],
+    statics: {
+        calculateState: function calculateState(prevState) {
+            return {
+                loggedUser: UserStore.getLoggedUser()
+            };
+        }
+    },
 
     goToStep2: function goToStep2() {
-        Creator.goToSharePostStep2(this.refs.url.value, this.refs.text.value);
+        if (Object.keys(this.validate({ url: this.state.url, text: this.state.text }, PostSchema)).length == 0) Creator.goToSharePostStep2(this.state.url, this.state.text);
     },
     render: function render() {
         return React.createElement(
@@ -28907,11 +28927,19 @@ var ShareNewPost = React.createClass({
                 React.createElement(
                     'p',
                     { className: 'username' },
-                    'yachaka'
+                    this.state.loggedUser.username
                 )
             ),
-            React.createElement('input', { ref: 'url', autoFocus: true, placeholder: 'URL of the post you want to locate', type: 'text' }),
-            React.createElement('textarea', { ref: 'text', placeholder: 'What\'s fun in this post ?' }),
+            React.createElement(
+                ErrorDisplayer,
+                { errors: this.errors('url') },
+                React.createElement('input', { ref: this.registerFor('url'), autoFocus: true, placeholder: 'URL of the post you want to locate', type: 'text' })
+            ),
+            React.createElement(
+                ErrorDisplayer,
+                { errors: this.errors('text') },
+                React.createElement('textarea', { ref: this.registerFor('text'), placeholder: 'What\'s fun in this post ?' })
+            ),
             React.createElement(
                 'button',
                 { onClick: this.goToStep2, className: 'next' },
@@ -28923,7 +28951,60 @@ var ShareNewPost = React.createClass({
 
 module.exports = ShareNewPost;
 
-},{"../actions/Creator":191,"../mixins/ValidateMixin":201,"react":186,"validate.js":188}],200:[function(require,module,exports){
+},{"../../../shared/schemas/PostSchema":207,"../actions/Creator":191,"../mixins/ValidateMixin":203,"../stores/UserStore":206,"./common/ErrorDisplayer.jsx":200,"./common/Input.jsx":201,"flux/utils":48,"react":186,"validate.js":188}],200:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+var ErrorDisplayer = React.createClass({
+    displayName: 'ErrorDisplayer',
+    render: function render() {
+
+        var errors = this.props.errors ? this.props.errors.map(function (val, i) {
+            return React.createElement(
+                'p',
+                { className: 'error-message', key: i },
+                val
+            );
+        }) : null;
+        var className = this.props.errors ? 'error' : '';
+        return React.createElement(
+            'div',
+            { className: className },
+            errors,
+            this.props.children
+        );
+    }
+});
+
+module.exports = ErrorDisplayer;
+
+},{"react":186}],201:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+var ErrorDisplayer = require('./ErrorDisplayer.jsx');
+
+var Input = React.createClass({
+    displayName: 'Input',
+
+    contextTypes: {
+        getErrors: React.PropTypes.func
+    },
+
+    render: function render() {
+        return React.createElement(
+            ErrorDisplayer,
+            { errors: this.context.getErrors(this.props.name) },
+            React.createElement('input', this.props)
+        );
+    }
+});
+
+module.exports = Input;
+
+},{"./ErrorDisplayer.jsx":200,"react":186}],202:[function(require,module,exports){
 'use strict';
 
 module.exports = function (text) {
@@ -28936,27 +29017,86 @@ module.exports = function (text) {
 	return text;
 };
 
-},{}],201:[function(require,module,exports){
-"use strict";
+},{}],203:[function(require,module,exports){
+'use strict';
 
-function ValidateFactory(Validator) {
+var React = require('react');
+
+function ValidateFactory(Validate) {
 
 	return {
+		// childContextTypes: {
+		// 	getErrors: React.PropTypes.func
+		// },
+		// getChildContext: function () {
+		// 	return {
+		// 		getErrors: this.errors
+		// 	};
+		// },
+
 		getInitialState: function getInitialState() {
 			return {
-				validationErrors: []
+				validationErrors: {}
 			};
 		},
+		registerFor: function registerFor(attribute) {
+			var self = this,
+			    lastElement;
 
-		validate: function validate() {},
+			function _change(e) {
+				var obj = {};
+				obj[attribute] = e.target.value;
+				self.setState(obj);
+			}
 
-		error: function error() {}
+			return function (element) {
+				if (element == null && lastElement) {
+					lastElement.removeEventListener('input', _change);
+					return;
+				}
+
+				element.addEventListener('input', _change);
+				lastElement = element;
+			};
+		},
+		// componentWillUpdate: function () {
+		// 	for (var key in this.refs) {
+		// 		if (!_listeners[key])
+		// 			continue ;
+		// 		this.refs[key].removeEventListener('input', _listeners[key]);
+		// 		delete _listeners[key];
+		// 	}
+		// },
+		// componentDidUpdate: function (pProps, pState) {
+		// 	for (var key in this.refs) {
+		// 		_listeners[key] = this.clean.bind(this, key);
+		// 		this.refs[key].addEventListener('input', _listeners[key]);
+		// 		if (_refsData[key]) {
+		// 			this.refs[key].value = _refsData[key];
+		// 		}
+		// 	}
+		// },
+
+		validate: function validate(attributes, constraints) {
+			var errors = Validate(attributes, constraints);
+			errors = errors ? errors : {};
+
+			this.setState({
+				validationErrors: errors
+			});
+
+			return errors;
+		},
+
+		errors: function errors(attribute) {
+			return this.state.validationErrors[attribute];
+		}
 	};
 }
 
 module.exports = ValidateFactory;
 
-},{}],202:[function(require,module,exports){
+},{"react":186}],204:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29016,7 +29156,7 @@ var PostsStore = function (_FluxStore) {
 
 module.exports = new PostsStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],203:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],205:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29084,7 +29224,7 @@ var SharingPostStore = function (_FluxStore) {
 
 module.exports = new SharingPostStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],204:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],206:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29158,4 +29298,17 @@ var UserStore = function (_FluxStore) {
 
 module.exports = new UserStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}]},{},[189]);
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],207:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+    url: {
+        presence: true,
+        url: true
+    },
+    text: {
+        presence: true
+    }
+};
+
+},{}]},{},[189]);

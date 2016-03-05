@@ -37,7 +37,7 @@ var App = React.createClass({
         calculateState: function (prevState) {
             return {
                 posts: PostsStore.getAll(),
-                sharingPostScreenDisplayed: 1,
+                sharingPostScreenDisplayed: SharingPostStore.whichShareStep(),
                 sharingData: SharingPostStore.getShareData(),
                 loggedUser: UserStore.getLoggedUser()
             };
@@ -61,6 +61,8 @@ var App = React.createClass({
             <div id="app">
 
                 {loggedUser}
+
+                <p id="title">#skate</p>
 
                 <div id="phone">
                     <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>

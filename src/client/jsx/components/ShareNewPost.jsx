@@ -2,14 +2,33 @@ var React = require('react');
 
 var Creator = require('../actions/Creator')
     , ValidateMixin = require('../mixins/ValidateMixin')
-    , validate = require('validate.js');
+    , FluxContainerMixin = require('flux/utils').Mixin
+
+    , ErrorDisplayer = require('./common/ErrorDisplayer.jsx')
+    , Input = require('./common/Input.jsx')
+
+    , Validator = require('validate.js')
+
+    , UserStore = require('../stores/UserStore');
 
 
+var PostSchema = require('../../../shared/schemas/PostSchema');
+// <ErrorDisplayer errors={this.errors('url')}>
+//     <input ref="url" autoFocus placeholder="URL of the post you want to locate" type="text" defaultValue={this.state.validationData.url}/>
+// </ErrorDisplayer>
 var ShareNewPost = React.createClass({
-    mixins: [ValidateMixin(validate)],
+    mixins: [ValidateMixin(Validator), FluxContainerMixin([UserStore])],
+    statics: {
+        calculateState: function (prevState) {
+            return {
+                loggedUser: UserStore.getLoggedUser()
+            };
+        }
+    },
 
     goToStep2() {
-        Creator.goToSharePostStep2(this.refs.url.value, this.refs.text.value);
+        if (Object.keys(this.validate({url: this.state.url, text: this.state.text}, PostSchema)).length == 0)
+            Creator.goToSharePostStep2(this.state.url, this.state.text);
     },
 
     render() {
@@ -18,10 +37,15 @@ var ShareNewPost = React.createClass({
                 <button className="cancel" onClick={Creator.cancelSharePost.bind(Creator)}>Cancel</button>
                 <div className="user-info">
                     <div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
-                    <p className="username">yachaka</p>
+                    <p className="username">{this.state.loggedUser.username}</p>
                 </div>
-                <input ref="url" autoFocus placeholder="URL of the post you want to locate" type="text"/>
-                <textarea ref="text" placeholder="What's fun in this post ?"></textarea>
+                <ErrorDisplayer errors={this.errors('url')}>
+                    <input ref={this.registerFor('url')} autoFocus placeholder="URL of the post you want to locate" type="text"/>
+                </ErrorDisplayer>
+                
+                <ErrorDisplayer errors={this.errors('text')}>
+                    <textarea ref={this.registerFor('text')} placeholder="What's fun in this post ?"></textarea>
+                </ErrorDisplayer>
 
                 <button onClick={this.goToStep2} className="next">Next</button>
             </div>

@@ -143,7 +143,7 @@ express.post('/posts', needUserCreationMiddleware, function (req, res) {
 		.catch(function (err) {
 			console.log(err.stack);
 			res.json({
-				error: err
+				errors: err.data
 			});
 		});
 });

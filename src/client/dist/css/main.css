@@ -7,14 +7,14 @@ html {box-sizing: border-box;}
 a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
 /** END RESET **/
 
-body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial;}
+body {width: 900px; margin: auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial;}
 
-#app {margin:auto; margin-top: 200px; width: 500px; overflow: hidden; position: relative;}
+#app {margin:auto; margin-top: 150px; width: 500px; position: relative; overflow-y: hidden; overflow-x: visible;}
 
 /*********
 * Logged User
 *****/
-#app #loggedUser { overflow: hidden; margin-bottom: 10px;}
+#app #loggedUser { overflow: hidden; margin-bottom: 5px;}
 	#app #loggedUser .avatar { float:left; margin-right: 20px;}
 		#app #loggedUser .avatar img { width: 48px; height: 48px; border-radius: 24px;}
 	#app #loggedUser .username { padding-top: 7px; font-size: 15px; float: left; margin-right: 20px;}
@@ -23,6 +23,10 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 	#app #loggedUser .actions {}
 		#app #loggedUser .actions a { height: 48px; line-height: 48px; padding: 0 20px; display: inline-block; color: #3b5998; text-decoration: none;}
 			#app #loggedUser .actions a:hover {text-decoration: underline;}
+/*********
+* Title
+*****/
+#app #title { font-size: 42px; margin-bottom: 10px; color: #DCDDDE;}
 
 /*******
 * Top bar
@@ -50,7 +54,7 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 * FEED
 **/
 #app #feed {height: 800px; padding: 15px 10px 10px; position: relative; overflow: auto;}
-	#app #feed #blackOverlay { background-color: black; opacity: 0; position: fixed; width: 499px; height: 800px; margin: -15px 0 0 -10px; transition: opacity 500ms ease-out; pointer-events: none;}
+	#app #feed #blackOverlay { backdrop-filter: blur(100px);background-color: black; opacity: 0; position: fixed; width: 499px; height: 800px; margin: -15px 0 0 -10px; transition: opacity 500ms ease-out; pointer-events: none;}
 		#app #feed #blackOverlay.active { opacity: 0.1; display: block; pointer-events: auto;}
 
 .post { width: 70%; margin-left: 3%; margin-bottom: 20px;}
@@ -119,8 +123,12 @@ body {width: 1200px; margin: auto; font-size: 14px; font-family: "Helvetica Neue
 			#enterDescriptionScreen .user-info .avatar img { border-radius: 16px; width: 32px; height: 32px;}
 		#enterDescriptionScreen .user-info .username { color: #777; line-height: 32px; font-size: 16px;}
 
-	#enterDescriptionScreen input { height: 42px; width: 100%; font-size: 16px; padding: 20px; border: 1px solid #ddd; border-left: none; border-right: none;}
-	#enterDescriptionScreen textarea {resize: none; width: 100%; font-size: 16px; padding: 20px; display: block; border: none; height: 160px;}
+	#enterDescriptionScreen input { height: 42px; width: 100%; font-size: 16px; padding: 0 20px; border: 1px solid #ddd; border-left: none; border-right: none; outline: none;}
+		#enterDescriptionScreen input:focus { border-color: #49ACF2;}
+		#enterDescriptionScreen .error input:focus { border-color: red; outline-color: red;}
+	#enterDescriptionScreen textarea {resize: none; width: 100%; font-size: 16px; padding: 20px; display: block; border: none; height: 160px; outline: none;}
+		#enterDescriptionScreen textarea:focus { border-bottom: 1px solid #49ACF2;}
+		#enterDescriptionScreen .error textarea:focus { border-bottom-color: red;}
 
 	#enterDescriptionScreen .next {
 		height: 35px; width: 80%; margin: auto; display: block; margin-top: 24px;
@@ -164,6 +172,27 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', e
 		#locateScreen.screen-appear.screen-appear-active, #locateScreen.screen-enter.screen-enter-active {left: 0; transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
 	#locateScreen.screen-leave {opacity: 1;}
 		#locateScreen.screen-leave-active { animation: screenDisappear 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+/**
+** ERRORS
+**
+**/
+.error { position: relative;}
+	.error .error-message { position: absolute; padding: 10px 6px; left: 100%;	top: 10px; margin-left: 15px; color: #E82A49; width: 200px; border-radius: 4px;}
+	.error .error-message:after {
+	right: 100%;
+	top: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-color: rgba(232, 42, 73, 0);
+	border-right-color: #E82A49;
+	border-width: 5px;
+	margin-top: -5px;
+}
+
 /**
 ** MISCELLANOUS
 **
