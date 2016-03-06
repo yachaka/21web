@@ -11,7 +11,7 @@ var _dispatch = function (ActionType, argumentsKeys) {
             type: ActionType
         };
 
-        if (argumentsKeys && argumentsKeys.length != arguments.length) {
+        if (argumentsKeys && argumentsKeys.length > arguments.length) {
             console.error('Arguments required:', argumentsKeys);
             console.error('Arguments provided:', arguments);
             throw new Error('Arguments mismatch required arguments in a call to Creator. See console debug');

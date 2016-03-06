@@ -28349,7 +28349,8 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx'),
     AnonymousUser = require('./components/AnonymousUser.jsx'),
     RegisteredUser = require('./components/RegisteredUser.jsx'),
     GpsScreen = require('./components/GpsScreen.jsx'),
-    FeedScreen = require('./components/FeedScreen.jsx');
+    FeedScreen = require('./components/FeedScreen.jsx'),
+    LoginRegisterScreen = require('./components/LoginRegisterScreen.jsx');
 
 var Dispatcher = require('./Dispatcher'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -28386,38 +28387,20 @@ var App = React.createClass({
 
     componentDidMount: function componentDidMount() {
         Creator.fetchPosts();
-
-        navigator.geolocation.getCurrentPosition(function (newLocation) {
-            Creator.setLocation(newLocation);
-            Creator.goToScreen(k.Screens.FEED);
-        }, function (error) {
-            var newLocation = null;
-            switch (error.code) {
-                case error.TIMEOUT:
-                    newLocation = k.LocationState.TIMEOUT;
-                    break;
-                case error.PERMISSION_DENIED:
-                    newLocation = k.LocationState.DENIED;
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    newLocation = k.LocationState.UNAVAILABLE;
-                    break;
-                default:
-                    newLocation = k.LocationState.UNKNOWN_ERROR;
-                    break;
-            }
-            Creator.setLocation(newLocation);
-        });
     },
     render: function render() {
         var loggedUser = this.state.loggedUser.newUser ? React.createElement(AnonymousUser, { user: this.state.loggedUser }) : React.createElement(RegisteredUser, { user: this.state.loggedUser });
         var screen;
         switch (this.state.screen) {
+            case k.Screens.LOGIN_REGISTER:
+                screen = React.createElement(LoginRegisterScreen, null);
+                break;
             case k.Screens.GPS:
                 screen = React.createElement(GpsScreen, null);
                 break;
             case k.Screens.FEED:
                 screen = React.createElement(FeedScreen, null);
+                break;
         }
 
         return React.createElement(
@@ -28451,7 +28434,7 @@ var App = React.createClass({
                     </div>*/
 window.App = App;
 
-},{"./Dispatcher":190,"./actions":192,"./actions/Creator":191,"./components/AnonymousUser.jsx":193,"./components/FeedScreen.jsx":195,"./components/GpsScreen.jsx":196,"./components/PostActionsCircle.jsx":199,"./components/RegisteredUser.jsx":200,"./k":205,"./stores/AppStateStore":207,"./stores/PostsStore":208,"./stores/SharingPostStore":209,"./stores/UserStore":210,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],190:[function(require,module,exports){
+},{"./Dispatcher":190,"./actions":192,"./actions/Creator":191,"./components/AnonymousUser.jsx":193,"./components/FeedScreen.jsx":195,"./components/GpsScreen.jsx":196,"./components/LoginRegisterScreen.jsx":198,"./components/PostActionsCircle.jsx":200,"./components/RegisteredUser.jsx":201,"./k":206,"./stores/AppStateStore":208,"./stores/PostsStore":209,"./stores/SharingPostStore":210,"./stores/UserStore":211,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],190:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -28471,7 +28454,7 @@ var _dispatch = function _dispatch(ActionType, argumentsKeys) {
             type: ActionType
         };
 
-        if (argumentsKeys && argumentsKeys.length != arguments.length) {
+        if (argumentsKeys && argumentsKeys.length > arguments.length) {
             console.error('Arguments required:', argumentsKeys);
             console.error('Arguments provided:', arguments);
             throw new Error('Arguments mismatch required arguments in a call to Creator. See console debug');
@@ -28654,7 +28637,7 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":190,"../actions":192,"../stores/PostsStore":208,"./Post.jsx":198,"flux/utils":48,"react":186,"react-dom":52}],195:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"../stores/PostsStore":209,"./Post.jsx":199,"flux/utils":48,"react":186,"react-dom":52}],195:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -28706,11 +28689,12 @@ var FeedScreen = React.createClass({
 
 module.exports = FeedScreen;
 
-},{"../actions":192,"../actions/Creator":191,"../stores/SharingPostStore":209,"./Feed.jsx":194,"./LocationChooser.jsx":197,"./ShareNewPost.jsx":201,"flux/utils":48,"react":186,"react-addons-css-transition-group":51}],196:[function(require,module,exports){
+},{"../actions":192,"../actions/Creator":191,"../stores/SharingPostStore":210,"./Feed.jsx":194,"./LocationChooser.jsx":197,"./ShareNewPost.jsx":202,"flux/utils":48,"react":186,"react-addons-css-transition-group":51}],196:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
     FluxContainerMixin = require('flux/utils').Mixin,
+    Creator = require('../actions/Creator'),
     AppStateStore = require('../stores/AppStateStore'),
     k = require('../k');
 
@@ -28724,6 +28708,30 @@ var GpsScreen = React.createClass({
                 location: AppStateStore.location
             };
         }
+    },
+
+    componentDidMount: function componentDidMount() {
+        navigator.geolocation.getCurrentPosition(function (newLocation) {
+            Creator.setLocation(newLocation);
+            Creator.goToScreen(k.Screens.FEED);
+        }, function (error) {
+            var newLocation = null;
+            switch (error.code) {
+                case error.TIMEOUT:
+                    newLocation = k.LocationState.TIMEOUT;
+                    break;
+                case error.PERMISSION_DENIED:
+                    newLocation = k.LocationState.DENIED;
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    newLocation = k.LocationState.UNAVAILABLE;
+                    break;
+                default:
+                    newLocation = k.LocationState.UNKNOWN_ERROR;
+                    break;
+            }
+            Creator.setLocation(newLocation);
+        });
     },
     render: function render() {
         var msg = null;
@@ -28752,7 +28760,7 @@ var GpsScreen = React.createClass({
 
         return React.createElement(
             'div',
-            { id: 'gpsScreen', className: 'screen' },
+            { id: 'gpsScreen', className: 'screen grey' },
             msg
         );
     }
@@ -28760,7 +28768,7 @@ var GpsScreen = React.createClass({
 
 module.exports = GpsScreen;
 
-},{"../k":205,"../stores/AppStateStore":207,"flux/utils":48,"react":186}],197:[function(require,module,exports){
+},{"../actions/Creator":191,"../k":206,"../stores/AppStateStore":208,"flux/utils":48,"react":186}],197:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -28893,7 +28901,56 @@ var LocationChooser = React.createClass({
 
 module.exports = LocationChooser;
 
-},{"../actions/Creator":191,"../stores/AppStateStore":207,"../stores/UserStore":210,"flux/utils":48,"google-maps":49,"react":186}],198:[function(require,module,exports){
+},{"../actions/Creator":191,"../stores/AppStateStore":208,"../stores/UserStore":211,"flux/utils":48,"google-maps":49,"react":186}],198:[function(require,module,exports){
+'use strict';
+
+var React = require('react'),
+    Creator = require('../actions/Creator'),
+    k = require('../k');
+
+var LoginRegisterScreen = React.createClass({
+    displayName: 'LoginRegisterScreen',
+    render: function render() {
+        return React.createElement(
+            'div',
+            { id: 'loginRegisterScreen', className: 'screen grey' },
+            React.createElement(
+                'p',
+                { className: 'title' },
+                'Welcome on',
+                React.createElement('br', null),
+                React.createElement('img', { src: '/img/locate.png', height: '62' })
+            ),
+            React.createElement(
+                'p',
+                { className: 'action' },
+                React.createElement(
+                    'a',
+                    { href: '#', onClick: Creator.goToScreen.bind(Creator, k.Screens.GPS) },
+                    'Go anonymous'
+                )
+            ),
+            React.createElement(
+                'p',
+                { className: 'or' },
+                'or'
+            ),
+            React.createElement(
+                'p',
+                { className: 'action' },
+                React.createElement(
+                    'a',
+                    { href: '#' },
+                    'Log in'
+                )
+            )
+        );
+    }
+});
+
+module.exports = LoginRegisterScreen;
+
+},{"../actions/Creator":191,"../k":206,"react":186}],199:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28967,7 +29024,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":204,"../stores/UserStore":210,"classnames":3,"flux/utils":48,"react":186}],199:[function(require,module,exports){
+},{"../helpers/PostTextParser":205,"../stores/UserStore":211,"classnames":3,"flux/utils":48,"react":186}],200:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28988,7 +29045,7 @@ var PostActionsCircle = React.createClass({
 
 module.exports = PostActionsCircle;
 
-},{"react":186}],200:[function(require,module,exports){
+},{"react":186}],201:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29030,7 +29087,7 @@ var RegisteredUser = React.createClass({
 
 module.exports = RegisteredUser;
 
-},{"react":186}],201:[function(require,module,exports){
+},{"react":186}],202:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29106,7 +29163,7 @@ var ShareNewPost = React.createClass({
 
 module.exports = ShareNewPost;
 
-},{"../../../shared/schemas/PostSchema":211,"../actions/Creator":191,"../mixins/ValidateMixin":206,"../stores/UserStore":210,"./common/ErrorDisplayer.jsx":202,"./common/Input.jsx":203,"flux/utils":48,"react":186,"validate.js":188}],202:[function(require,module,exports){
+},{"../../../shared/schemas/PostSchema":212,"../actions/Creator":191,"../mixins/ValidateMixin":207,"../stores/UserStore":211,"./common/ErrorDisplayer.jsx":203,"./common/Input.jsx":204,"flux/utils":48,"react":186,"validate.js":188}],203:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29134,7 +29191,7 @@ var ErrorDisplayer = React.createClass({
 
 module.exports = ErrorDisplayer;
 
-},{"react":186}],203:[function(require,module,exports){
+},{"react":186}],204:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29159,7 +29216,7 @@ var Input = React.createClass({
 
 module.exports = Input;
 
-},{"./ErrorDisplayer.jsx":202,"react":186}],204:[function(require,module,exports){
+},{"./ErrorDisplayer.jsx":203,"react":186}],205:[function(require,module,exports){
 'use strict';
 
 module.exports = function (text) {
@@ -29172,24 +29229,25 @@ module.exports = function (text) {
 	return text;
 };
 
-},{}],205:[function(require,module,exports){
-"use strict";
+},{}],206:[function(require,module,exports){
+'use strict';
 
 module.exports = {
 	Screens: {
-		GPS: 1,
-		FEED: 2
+		LOGIN_REGISTER: 'login_register',
+		GPS: 'gps',
+		FEED: 'feed'
 	},
 	LocationState: {
 		PENDING: 1,
-		TIMEOUT: 3,
-		DENIED: 2,
+		TIMEOUT: 2,
+		DENIED: 3,
 		UNAVAILABLE: 4,
 		UNKNOWN_ERROR: 5
 	}
 };
 
-},{}],206:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29268,7 +29326,7 @@ function ValidateFactory(Validate) {
 
 module.exports = ValidateFactory;
 
-},{"react":186}],207:[function(require,module,exports){
+},{"react":186}],208:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29292,7 +29350,7 @@ var AppStateStore = function (_FluxStore) {
 
 		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AppStateStore).call(this, Dispatcher));
 
-		_this.screen = k.Screens.GPS;
+		_this.screen = k.Screens.LOGIN_REGISTER;
 		_this.location = k.LocationState.PENDING;
 		return _this;
 	}
@@ -29324,7 +29382,7 @@ var AppStateStore = function (_FluxStore) {
 
 module.exports = new AppStateStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"../k":205,"flux/utils":48}],208:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"../k":206,"flux/utils":48}],209:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29384,7 +29442,7 @@ var PostsStore = function (_FluxStore) {
 
 module.exports = new PostsStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],209:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],210:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29452,7 +29510,7 @@ var SharingPostStore = function (_FluxStore) {
 
 module.exports = new SharingPostStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],210:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],211:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29526,7 +29584,7 @@ var UserStore = function (_FluxStore) {
 
 module.exports = new UserStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],211:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],212:[function(require,module,exports){
 "use strict";
 
 module.exports = {

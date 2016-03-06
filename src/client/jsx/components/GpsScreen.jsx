@@ -2,6 +2,8 @@
 var React = require('react')
     , FluxContainerMixin = require('flux/utils').Mixin
 
+	, Creator = require('../actions/Creator')
+	
     , AppStateStore = require('../stores/AppStateStore')
     , k = require('../k');
 
@@ -14,6 +16,31 @@ var GpsScreen = React.createClass({
             };
         }
     },
+
+    componentDidMount() {
+        navigator.geolocation.getCurrentPosition(function (newLocation) {
+            Creator.setLocation(newLocation);
+            Creator.goToScreen(k.Screens.FEED);
+        }, function (error) {
+            var newLocation = null;
+            switch(error.code) {
+                case error.TIMEOUT:
+                    newLocation = k.LocationState.TIMEOUT;
+                    break;
+                case error.PERMISSION_DENIED:
+                    newLocation = k.LocationState.DENIED;
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    newLocation = k.LocationState.UNAVAILABLE;
+                    break;
+                default:
+                    newLocation = k.LocationState.UNKNOWN_ERROR;
+                    break;
+            }
+            Creator.setLocation(newLocation);
+        });  
+    },
+
     render() {
     	var msg = null;
 
@@ -40,7 +67,7 @@ var GpsScreen = React.createClass({
     	}
 
         return (
-            <div id="gpsScreen" className="screen">
+            <div id="gpsScreen" className="screen grey">
             	{msg}
 
             </div>

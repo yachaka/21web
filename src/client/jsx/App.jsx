@@ -8,7 +8,8 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx')
     , AnonymousUser = require('./components/AnonymousUser.jsx')
     , RegisteredUser = require('./components/RegisteredUser.jsx')
     , GpsScreen = require('./components/GpsScreen.jsx')
-	, FeedScreen = require('./components/FeedScreen.jsx');
+    , FeedScreen = require('./components/FeedScreen.jsx')
+	, LoginRegisterScreen = require('./components/LoginRegisterScreen.jsx');
 
 var Dispatcher = require('./Dispatcher')
     , FluxContainerMixin = require('flux/utils').Mixin
@@ -45,39 +46,21 @@ var App = React.createClass({
 
     componentDidMount() {
         Creator.fetchPosts();
-
-        navigator.geolocation.getCurrentPosition(function (newLocation) {
-            Creator.setLocation(newLocation);
-            Creator.goToScreen(k.Screens.FEED);
-        }, function (error) {
-            var newLocation = null;
-            switch(error.code) {
-                case error.TIMEOUT:
-                    newLocation = k.LocationState.TIMEOUT;
-                    break;
-                case error.PERMISSION_DENIED:
-                    newLocation = k.LocationState.DENIED;
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    newLocation = k.LocationState.UNAVAILABLE;
-                    break;
-                default:
-                    newLocation = k.LocationState.UNKNOWN_ERROR;
-                    break;
-            }
-            Creator.setLocation(newLocation);
-        });
     },
 
     render() {
         var loggedUser = this.state.loggedUser.newUser ? <AnonymousUser user={this.state.loggedUser}/> : <RegisteredUser user={this.state.loggedUser}/>;
         var screen;
         switch (this.state.screen) {
+            case k.Screens.LOGIN_REGISTER:
+                screen = <LoginRegisterScreen/>;
+                break;
             case k.Screens.GPS:
                 screen = <GpsScreen/>;
-                break
+                break;
             case k.Screens.FEED:
                 screen = <FeedScreen/>;
+                break;
         }
 
         return (
