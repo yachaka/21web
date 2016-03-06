@@ -33,7 +33,7 @@ var ShareNewPost = React.createClass({
 
     render() {
         return (
-            <div id="enterDescriptionScreen" className="screen">
+            <div id="enterDescriptionModal" className="modal fullwidth-modal white">
                 <button className="cancel" onClick={Creator.cancelSharePost.bind(Creator)}>Cancel</button>
                 <div className="user-info">
                     <div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>

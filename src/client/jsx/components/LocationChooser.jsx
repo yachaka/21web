@@ -4,14 +4,16 @@ var React = require('react')
 
 var Creator = require('../actions/Creator')
 	, FluxContainerMixin = require('flux/utils').Mixin
-	, UserStore = require('../stores/UserStore');
+	, UserStore = require('../stores/UserStore')
+	, AppStateStore = require('../stores/AppStateStore');
 
 var LocationChooser = React.createClass({
-    mixins: [FluxContainerMixin([UserStore])],
+    mixins: [FluxContainerMixin([UserStore, AppStateStore])],
     statics: {
         calculateState: function (prevState) {
             return {
-                loggedUser: UserStore.getLoggedUser()
+                loggedUser: UserStore.getLoggedUser(),
+                location: AppStateStore.location
             };
         }
     },
@@ -19,8 +21,12 @@ var LocationChooser = React.createClass({
     componentDidMount() {
     	GoogleMapsLoader.LIBRAIRIES = ['geometry'];
 	    GoogleMapsLoader.load(function(google) {
+	    	var center = {
+	    		lat: this.state.location.coords.latitude,
+	    		lng: this.state.location.coords.longitude
+	    	};
 			var map = this.map = new google.maps.Map(this.refs.map, {
-				center: {lat: -33.8950781, lng: 151.2159195},
+				center: center,
 				zoom: 14,
 				mapTypeControl: false,
 				styles: [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}]
@@ -33,7 +39,7 @@ var LocationChooser = React.createClass({
 		      fillColor: '#FF0000',
 		      fillOpacity: 0.35,
 		      map: map,
-		      center: {lat: -33.8950781, lng: 151.2159195},
+		      center: center,
 		      radius: 5500
 		    });
 		    var allowedBounds = circle.getBounds();
@@ -53,7 +59,7 @@ var LocationChooser = React.createClass({
 			// });
 
 			map.addListener('center_changed', function () {
-				if (google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(-33.8950781, 151.2159195), map.getCenter()) <= 5500) {
+				if (google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(center.lat, center.lng), map.getCenter()) <= 5500) {
 			        lastValidCenter = map.getCenter();
 			        return false; 
 			    }
@@ -78,7 +84,7 @@ var LocationChooser = React.createClass({
 
     render() {
         return (
-            <div id="locateScreen" className="screen fullscreen">
+            <div id="locateModal" className="modal fullheight-modal fullwidth-modal">
             	<div id="userPostInfos">
 		            <button className="cancel" onClick={Creator.cancelSharePost.bind(Creator)}>Cancel</button>
             		<div className="user">

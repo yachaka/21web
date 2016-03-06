@@ -4,12 +4,11 @@ var reqwest = require('reqwest');
 var React = require('react')
 	, ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
-var Feed = require('./components/Feed.jsx')
-	, PostActionsCircle = require('./components/PostActionsCircle.jsx')
-    , ShareNewPost = require('./components/ShareNewPost.jsx')
-    , LocationChooser = require('./components/LocationChooser.jsx')
+var PostActionsCircle = require('./components/PostActionsCircle.jsx')
     , AnonymousUser = require('./components/AnonymousUser.jsx')
-	, RegisteredUser = require('./components/RegisteredUser.jsx');
+    , RegisteredUser = require('./components/RegisteredUser.jsx')
+    , GpsScreen = require('./components/GpsScreen.jsx')
+	, FeedScreen = require('./components/FeedScreen.jsx');
 
 var Dispatcher = require('./Dispatcher')
     , FluxContainerMixin = require('flux/utils').Mixin
@@ -19,7 +18,9 @@ var Dispatcher = require('./Dispatcher')
 
     , PostsStore = require('./stores/PostsStore')
     , SharingPostStore = require('./stores/SharingPostStore')
-    , UserStore = require('./stores/UserStore');
+    , UserStore = require('./stores/UserStore')
+    , AppStateStore = require('./stores/AppStateStore')
+    , k = require('./k');
 /*
 <div id="enterDescriptionScreen" className="screen">
                             <div className="user-info">
@@ -32,13 +33,11 @@ var Dispatcher = require('./Dispatcher')
                         </div>
                         */
 var App = React.createClass({
-    mixins: [FluxContainerMixin([PostsStore, SharingPostStore, UserStore])],
+    mixins: [FluxContainerMixin([UserStore, AppStateStore])],
     statics: {
         calculateState: function (prevState) {
             return {
-                posts: PostsStore.getAll(),
-                sharingPostScreenDisplayed: SharingPostStore.whichShareStep(),
-                sharingData: SharingPostStore.getShareData(),
+                screen: AppStateStore.whichScreen(),
                 loggedUser: UserStore.getLoggedUser()
             };
         }
@@ -46,41 +45,69 @@ var App = React.createClass({
 
     componentDidMount() {
         Creator.fetchPosts();
+
+        navigator.geolocation.getCurrentPosition(function (newLocation) {
+            Creator.setLocation(newLocation);
+            Creator.goToScreen(k.Screens.FEED);
+        }, function (error) {
+            var newLocation = null;
+            switch(error.code) {
+                case error.TIMEOUT:
+                    newLocation = k.LocationState.TIMEOUT;
+                    break;
+                case error.PERMISSION_DENIED:
+                    newLocation = k.LocationState.DENIED;
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    newLocation = k.LocationState.UNAVAILABLE;
+                    break;
+                default:
+                    newLocation = k.LocationState.UNKNOWN_ERROR;
+                    break;
+            }
+            Creator.setLocation(newLocation);
+        });
     },
 
     render() {
-        var sharingPostScreenDisplayed = null;
-        if (this.state.sharingPostScreenDisplayed == 1)
-            sharingPostScreenDisplayed = <ShareNewPost key="step1"/>;
-        else if (this.state.sharingPostScreenDisplayed == 2)
-            sharingPostScreenDisplayed = <LocationChooser postData={this.state.sharingData} key="step2"/>;
-
         var loggedUser = this.state.loggedUser.newUser ? <AnonymousUser user={this.state.loggedUser}/> : <RegisteredUser user={this.state.loggedUser}/>;
+        var screen;
+        switch (this.state.screen) {
+            case k.Screens.GPS:
+                screen = <GpsScreen/>;
+                break
+            case k.Screens.FEED:
+                screen = <FeedScreen/>;
+        }
 
         return (
             <div id="app">
 
                 {loggedUser}
 
-                <p id="title">#skate</p>
+                <p id="appTheme">#skate</p>
 
-                <div id="phone">
-                    <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
-                        {sharingPostScreenDisplayed}
-                    </ReactCSSTransitionGroup>
+                <ReactCSSTransitionGroup id="screenWrapper" component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
+
+                    {screen}
+
                     
-                    <div id="top"></div>
+                </ReactCSSTransitionGroup>
 
-                    <div id="main">
-
-        				<Feed userSharingNewPost={this.state.sharingPostScreenDisplayed > 0}/>
-
-                        <button className="startShare" onClick={Creator.goToSharePostStep1.bind(Creator)}>Share a post</button>
-                    </div>
-                </div>
 			</div>
 		);
     }
 });
+/*<div id="feedScreen" className="screen">
+                        <div id="top"></div>
 
+                        <div id="blackOverlay" className={this.state.modalDisplayed > 0 ? 'active' : null}></div>
+                        <Feed userSharingNewPost={this.state.modalDisplayed > 0}/>
+
+                        <button className="startShare" onClick={Creator.goToSharePostStep1.bind(Creator)}>Share a post</button>
+
+                        <ReactCSSTransitionGroup id="modalWrapper" component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
+                            {modalDisplayed}
+                        </ReactCSSTransitionGroup>
+                    </div>*/
 window.App = App;

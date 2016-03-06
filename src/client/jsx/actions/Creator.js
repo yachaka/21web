@@ -4,11 +4,24 @@ var reqwest = require('reqwest');
 var Dispatcher = require('../Dispatcher')
 	, ActionsType = require('./');
 
-var _dispatch = function (ActionType) {
+var _dispatch = function (ActionType, argumentsKeys) {
+
     return function () {
-        Dispatcher.dispatch({
+        var payload = {
             type: ActionType
-        });
+        };
+
+        if (argumentsKeys && argumentsKeys.length != arguments.length) {
+            console.error('Arguments required:', argumentsKeys);
+            console.error('Arguments provided:', arguments);
+            throw new Error('Arguments mismatch required arguments in a call to Creator. See console debug');
+        }
+        if (argumentsKeys) {
+            for (var i = 0; i < argumentsKeys.length; i++) {
+                payload[argumentsKeys[i]] = arguments[i];
+            }
+        }
+        Dispatcher.dispatch(payload);
     }
 };
 
@@ -86,6 +99,10 @@ module.exports = {
         }, function (err, msg) {
             console.error(err, msg);
         });
-	}
+	},
+
+    setLocation: _dispatch(ActionsType.SET_LOCATION, ['newLocation']),
+
+    goToScreen: _dispatch(ActionsType.GO_TO_SCREEN, ['screen'])
 
 };

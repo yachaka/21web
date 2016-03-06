@@ -28345,12 +28345,11 @@ var reqwest = require('reqwest');
 var React = require('react'),
     ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
-var Feed = require('./components/Feed.jsx'),
-    PostActionsCircle = require('./components/PostActionsCircle.jsx'),
-    ShareNewPost = require('./components/ShareNewPost.jsx'),
-    LocationChooser = require('./components/LocationChooser.jsx'),
+var PostActionsCircle = require('./components/PostActionsCircle.jsx'),
     AnonymousUser = require('./components/AnonymousUser.jsx'),
-    RegisteredUser = require('./components/RegisteredUser.jsx');
+    RegisteredUser = require('./components/RegisteredUser.jsx'),
+    GpsScreen = require('./components/GpsScreen.jsx'),
+    FeedScreen = require('./components/FeedScreen.jsx');
 
 var Dispatcher = require('./Dispatcher'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -28358,7 +28357,9 @@ var Dispatcher = require('./Dispatcher'),
     Creator = require('./actions/Creator'),
     PostsStore = require('./stores/PostsStore'),
     SharingPostStore = require('./stores/SharingPostStore'),
-    UserStore = require('./stores/UserStore');
+    UserStore = require('./stores/UserStore'),
+    AppStateStore = require('./stores/AppStateStore'),
+    k = require('./k');
 /*
 <div id="enterDescriptionScreen" className="screen">
                             <div className="user-info">
@@ -28373,13 +28374,11 @@ var Dispatcher = require('./Dispatcher'),
 var App = React.createClass({
     displayName: 'App',
 
-    mixins: [FluxContainerMixin([PostsStore, SharingPostStore, UserStore])],
+    mixins: [FluxContainerMixin([UserStore, AppStateStore])],
     statics: {
         calculateState: function calculateState(prevState) {
             return {
-                posts: PostsStore.getAll(),
-                sharingPostScreenDisplayed: SharingPostStore.whichShareStep(),
-                sharingData: SharingPostStore.getShareData(),
+                screen: AppStateStore.whichScreen(),
                 loggedUser: UserStore.getLoggedUser()
             };
         }
@@ -28387,12 +28386,39 @@ var App = React.createClass({
 
     componentDidMount: function componentDidMount() {
         Creator.fetchPosts();
+
+        navigator.geolocation.getCurrentPosition(function (newLocation) {
+            Creator.setLocation(newLocation);
+            Creator.goToScreen(k.Screens.FEED);
+        }, function (error) {
+            var newLocation = null;
+            switch (error.code) {
+                case error.TIMEOUT:
+                    newLocation = k.LocationState.TIMEOUT;
+                    break;
+                case error.PERMISSION_DENIED:
+                    newLocation = k.LocationState.DENIED;
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    newLocation = k.LocationState.UNAVAILABLE;
+                    break;
+                default:
+                    newLocation = k.LocationState.UNKNOWN_ERROR;
+                    break;
+            }
+            Creator.setLocation(newLocation);
+        });
     },
     render: function render() {
-        var sharingPostScreenDisplayed = null;
-        if (this.state.sharingPostScreenDisplayed == 1) sharingPostScreenDisplayed = React.createElement(ShareNewPost, { key: 'step1' });else if (this.state.sharingPostScreenDisplayed == 2) sharingPostScreenDisplayed = React.createElement(LocationChooser, { postData: this.state.sharingData, key: 'step2' });
-
         var loggedUser = this.state.loggedUser.newUser ? React.createElement(AnonymousUser, { user: this.state.loggedUser }) : React.createElement(RegisteredUser, { user: this.state.loggedUser });
+        var screen;
+        switch (this.state.screen) {
+            case k.Screens.GPS:
+                screen = React.createElement(GpsScreen, null);
+                break;
+            case k.Screens.FEED:
+                screen = React.createElement(FeedScreen, null);
+        }
 
         return React.createElement(
             'div',
@@ -28400,36 +28426,32 @@ var App = React.createClass({
             loggedUser,
             React.createElement(
                 'p',
-                { id: 'title' },
+                { id: 'appTheme' },
                 '#skate'
             ),
             React.createElement(
-                'div',
-                { id: 'phone' },
-                React.createElement(
-                    ReactCSSTransitionGroup,
-                    { component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
-                    sharingPostScreenDisplayed
-                ),
-                React.createElement('div', { id: 'top' }),
-                React.createElement(
-                    'div',
-                    { id: 'main' },
-                    React.createElement(Feed, { userSharingNewPost: this.state.sharingPostScreenDisplayed > 0 }),
-                    React.createElement(
-                        'button',
-                        { className: 'startShare', onClick: Creator.goToSharePostStep1.bind(Creator) },
-                        'Share a post'
-                    )
-                )
+                ReactCSSTransitionGroup,
+                { id: 'screenWrapper', component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
+                screen
             )
         );
     }
 });
+/*<div id="feedScreen" className="screen">
+                        <div id="top"></div>
 
+                        <div id="blackOverlay" className={this.state.modalDisplayed > 0 ? 'active' : null}></div>
+                        <Feed userSharingNewPost={this.state.modalDisplayed > 0}/>
+
+                        <button className="startShare" onClick={Creator.goToSharePostStep1.bind(Creator)}>Share a post</button>
+
+                        <ReactCSSTransitionGroup id="modalWrapper" component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
+                            {modalDisplayed}
+                        </ReactCSSTransitionGroup>
+                    </div>*/
 window.App = App;
 
-},{"./Dispatcher":190,"./actions":192,"./actions/Creator":191,"./components/AnonymousUser.jsx":193,"./components/Feed.jsx":194,"./components/LocationChooser.jsx":195,"./components/PostActionsCircle.jsx":197,"./components/RegisteredUser.jsx":198,"./components/ShareNewPost.jsx":199,"./stores/PostsStore":204,"./stores/SharingPostStore":205,"./stores/UserStore":206,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],190:[function(require,module,exports){
+},{"./Dispatcher":190,"./actions":192,"./actions/Creator":191,"./components/AnonymousUser.jsx":193,"./components/FeedScreen.jsx":195,"./components/GpsScreen.jsx":196,"./components/PostActionsCircle.jsx":199,"./components/RegisteredUser.jsx":200,"./k":205,"./stores/AppStateStore":207,"./stores/PostsStore":208,"./stores/SharingPostStore":209,"./stores/UserStore":210,"flux/utils":48,"react":186,"react-addons-css-transition-group":51,"reqwest":187}],190:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -28442,11 +28464,24 @@ var reqwest = require('reqwest');
 var Dispatcher = require('../Dispatcher'),
     ActionsType = require('./');
 
-var _dispatch = function _dispatch(ActionType) {
+var _dispatch = function _dispatch(ActionType, argumentsKeys) {
+
     return function () {
-        Dispatcher.dispatch({
+        var payload = {
             type: ActionType
-        });
+        };
+
+        if (argumentsKeys && argumentsKeys.length != arguments.length) {
+            console.error('Arguments required:', argumentsKeys);
+            console.error('Arguments provided:', arguments);
+            throw new Error('Arguments mismatch required arguments in a call to Creator. See console debug');
+        }
+        if (argumentsKeys) {
+            for (var i = 0; i < argumentsKeys.length; i++) {
+                payload[argumentsKeys[i]] = arguments[i];
+            }
+        }
+        Dispatcher.dispatch(payload);
     };
 };
 
@@ -28519,7 +28554,11 @@ module.exports = {
         }, function (err, msg) {
             console.error(err, msg);
         });
-    }
+    },
+
+    setLocation: _dispatch(ActionsType.SET_LOCATION, ['newLocation']),
+
+    goToScreen: _dispatch(ActionsType.GO_TO_SCREEN, ['screen'])
 
 };
 
@@ -28527,6 +28566,8 @@ module.exports = {
 "use strict";
 
 module.exports = {
+	GO_TO_SCREEN: "GO_TO_SCREEN",
+
 	USER_LOGGED_IN: "USER_LOGGED_IN",
 
 	GO_TO_SHARE_POST_STEP_1: "GO_TO_SHARE_POST_STEP_1",
@@ -28535,7 +28576,9 @@ module.exports = {
 	CANCEL_SHARE_POST: "CANCEL_SHARE_POST",
 	PENDING_POST_APPROVED: "PENDING_POST_APPROVED",
 
-	NEW_POSTS: "NEW_POSTS"
+	NEW_POSTS: "NEW_POSTS",
+
+	SET_LOCATION: "SET_LOCATION"
 };
 
 },{}],193:[function(require,module,exports){
@@ -28594,7 +28637,8 @@ var Feed = React.createClass({
 	},
 	render: function render() {
 		// var button = this.state.postActionsCircleShown ? <PostActionsCircle coords={this.state.postActionsCircleCoords} /> : null;
-		var posts = this.state.posts.map(function (post) {
+		var posts = this.state.posts.concat(this.state.posts).concat(this.state.posts);
+		var posts = posts.map(function (post) {
 			return React.createElement(Post, { data: post });
 		}.bind(this));
 
@@ -28603,7 +28647,6 @@ var Feed = React.createClass({
 		return React.createElement(
 			'div',
 			{ id: 'feed' },
-			React.createElement('div', { id: 'blackOverlay', className: overlayActive }),
 			posts
 		);
 	}
@@ -28611,7 +28654,113 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":190,"../actions":192,"../stores/PostsStore":204,"./Post.jsx":196,"flux/utils":48,"react":186,"react-dom":52}],195:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"../stores/PostsStore":208,"./Post.jsx":198,"flux/utils":48,"react":186,"react-dom":52}],195:[function(require,module,exports){
+'use strict';
+
+var React = require('react'),
+    ReactCSSTransitionGroup = require('react-addons-css-transition-group'),
+    FluxContainerMixin = require('flux/utils').Mixin,
+    ActionsType = require('../actions'),
+    Creator = require('../actions/Creator'),
+    SharingPostStore = require('../stores/SharingPostStore'),
+    Feed = require('./Feed.jsx'),
+    ShareNewPost = require('./ShareNewPost.jsx'),
+    LocationChooser = require('./LocationChooser.jsx');
+
+var FeedScreen = React.createClass({
+    displayName: 'FeedScreen',
+
+    mixins: [FluxContainerMixin([SharingPostStore])],
+    statics: {
+        calculateState: function calculateState(prevState) {
+            return {
+                modalDisplayed: SharingPostStore.whichShareStep(),
+                sharingData: SharingPostStore.getShareData()
+            };
+        }
+    },
+
+    render: function render() {
+        var modalDisplayed = null;
+        if (this.state.modalDisplayed == 1) modalDisplayed = React.createElement(ShareNewPost, { key: 'step1' });else if (this.state.modalDisplayed == 2) modalDisplayed = React.createElement(LocationChooser, { postData: this.state.sharingData, key: 'step2' });
+
+        return React.createElement(
+            'div',
+            { id: 'feedScreen', className: 'screen' },
+            React.createElement('div', { id: 'top' }),
+            React.createElement('div', { id: 'blackOverlay', className: this.state.modalDisplayed > 0 ? 'active' : null }),
+            React.createElement(Feed, { userSharingNewPost: this.state.modalDisplayed > 0 }),
+            React.createElement(
+                'button',
+                { className: 'startShare', onClick: Creator.goToSharePostStep1.bind(Creator) },
+                'Share a post'
+            ),
+            React.createElement(
+                ReactCSSTransitionGroup,
+                { id: 'modalWrapper', component: 'div', transitionName: 'modal', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
+                modalDisplayed
+            )
+        );
+    }
+});
+
+module.exports = FeedScreen;
+
+},{"../actions":192,"../actions/Creator":191,"../stores/SharingPostStore":209,"./Feed.jsx":194,"./LocationChooser.jsx":197,"./ShareNewPost.jsx":201,"flux/utils":48,"react":186,"react-addons-css-transition-group":51}],196:[function(require,module,exports){
+'use strict';
+
+var React = require('react'),
+    FluxContainerMixin = require('flux/utils').Mixin,
+    AppStateStore = require('../stores/AppStateStore'),
+    k = require('../k');
+
+var GpsScreen = React.createClass({
+    displayName: 'GpsScreen',
+
+    mixins: [FluxContainerMixin([AppStateStore])],
+    statics: {
+        calculateState: function calculateState(prevState) {
+            return {
+                location: AppStateStore.location
+            };
+        }
+    },
+    render: function render() {
+        var msg = null;
+
+        switch (this.state.location) {
+            case k.LocationState.PENDING:
+                msg = 'Waiting for user to accept being located...';
+                break;
+            case k.LocationState.TIMEOUT:
+                msg = 'Timed out';
+                break;
+            case k.LocationState.DENIED:
+                msg = 'User denied access to his location.';
+                break;
+            case k.LocationState.UNAVAILABLE:
+                msg = 'Position unavailable';
+                break;
+            case k.LocationState.UNKNOWN_ERROR:
+                msg = 'Unknow error';
+                break;
+            default:
+                console.log(this.state.location.coords);
+                msg = 'Seems like we got it?' + JSON.stringify(this.state.location.coords);
+                break;
+        }
+
+        return React.createElement(
+            'div',
+            { id: 'gpsScreen', className: 'screen' },
+            msg
+        );
+    }
+});
+
+module.exports = GpsScreen;
+
+},{"../k":205,"../stores/AppStateStore":207,"flux/utils":48,"react":186}],197:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -28619,16 +28768,18 @@ var React = require('react'),
 
 var Creator = require('../actions/Creator'),
     FluxContainerMixin = require('flux/utils').Mixin,
-    UserStore = require('../stores/UserStore');
+    UserStore = require('../stores/UserStore'),
+    AppStateStore = require('../stores/AppStateStore');
 
 var LocationChooser = React.createClass({
 	displayName: 'LocationChooser',
 
-	mixins: [FluxContainerMixin([UserStore])],
+	mixins: [FluxContainerMixin([UserStore, AppStateStore])],
 	statics: {
 		calculateState: function calculateState(prevState) {
 			return {
-				loggedUser: UserStore.getLoggedUser()
+				loggedUser: UserStore.getLoggedUser(),
+				location: AppStateStore.location
 			};
 		}
 	},
@@ -28636,8 +28787,12 @@ var LocationChooser = React.createClass({
 	componentDidMount: function componentDidMount() {
 		GoogleMapsLoader.LIBRAIRIES = ['geometry'];
 		GoogleMapsLoader.load(function (google) {
+			var center = {
+				lat: this.state.location.coords.latitude,
+				lng: this.state.location.coords.longitude
+			};
 			var map = this.map = new google.maps.Map(this.refs.map, {
-				center: { lat: -33.8950781, lng: 151.2159195 },
+				center: center,
 				zoom: 14,
 				mapTypeControl: false,
 				styles: [{ "featureType": "administrative", "elementType": "labels.text.fill", "stylers": [{ "color": "#444444" }] }, { "featureType": "landscape", "elementType": "all", "stylers": [{ "color": "#f2f2f2" }] }, { "featureType": "poi", "elementType": "all", "stylers": [{ "visibility": "off" }] }, { "featureType": "road", "elementType": "all", "stylers": [{ "saturation": -100 }, { "lightness": 45 }] }, { "featureType": "road.highway", "elementType": "all", "stylers": [{ "visibility": "simplified" }] }, { "featureType": "road.arterial", "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] }, { "featureType": "transit", "elementType": "all", "stylers": [{ "visibility": "off" }] }, { "featureType": "water", "elementType": "all", "stylers": [{ "color": "#46bcec" }, { "visibility": "on" }] }]
@@ -28650,7 +28805,7 @@ var LocationChooser = React.createClass({
 				fillColor: '#FF0000',
 				fillOpacity: 0.35,
 				map: map,
-				center: { lat: -33.8950781, lng: 151.2159195 },
+				center: center,
 				radius: 5500
 			});
 			var allowedBounds = circle.getBounds();
@@ -28670,7 +28825,7 @@ var LocationChooser = React.createClass({
 			// });
 
 			map.addListener('center_changed', function () {
-				if (google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(-33.8950781, 151.2159195), map.getCenter()) <= 5500) {
+				if (google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(center.lat, center.lng), map.getCenter()) <= 5500) {
 					lastValidCenter = map.getCenter();
 					return false;
 				}
@@ -28694,7 +28849,7 @@ var LocationChooser = React.createClass({
 	render: function render() {
 		return React.createElement(
 			'div',
-			{ id: 'locateScreen', className: 'screen fullscreen' },
+			{ id: 'locateModal', className: 'modal fullheight-modal fullwidth-modal' },
 			React.createElement(
 				'div',
 				{ id: 'userPostInfos' },
@@ -28738,7 +28893,7 @@ var LocationChooser = React.createClass({
 
 module.exports = LocationChooser;
 
-},{"../actions/Creator":191,"../stores/UserStore":206,"flux/utils":48,"google-maps":49,"react":186}],196:[function(require,module,exports){
+},{"../actions/Creator":191,"../stores/AppStateStore":207,"../stores/UserStore":210,"flux/utils":48,"google-maps":49,"react":186}],198:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28812,7 +28967,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":202,"../stores/UserStore":206,"classnames":3,"flux/utils":48,"react":186}],197:[function(require,module,exports){
+},{"../helpers/PostTextParser":204,"../stores/UserStore":210,"classnames":3,"flux/utils":48,"react":186}],199:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28833,7 +28988,7 @@ var PostActionsCircle = React.createClass({
 
 module.exports = PostActionsCircle;
 
-},{"react":186}],198:[function(require,module,exports){
+},{"react":186}],200:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28875,7 +29030,7 @@ var RegisteredUser = React.createClass({
 
 module.exports = RegisteredUser;
 
-},{"react":186}],199:[function(require,module,exports){
+},{"react":186}],201:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28910,7 +29065,7 @@ var ShareNewPost = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { id: 'enterDescriptionScreen', className: 'screen' },
+            { id: 'enterDescriptionModal', className: 'modal fullwidth-modal white' },
             React.createElement(
                 'button',
                 { className: 'cancel', onClick: Creator.cancelSharePost.bind(Creator) },
@@ -28951,7 +29106,7 @@ var ShareNewPost = React.createClass({
 
 module.exports = ShareNewPost;
 
-},{"../../../shared/schemas/PostSchema":207,"../actions/Creator":191,"../mixins/ValidateMixin":203,"../stores/UserStore":206,"./common/ErrorDisplayer.jsx":200,"./common/Input.jsx":201,"flux/utils":48,"react":186,"validate.js":188}],200:[function(require,module,exports){
+},{"../../../shared/schemas/PostSchema":211,"../actions/Creator":191,"../mixins/ValidateMixin":206,"../stores/UserStore":210,"./common/ErrorDisplayer.jsx":202,"./common/Input.jsx":203,"flux/utils":48,"react":186,"validate.js":188}],202:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -28979,7 +29134,7 @@ var ErrorDisplayer = React.createClass({
 
 module.exports = ErrorDisplayer;
 
-},{"react":186}],201:[function(require,module,exports){
+},{"react":186}],203:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29004,7 +29159,7 @@ var Input = React.createClass({
 
 module.exports = Input;
 
-},{"./ErrorDisplayer.jsx":200,"react":186}],202:[function(require,module,exports){
+},{"./ErrorDisplayer.jsx":202,"react":186}],204:[function(require,module,exports){
 'use strict';
 
 module.exports = function (text) {
@@ -29017,7 +29172,24 @@ module.exports = function (text) {
 	return text;
 };
 
-},{}],203:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+	Screens: {
+		GPS: 1,
+		FEED: 2
+	},
+	LocationState: {
+		PENDING: 1,
+		TIMEOUT: 3,
+		DENIED: 2,
+		UNAVAILABLE: 4,
+		UNKNOWN_ERROR: 5
+	}
+};
+
+},{}],206:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -29096,7 +29268,63 @@ function ValidateFactory(Validate) {
 
 module.exports = ValidateFactory;
 
-},{"react":186}],204:[function(require,module,exports){
+},{"react":186}],207:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Dispatcher = require('../Dispatcher'),
+    FluxStore = require('flux/utils').Store,
+    ActionsTypes = require('../actions'),
+    k = require('../k');
+
+var AppStateStore = function (_FluxStore) {
+	_inherits(AppStateStore, _FluxStore);
+
+	function AppStateStore(Dispatcher) {
+		_classCallCheck(this, AppStateStore);
+
+		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AppStateStore).call(this, Dispatcher));
+
+		_this.screen = k.Screens.GPS;
+		_this.location = k.LocationState.PENDING;
+		return _this;
+	}
+
+	_createClass(AppStateStore, [{
+		key: 'whichScreen',
+		value: function whichScreen() {
+			return this.screen;
+		}
+	}, {
+		key: '__onDispatch',
+		value: function __onDispatch(action) {
+			switch (action.type) {
+				case ActionsTypes.GO_TO_SCREEN:
+					this.screen = action.screen;
+					this.__emitChange();
+					break;
+
+				case ActionsTypes.SET_LOCATION:
+					this.location = action.newLocation;
+					this.__emitChange();
+					break;
+			}
+		}
+	}]);
+
+	return AppStateStore;
+}(FluxStore);
+
+module.exports = new AppStateStore(Dispatcher);
+
+},{"../Dispatcher":190,"../actions":192,"../k":205,"flux/utils":48}],208:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29156,7 +29384,7 @@ var PostsStore = function (_FluxStore) {
 
 module.exports = new PostsStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],205:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],209:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29224,7 +29452,7 @@ var SharingPostStore = function (_FluxStore) {
 
 module.exports = new SharingPostStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],206:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],210:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29298,7 +29526,7 @@ var UserStore = function (_FluxStore) {
 
 module.exports = new UserStore(Dispatcher);
 
-},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],207:[function(require,module,exports){
+},{"../Dispatcher":190,"../actions":192,"flux/utils":48}],211:[function(require,module,exports){
 "use strict";
 
 module.exports = {

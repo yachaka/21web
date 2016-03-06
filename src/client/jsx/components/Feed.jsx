@@ -29,7 +29,8 @@ var Feed = React.createClass({
 
 	render() {
 		// var button = this.state.postActionsCircleShown ? <PostActionsCircle coords={this.state.postActionsCircleCoords} /> : null;
-		var posts = this.state.posts.map(function (post) {
+		var posts = this.state.posts.concat(this.state.posts).concat(this.state.posts);
+		var posts = posts.map(function (post) {
 			return <Post data={post}/>;
 		}.bind(this));
 
@@ -37,7 +38,6 @@ var Feed = React.createClass({
 
 		return (
 			<div id="feed">
-				<div id="blackOverlay" className={overlayActive}></div>
 				{posts}
 			</div>
 		);

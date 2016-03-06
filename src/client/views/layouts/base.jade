@@ -8,6 +8,7 @@ html
 		block scripts
 			script.
 				var LOGGED_USER = !{JSON.stringify(user)};
+			script(type='text/javascript', src="/js/geolocation.polyfill.js")
 			script(type='text/javascript', src="/js/app.js")
 	body
 		block content

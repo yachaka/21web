@@ -2,7 +2,7 @@
    v2.0 | 20110126
    License: none (public domain)
 */
-html {box-sizing: border-box;}
+html, body {box-sizing: border-box;}
 *, *:before, *:after {box-sizing: inherit;}
 a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
 /** END RESET **/
@@ -26,7 +26,7 @@ body {width: 900px; margin: auto; font-size: 14px; font-family: "Helvetica Neue"
 /*********
 * Title
 *****/
-#app #title { font-size: 42px; margin-bottom: 10px; color: #DCDDDE;}
+#app #appTheme { font-size: 42px; margin-bottom: 10px; color: #DCDDDE;}
 
 /*******
 * Top bar
@@ -42,20 +42,20 @@ body {width: 900px; margin: auto; font-size: 14px; font-family: "Helvetica Neue"
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#86247e', endColorstr='#cc5e38',GradientType=1 ); /* IE6-9 */
 }
 
-#app #phone { position: relative; }
-#app #main { border: 1px solid #ddd; border-top: none; overflow: hidden;}
-
 /********
 * SHARE Button
 **/
-#app #main button.startShare { position: absolute; bottom: 0; left: 0;}
+#app button.startShare { position: absolute; bottom: 0; left: 0; z-index: 5;}
 
+/********
+* BLACK OVERLAY
+**/
+#app #blackOverlay { z-index:4; backdrop-filter: blur(100px);background-color: black; opacity: 0; position: absolute; top: 0; left: 0; bottom:0; right:0; transition: opacity 500ms ease-out; pointer-events: none;}
+	#app #blackOverlay.active { opacity: 0.1; display: block; pointer-events: auto;}
 /********	
 * FEED
 **/
-#app #feed {height: 800px; padding: 15px 10px 10px; position: relative; overflow: auto;}
-	#app #feed #blackOverlay { backdrop-filter: blur(100px);background-color: black; opacity: 0; position: fixed; width: 499px; height: 800px; margin: -15px 0 0 -10px; transition: opacity 500ms ease-out; pointer-events: none;}
-		#app #feed #blackOverlay.active { opacity: 0.1; display: block; pointer-events: auto;}
+#app #feed { border: 1px solid #ddd; border-top: none; position: absolute; top: 10px; bottom: 0; left:0; right:0; padding: 15px 10px 10px; overflow: auto; z-index: 1;}
 
 .post { width: 70%; margin-left: 3%; margin-bottom: 20px;}
 	.post .top {overflow: hidden; margin-bottom: 10px;}
@@ -87,9 +87,15 @@ body {width: 900px; margin: auto; font-size: 14px; font-family: "Helvetica Neue"
 
 	.post.my-post .comments, .post.my-post .location { text-align: right;}
 /********
-* SCREENS
+* SCREEN WRAPPER + SCREEN
 **/
-@keyframes screenDisappear {
+#screenWrapper {width: 500px; height: 800px; position: relative;}
+	#screenWrapper .screen { position: absolute; top:0; left:0; bottom:0; width: 100%;}
+
+/********
+* MODALS
+**/
+@keyframes modalDisappear {
 	0% {
 		transform: scale(1);
 		opacity: 1;
@@ -105,53 +111,53 @@ body {width: 900px; margin: auto; font-size: 14px; font-family: "Helvetica Neue"
 	}
 }
 
-.screen { border: 1px solid #ddd; position: absolute; background-color: white; width: 500px; left: 0;}
-
-.fullscreen { border: none; top: 10px; height: 800px;}
-
+.modal { position: absolute; border: 1px solid #ddd;}
+.modal.fullwidth-modal { left:0; right: 0;}
+.modal.fullheight-modal { top: 0; bottom: 0;}
+.modal.white { background-color: white;}
 
 /********
-* Enter description SCREEN
+* Enter description MODAL
 **/
-#enterDescriptionScreen { z-index: 5; top: auto; bottom: 0; height: 350px; border-top: 1px solid #86247e;}
-	#enterDescriptionScreen button.cancel { float:right; width: 100px; font-size: 14px; color: #86247e; line-height: 62px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
-		#enterDescriptionScreen button.cancel:hover {background-color: #f4f4f4;}
-		#enterDescriptionScreen button.cancel:active {background-color: #e2e2e2;}
+#enterDescriptionModal { z-index: 5; top: auto; bottom: 0; height: 350px; border-top: 1px solid #86247e;}
+	#enterDescriptionModal button.cancel { float:right; width: 100px; font-size: 14px; color: #86247e; line-height: 62px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
+		#enterDescriptionModal button.cancel:hover {background-color: #f4f4f4;}
+		#enterDescriptionModal button.cancel:active {background-color: #e2e2e2;}
 
-	#enterDescriptionScreen .user-info { padding: 15px;}
-		#enterDescriptionScreen .user-info .avatar { float: left; margin-right: 15px;}
-			#enterDescriptionScreen .user-info .avatar img { border-radius: 16px; width: 32px; height: 32px;}
-		#enterDescriptionScreen .user-info .username { color: #777; line-height: 32px; font-size: 16px;}
+	#enterDescriptionModal .user-info { padding: 15px;}
+		#enterDescriptionModal .user-info .avatar { float: left; margin-right: 15px;}
+			#enterDescriptionModal .user-info .avatar img { border-radius: 16px; width: 32px; height: 32px;}
+		#enterDescriptionModal .user-info .username { color: #777; line-height: 32px; font-size: 16px;}
 
-	#enterDescriptionScreen input { height: 42px; width: 100%; font-size: 16px; padding: 0 20px; border: 1px solid #ddd; border-left: none; border-right: none; outline: none;}
-		#enterDescriptionScreen input:focus { border-color: #49ACF2;}
-		#enterDescriptionScreen .error input:focus { border-color: red; outline-color: red;}
-	#enterDescriptionScreen textarea {resize: none; width: 100%; font-size: 16px; padding: 20px; display: block; border: none; height: 160px; outline: none;}
-		#enterDescriptionScreen textarea:focus { border-bottom: 1px solid #49ACF2;}
-		#enterDescriptionScreen .error textarea:focus { border-bottom-color: red;}
+	#enterDescriptionModal input { height: 42px; width: 100%; font-size: 16px; padding: 0 20px; border: 1px solid #ddd; border-left: none; border-right: none; outline: none;}
+		#enterDescriptionModal input:focus { border-color: #49ACF2;}
+		#enterDescriptionModal .error input:focus { border-color: red; outline-color: red;}
+	#enterDescriptionModal textarea {resize: none; width: 100%; font-size: 16px; padding: 20px; display: block; border: none; height: 160px; outline: none;}
+		#enterDescriptionModal textarea:focus { border-bottom: 1px solid #49ACF2;}
+		#enterDescriptionModal .error textarea:focus { border-bottom-color: red;}
 
-	#enterDescriptionScreen .next {
+	#enterDescriptionModal .next {
 		height: 35px; width: 80%; margin: auto; display: block; margin-top: 24px;
 		background-color: transparent; border: 1px solid #86247e; color: #86247e; border-radius: 4px; font-size: 15px; cursor: pointer;
 	}
-	#enterDescriptionScreen .next:hover { color: #A83DA0; border-color: #A83DA0;}
-	#enterDescriptionScreen .next:active { background-color: #86247e; color: white; outline: 0;}
+	#enterDescriptionModal .next:hover { color: #A83DA0; border-color: #A83DA0;}
+	#enterDescriptionModal .next:active { background-color: #86247e; color: white; outline: 0;}
 
-	#enterDescriptionScreen.screen-appear, #enterDescriptionScreen.screen-enter {bottom: -350px;}
-		#enterDescriptionScreen.screen-appear.screen-appear-active, #enterDescriptionScreen.screen-enter.screen-enter-active {bottom: 0; transition: bottom 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
-	#enterDescriptionScreen.screen-leave { bottom: 0;}
-		#enterDescriptionScreen.screen-leave-active { bottom: -350px; transition: bottom 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#enterDescriptionModal.modal-appear, #enterDescriptionModal.modal-enter {bottom: -350px;}
+		#enterDescriptionModal.modal-appear.modal-appear-active, #enterDescriptionModal.modal-enter.modal-enter-active {bottom: 0; transition: bottom 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#enterDescriptionModal.modal-leave { bottom: 0;}
+		#enterDescriptionModal.modal-leave-active { bottom: -350px; transition: bottom 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
 
 /********
-* Locate SCREEN
+* Locate MODAL
 **/
-#locateScreen { z-index: 6; background-color: grey;}
+#locateModal { z-index: 6; background-color: grey;}
 
-	#locateScreen button.cancel { float:right; width: 100px; font-size: 14px; color: #CFC0CD; line-height: 24px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
-		#locateScreen button.cancel:hover {background-color: #f4f4f4; color: #86247e;}
-		#locateScreen button.cancel:active {background-color: #e2e2e2; color: #86247e;}
+	#locateModal button.cancel { float:right; width: 100px; font-size: 14px; color: #CFC0CD; line-height: 24px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
+		#locateModal button.cancel:hover {background-color: #f4f4f4; color: #86247e;}
+		#locateModal button.cancel:active {background-color: #e2e2e2; color: #86247e;}
 
-	#locateScreen #userPostInfos { color: #bbb; position: absolute; top: 0; left: 0; right: 0; padding: 15px 20px 20px; padding-bottom: 60px; z-index: 10; /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+60,000000+92&0.65+0,0.5+60,0+92 */
+	#locateModal #userPostInfos { color: #bbb; position: absolute; top: 0; left: 0; right: 0; padding: 15px 20px 20px; padding-bottom: 60px; z-index: 10; /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+60,000000+92&0.65+0,0.5+60,0+92 */
 background: -moz-linear-gradient(top,  rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 92%); /* FF3.6-15 */
 background: -webkit-linear-gradient(top,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.5) 60%,rgba(0,0,0,0) 92%); /* Chrome10-25,Safari5.1-6 */
 background: linear-gradient(to bottom,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.5) 60%,rgba(0,0,0,0) 92%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
@@ -159,19 +165,27 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', e
 
 
 }
-		#locateScreen #userPostInfos .user { overflow: hidden; margin-bottom: 15px;}
-			#locateScreen #userPostInfos .user .avatar { float: left; margin-right: 15px;}
-				#locateScreen #userPostInfos .user .avatar img { border-radius: 16px; width: 32px; height: 32px;}
-			#locateScreen #userPostInfos .user .username { color: white; line-height: 32px; font-size: 16px;}
+		#locateModal #userPostInfos .user { overflow: hidden; margin-bottom: 15px;}
+			#locateModal #userPostInfos .user .avatar { float: left; margin-right: 15px;}
+				#locateModal #userPostInfos .user .avatar img { border-radius: 16px; width: 32px; height: 32px;}
+			#locateModal #userPostInfos .user .username { color: white; line-height: 32px; font-size: 16px;}
 
-	#locateScreen #map { position: absolute; bottom: 0; left: 0; right: 0; top:0; z-index: 6;}
-	#locateScreen .marker {position: absolute; top: 50%; left: 50%; margin-top: -40px; margin-left: -11px; z-index: 10;}
-	#locateScreen button.share { position: absolute; bottom: 40px; margin-left: -50px; left: 50%; width: 100px; height: 40px; z-index: 10;}
+	#locateModal #map { position: absolute; left: 0; right: 0; top:0; bottom: 0;}
+	#locateModal .marker {position: absolute; top: 50%; left: 50%; margin-top: -40px; margin-left: -11px; z-index: 10;}
+	#locateModal button.share { position: absolute; bottom: 40px; margin-left: -50px; left: 50%; width: 100px; height: 40px; z-index: 10;}
 
-	#locateScreen.screen-appear, #locateScreen.screen-enter {left: 500px;}
-		#locateScreen.screen-appear.screen-appear-active, #locateScreen.screen-enter.screen-enter-active {left: 0; transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
-	#locateScreen.screen-leave {opacity: 1;}
-		#locateScreen.screen-leave-active { animation: screenDisappear 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#locateModal.modal-appear, #locateModal.modal-enter {left: 0;}
+		#locateModal.modal-appear.modal-appear-active, #locateModal.modal-enter.modal-enter-active {left: 0; transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#locateModal.modal-leave {opacity: 1;}
+		#locateModal.modal-leave-active { animation: modalDisappear 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+
+
+/**
+** GPS SCREEN
+**
+**/
+#gpsScreen {background-color: #ddd;}
+
 /**
 ** ERRORS
 **
