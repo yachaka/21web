@@ -40,7 +40,7 @@ var LocationChooser = React.createClass({
 		      fillOpacity: 0.35,
 		      map: map,
 		      center: center,
-		      radius: 5500
+		      radius: 65
 		    });
 		    var allowedBounds = circle.getBounds();
 		    var lastValidCenter = map.getCenter();
