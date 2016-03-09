@@ -111,6 +111,7 @@ express.get('/', function (req, res) {
 
 express.get('/posts', function (req, res) {
 	Post.query()
+		.eager('user')
 		.then(function (posts) {
 			// console.log(posts)
 			res.json({

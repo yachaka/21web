@@ -43,7 +43,7 @@ module.exports = {
 	goToSharePostStepTwo: function (url, text) {
         Dispatcher.dispatch({
             type: ActionsType('SET_SHARE_DATA'),
-            shareData: {
+            data: {
                 url: url,
                 text: text
             }

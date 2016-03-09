@@ -18,8 +18,8 @@ Post.relationMappings = {
 		relation: Model.OneToOneRelation,
 		modelClass: User,
 		join: {
-			from: 'Post.user_id',
-			to: 'User.id'
+			from: 'posts.user_id',
+			to: 'users.id'
 		}
 	}
 };

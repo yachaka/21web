@@ -31621,7 +31621,7 @@ module.exports = {
     goToSharePostStepTwo: function goToSharePostStepTwo(url, text) {
         Dispatcher.dispatch({
             type: ActionsType('SET_SHARE_DATA'),
-            shareData: {
+            data: {
                 url: url,
                 text: text
             }
@@ -31860,8 +31860,8 @@ var Feed = React.createClass({
 	},
 
 	render: function render() {
-		var posts = this.state.posts.map(function (post) {
-			return React.createElement(Post, { key: post.id, data: post });
+		var posts = this.state.posts.map(function (post, i) {
+			return React.createElement(Post, { key: post.id, odd: i % 2, data: post });
 		}.bind(this));
 
 		return React.createElement(
@@ -32048,10 +32048,34 @@ var postTextParser = require('../helpers/PostTextParser'),
     classNames = require('classnames');
 
 var FluxContainerMixin = require('flux/utils').Mixin,
-    UserStore = require('../stores/UserStore');
+    UserStore = require('../stores/UserStore'),
+    AppStateStore = require('../stores/AppStateStore');
 
 function htmlEntities(str) {
-				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function getHost(url) {
+	var pattern = /(https?:\/\/)(www\.)?([a-zA-Z0-9\.]+)(\/(.*))?/;
+	return url.replace(pattern, "$3");
+}
+
+function distance(lat1, lon1, lat2, lon2, unit) {
+	var radlat1 = Math.PI * lat1 / 180;
+	var radlat2 = Math.PI * lat2 / 180;
+	var theta = lon1 - lon2;
+	var radtheta = Math.PI * theta / 180;
+	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+	dist = Math.acos(dist);
+	dist = dist * 180 / Math.PI;
+	dist = dist * 60 * 1.1515;
+	if (unit == "K") {
+		dist = dist * 1.609344;
+	}
+	if (unit == "N") {
+		dist = dist * 0.8684;
+	}
+	return dist;
 }
 
 /*
@@ -32061,59 +32085,74 @@ function htmlEntities(str) {
 				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
-				displayName: 'Post',
+	displayName: 'Post',
 
-				mixins: [FluxContainerMixin([UserStore])],
-				statics: {
-								calculateState: function calculateState(prevState) {
-												return {
-																loggedUser: UserStore.getLoggedUser()
-												};
-								}
-				},
+	mixins: [FluxContainerMixin([UserStore, AppStateStore])],
+	statics: {
+		calculateState: function calculateState(prevState) {
+			return {
+				loggedUser: UserStore.getLoggedUser(),
+				userLocation: AppStateStore.location
+			};
+		}
+	},
 
-				render: function render() {
-								var className = classNames('post', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared });
+	render: function render() {
+		var className = classNames('post', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
 
-								return React.createElement(
-												'div',
-												{ className: className },
-												React.createElement(
-																'div',
-																{ className: 'top' },
-																React.createElement(
-																				'div',
-																				{ className: 'avatar' },
-																				React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
-																),
-																React.createElement(
-																				'p',
-																				{ className: 'time' },
-																				'9 hours ago'
-																),
-																React.createElement('img', { src: '/img/spinner.gif', className: 'spinner' })
-												),
-												React.createElement(
-																'p',
-																{ className: 'text content first' },
-																React.createElement('span', { dangerouslySetInnerHTML: { __html: postTextParser(htmlEntities(this.props.data.url)) }, className: 'url' }),
-																React.createElement('br', null),
-																this.props.data.text
-												),
-												React.createElement(
-																'p',
-																{ className: 'location' },
-																'Located ',
-																React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
-																' 4 km away'
-												)
-								);
-				}
+		return React.createElement(
+			'div',
+			{ className: className },
+			React.createElement(
+				'div',
+				{ className: 'top' },
+				React.createElement(
+					'div',
+					{ className: 'avatar' },
+					React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+				),
+				React.createElement(
+					'p',
+					{ className: 'username' },
+					this.props.data.user ? this.props.data.user.username : '[deleted user]'
+				),
+				React.createElement(
+					'p',
+					{ className: 'time' },
+					'9 hours ago'
+				),
+				React.createElement('img', { src: '/img/spinner.gif', className: 'spinner' })
+			),
+			React.createElement(
+				'p',
+				{ className: 'location' },
+				'Located ',
+				React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
+				' ',
+				Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
+				' km away'
+			),
+			React.createElement(
+				'p',
+				{ className: 'title' },
+				React.createElement(
+					'a',
+					{ href: this.props.data.url },
+					this.props.data.text
+				)
+			),
+			React.createElement(
+				'p',
+				{ className: 'from' },
+				getHost(this.props.data.url)
+			)
+		);
+	}
 });
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":296,"../stores/UserStore":301,"classnames":3,"flux/utils":105,"react":274}],289:[function(require,module,exports){
+},{"../helpers/PostTextParser":296,"../stores/AppStateStore":299,"../stores/UserStore":301,"classnames":3,"flux/utils":105,"react":274}],289:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32390,6 +32429,7 @@ var LocationChooser = React.createClass({
 	},
 
 	componentDidMount: function componentDidMount() {
+		console.log(this.state);
 		GoogleMapsLoader.LIBRAIRIES = ['geometry'];
 		GoogleMapsLoader.load(function (google) {
 			var center = {
@@ -32442,8 +32482,8 @@ var LocationChooser = React.createClass({
 	sharePost: function sharePost() {
 		Creator.sharePost({
 			user_id: this.state.loggedUser.id,
-			url: this.props.postData.url,
-			text: this.props.postData.text,
+			url: this.state.shareData.url,
+			text: this.state.shareData.text,
 			lat: this.map.getCenter().lat,
 			lng: this.map.getCenter().lng,
 			date: new Date(),
@@ -32649,6 +32689,12 @@ var AppStateStore = function (_FluxStore) {
 		key: '__onDispatch',
 		value: function __onDispatch(action) {
 			switch (action.type) {
+				case ActionsType('SET_SHARE_DATA'):
+					console.log(action.data);
+					this.currentShareData = action.data;
+					this.__emitChange();
+					break;
+
 				case ActionsType('SET_MODAL'):
 					this.modal = action.modal;
 					this.__emitChange();

@@ -21,8 +21,8 @@ var Feed = React.createClass({
     },
 
 	render() {
-		var posts = this.state.posts.map(function (post) {
-			return <Post key={post.id} data={post}/>;
+		var posts = this.state.posts.map(function (post, i) {
+			return <Post key={post.id} odd={i % 2} data={post}/>;
 		}.bind(this));
 
 		return (

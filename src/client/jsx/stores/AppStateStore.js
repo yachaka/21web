@@ -21,6 +21,12 @@ class AppStateStore extends FluxStore {
 
 	__onDispatch(action) {
 		switch (action.type) {
+			case ActionsType('SET_SHARE_DATA'):
+				console.log(action.data)
+				this.currentShareData = action.data;
+				this.__emitChange();
+				break;
+
 			case ActionsType('SET_MODAL'):
 				this.modal = action.modal;
 				this.__emitChange();

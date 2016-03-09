@@ -21,6 +21,7 @@ var LocationChooser = React.createClass({
     },
 
     componentDidMount() {
+    	console.log(this.state);
     	GoogleMapsLoader.LIBRAIRIES = ['geometry'];
 	    GoogleMapsLoader.load(function(google) {
 	    	var center = {
@@ -74,8 +75,8 @@ var LocationChooser = React.createClass({
 	sharePost() {
 		Creator.sharePost({
 			user_id: this.state.loggedUser.id,
-			url: this.props.postData.url,
-			text: this.props.postData.text,
+			url: this.state.shareData.url,
+			text: this.state.shareData.text,
 			lat: this.map.getCenter().lat,
 			lng: this.map.getCenter().lng,
 			date: new Date(),
