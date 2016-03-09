@@ -1,7 +1,8 @@
 
 var reqwest = require('reqwest');
 
-var React = require('react')
+var React = window.React = require('react')
+    , ReactDOM = window.ReactDOM = require('react-dom')
 	, ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 var PostActionsCircle = require('./components/PostActionsCircle.jsx')
@@ -9,7 +10,8 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx')
     , RegisteredUser = require('./components/RegisteredUser.jsx')
     , GpsScreen = require('./components/GpsScreen.jsx')
     , FeedScreen = require('./components/FeedScreen.jsx')
-	, LoginRegisterScreen = require('./components/LoginRegisterScreen.jsx');
+	, LoginRegisterScreen = require('./components/LoginRegisterScreen.jsx')
+    , Modal = require('react-modal');
 
 var Dispatcher = require('./Dispatcher')
     , FluxContainerMixin = require('flux/utils').Mixin
@@ -18,10 +20,10 @@ var Dispatcher = require('./Dispatcher')
     , Creator = require('./actions/Creator')
 
     , PostsStore = require('./stores/PostsStore')
-    , SharingPostStore = require('./stores/SharingPostStore')
     , UserStore = require('./stores/UserStore')
     , AppStateStore = require('./stores/AppStateStore')
     , k = require('./k');
+
 /*
 <div id="enterDescriptionScreen" className="screen">
                             <div className="user-info">
@@ -44,6 +46,9 @@ var App = React.createClass({
         }
     },
 
+    componentWillMount() {
+        Modal.setAppElement('body');
+    },
     componentDidMount() {
         Creator.fetchPosts();
     },

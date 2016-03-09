@@ -1,15 +1,18 @@
 
 var Dispatcher = require('../Dispatcher')
 	, FluxStore = require('flux/utils').Store
-	, ActionsTypes = require('../actions')
+	, ActionsType = require('../actions')
 	, k = require('../k');
 
 class AppStateStore extends FluxStore {
 
 	constructor(Dispatcher) {
 		super(Dispatcher);
-		this.screen = k.Screens.LOGIN_REGISTER;
 		this.location = k.LocationState.PENDING;
+		this.screen = k.Screens.GPS;
+		this.modal = null;
+
+		this.currentShareData = {};
 	}
 
 	whichScreen() {
@@ -18,12 +21,17 @@ class AppStateStore extends FluxStore {
 
 	__onDispatch(action) {
 		switch (action.type) {
-			case ActionsTypes.GO_TO_SCREEN:
+			case ActionsType('SET_MODAL'):
+				this.modal = action.modal;
+				this.__emitChange();
+				break;
+
+			case ActionsType('GO_TO_SCREEN'):
 				this.screen = action.screen;
 				this.__emitChange();
 				break;
 
-			case ActionsTypes.SET_LOCATION:
+			case ActionsType('SET_LOCATION'):
 				this.location = action.newLocation;
 				this.__emitChange();
 				break;

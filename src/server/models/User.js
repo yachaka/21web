@@ -1,6 +1,11 @@
 
-var Model = require('objection').Model
-	, randomString = require('random-string');
+var objection = require('objection')
+	, Model = objection.Model
+	, randomString = require('random-string')
+	, Promise = require('bluebird')
+	, ValidateObjectionBridge = require('../ValidateObjectionBridge')
+
+	, Token = require('./Token');
 
 function User() {
 	Model.apply(this, arguments);
@@ -9,23 +14,38 @@ function User() {
 Model.extend(User);
 
 User.tableName = 'users';
-
-User.jsonSchema = {
-	type: 'object',
-	required: ['anonymous'],
-
-	properties: {
-		id: {type: 'integer'},
-		anonymous: {type: 'boolean'},
-		username: {type: 'string', minLength: 3},
-		password: {type: 'string', minLength: 8},
-		last_ip_connected: {type: 'string'},
-		anonymous_token: {type: 'string', minLength: 32, maxLength: 32},
-		claim_token: {type: 'string', minLength: 32, maxLength: 32},
-		created: {type: 'date'}
+User.schema = {
+	username: {
+		presence: true,
+		format: {
+			pattern: "[a-z0-9]+",
+			flags: "i",
+			message: "can only contain a-z and 0-9"
+		},
+		length: {
+			minimum: 3,
+			maximum: 25
+		}
+	},
+	password: {
+		presence: true,
+		length: {
+			minimum: 8,
+			maximum: 20
+		}
 	}
 };
-
+User.prototype.$validate = ValidateObjectionBridge;
+User.relationMappings = {
+	tokens: {
+		relation: Model.OneToManyRelation,
+		modelClass: __dirname + '/Token',
+		join: {
+			from: 'users.id',
+			to: 'tokens.user_id'
+		}
+	}
+};
 
 User.createAnonymousUser = function (req, fields) {
 	if (!fields)
@@ -33,10 +53,28 @@ User.createAnonymousUser = function (req, fields) {
 	fields.unclaimed = true;
 	fields.username = 'anonymous'+Math.ceil(Math.random()*1000000);
 	fields.last_ip_connected = req.ip;
-	fields.connect_token = randomString({length: 32});
-	fields.claim_token = randomString({length: 32});
-	return User.query()
-			.insert(fields);
+
+	return objection.transaction(User, Token, function (User, Token) {
+
+		var userInsert = User.query().insert(fields).then(function (user) { return user;});
+		var tokensInsert = userInsert.then(function (createdUser) {
+			return Promise.props({
+				connect_token: Token.query().insert({
+					type: 'connect',
+					user_id: createdUser.id
+				}),
+				claim_token: Token.query().insert({
+					type: 'claim',
+					user_id: createdUser.id
+				})
+			});
+		});
+
+		return Promise.all([
+			userInsert,
+			tokensInsert
+		]);
+	});
 };
 
 /*****

@@ -50,8 +50,8 @@ body {width: 900px; margin: auto; font-size: 14px; font-family: "Helvetica Neue"
 /********
 * BLACK OVERLAY
 **/
-#app #blackOverlay { z-index:4; backdrop-filter: blur(100px);background-color: black; opacity: 0; position: absolute; top: 0; left: 0; bottom:0; right:0; transition: opacity 500ms ease-out; pointer-events: none;}
-	#app #blackOverlay.active { opacity: 0.1; display: block; pointer-events: auto;}
+#app #feedScreen #blackOverlay { z-index:4; backdrop-filter: blur(100px);background-color: black; opacity: 0; position: absolute; top: 0; left: 0; bottom:0; right:0; transition: opacity 500ms ease-out; pointer-events: none;}
+	#app #feedScreen.modal-active #blackOverlay { opacity: 0.1; display: block; pointer-events: auto;}
 
 /********
 * Screens

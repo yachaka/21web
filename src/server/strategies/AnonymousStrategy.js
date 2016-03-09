@@ -6,7 +6,7 @@ function AnonymousStrategy(options, verifyCookie, verifyIp) {
 	if (!verifyCookie) { throw new TypeError('AnonymousStrategy requires a verifyCookie callback'); }
 	if (!verifyIp) { throw new TypeError('AnonymousStrategy requires a verifyIp callback'); }
 
-	this._anonymousTokenCookie = options.anonymousTokenCookie || 'anonymous_token';
+	this._connectTokenCookie = options.connectTokenCookie || 'connect_token';
 
 	Strategy.call(this);
 	this.name = 'anonymous';
@@ -18,6 +18,7 @@ util.inherits(AnonymousStrategy, Strategy);
 
 
 AnonymousStrategy.prototype.authenticate = function (req) {
+	console.log('In anonymous', req.cookies, req.path);
 	var self = this;
 	if (req.user) {
 		this.pass();
@@ -26,7 +27,7 @@ AnonymousStrategy.prototype.authenticate = function (req) {
 
 	function verified(err, user) {
 		if (err) { 
-			console.log(err);
+			console.log(err.stack);
 			self.fail(err);
 		}
 		if (!user)
@@ -34,8 +35,8 @@ AnonymousStrategy.prototype.authenticate = function (req) {
 		self.success(user);
 	}
 
-	if (req.cookies && req.cookies[this._anonymousTokenCookie]) {
-		this._verifyCookie(req.cookies[this._anonymousTokenCookie], verified);
+	if (req.cookies && req.cookies[this._connectTokenCookie]) {
+		this._verifyCookie(req.cookies[this._connectTokenCookie], verified);
 	} else
 		this._verifyIp(req.ip, verified);
 };

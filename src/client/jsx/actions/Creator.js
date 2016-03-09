@@ -2,7 +2,8 @@
 var reqwest = require('reqwest');
 
 var Dispatcher = require('../Dispatcher')
-	, ActionsType = require('./');
+	, ActionsType = require('./')
+    , AppStateCreator = require('./AppStateCreator');
 
 var _dispatch = function (ActionType, argumentsKeys) {
 
@@ -39,22 +40,23 @@ module.exports = {
     //     });
     // },
 
-	goToSharePostStep1: _dispatch(ActionsType.GO_TO_SHARE_POST_STEP_1),
-	goToSharePostStep2: function (url, text) {
+	goToSharePostStepTwo: function (url, text) {
         Dispatcher.dispatch({
-            type: ActionsType.GO_TO_SHARE_POST_STEP_2,
+            type: ActionsType('SET_SHARE_DATA'),
             shareData: {
                 url: url,
                 text: text
             }
         });
+
+        AppStateCreator.setActiveModal('shareStepTwo');
     },
 	sharePost: function (post) {
         post._clientIdentifier = new Date().getTime();
 
-        _dispatch(ActionsType.SHARE_POST)();
+        _dispatch(ActionsType('SHARE_POST'))();
         Dispatcher.dispatch({
-            type: ActionsType.NEW_POSTS,
+            type: ActionsType('NEW_POSTS'),
             posts: [post]
         });
         reqwest({
@@ -68,21 +70,21 @@ module.exports = {
             if (json.success) {
                 if (json.newUser)
                     Dispatcher.dispatch({
-                        type: ActionsType.USER_LOGGED_IN,
+                        type: ActionsType('USER_LOGGED_IN'),
                         user: json.newUser
                     });
                 
                 Dispatcher.dispatch({
-                    type: ActionsType.PENDING_POST_APPROVED,
+                    type: ActionsType('PENDING_POST_APPROVED'),
                     postId: json.postId,
                     _clientIdentifier: json._clientIdentifier
                 });
             } else {
                 console.log(json);
             }
-        })
+        });
     },
-	cancelSharePost: _dispatch(ActionsType.CANCEL_SHARE_POST),
+	cancelSharePost: _dispatch(ActionsType('CANCEL_SHARE_POST')),
 
 	fetchPosts: function () {
 		reqwest({
@@ -93,7 +95,7 @@ module.exports = {
 
         .then(function (json) {
             Dispatcher.dispatch({
-                type: ActionsType.NEW_POSTS,
+                type: ActionsType('NEW_POSTS'),
                 posts: json.posts
             });
         }, function (err, msg) {
@@ -101,8 +103,16 @@ module.exports = {
         });
 	},
 
-    setLocation: _dispatch(ActionsType.SET_LOCATION, ['newLocation']),
+    setLocation: _dispatch(ActionsType('SET_LOCATION'), ['newLocation']),
 
-    goToScreen: _dispatch(ActionsType.GO_TO_SCREEN, ['screen'])
+    goToScreen: _dispatch(ActionsType('GO_TO_SCREEN'), ['screen']),
+
+    claimAccount: function (token) {
+        // reqwest({
+        //     url:'/claim/'+token,
+        //     method: 'post',
+        //     type: 'json'
+        // })
+    }
 
 };

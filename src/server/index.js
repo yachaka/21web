@@ -11,11 +11,15 @@ var expressS = require('express')
 	, passport = require('passport')
 	, AnonymousStrategy = require('./strategies/AnonymousStrategy')
 
-	, Model = require('objection').Model
+	, objection = require('objection')
+	, Model = objection.Model
 	, Knex = require('knex');
 
 var Post = require('./models/Post')
-	, User = require('./models/User');
+	, User = require('./models/User')
+	, Token = require('./models/Token');
+
+var ReCaptchaMiddleware = require('./middlewares/ReCaptcha')('6LfbVBoTAAAAAN2gkqo5ZhN6t2drnY5zZo-RN9Tb');
 
 /**
 * KNEX Query Build: database connection
@@ -49,18 +53,33 @@ passport.deserializeUser(function(user, done) {
 	done(null, user);
 });
 
-passport.use(new AnonymousStrategy({}, function (anonymousToken, done) {
-	User.query()
-		.where({unclaimed: true, connect_token: anonymousToken})
-		.then(function (users) {
-			done(null, users[0]);
+passport.use(new AnonymousStrategy({}, function (connectToken, done) {
+	Token.query()
+		.first()
+		.where({
+			type: 'connect',
+			value: connectToken
+		})
+		.then(function (token) {
+			if (!token)
+				return null;
+			
+			return User.query()
+				.first()
+				.eager('tokens')
+				.where('id', token.user_id);
+		})
+		.then(function (user) {
+			done(null, user);
 		})
 		.catch(done);
 }, function (ip, done) {
 	User.query()
+		.first()
 		.where({unclaimed: true, last_ip_connected: ip})
-		.then(function (users) {
-			done(null, users[0]);
+		.eager('tokens')
+		.then(function (user) {
+			done(null, user);
 		})
 		.catch(done);
 }));
@@ -107,14 +126,15 @@ function needUserCreationMiddleware(req, res, next) {
 	}
 
 	User.createAnonymousUser(req)
-		.then(function (user) {
-			console.log('User was totally anonymous, needed creation, done');
+		.spread(function (user, tokens) {
+			res.cookie('connect_token', tokens.connect_token.value, {maxAge: 86400000*90, httpOnly: true});
 			req.userJustGotCreated = true;
 			req.login(user, function (err) {
 				if (err) { return next(err); }
 				next();
 			});
-		}, next);
+		})
+		.catch(function (err) { console.log(err);});
 }
 
 express.post('/posts', needUserCreationMiddleware, function (req, res) {
@@ -148,4 +168,74 @@ express.post('/posts', needUserCreationMiddleware, function (req, res) {
 		});
 });
 
+function needAuthentifiedUserMiddleware(req, res, next) {
+	if (req.user.anonymous) {
+		res.status(401).send('Unauthorized');
+	} else
+		next();
+}
+
+function requiredPostParamsMiddleware(params) {
+	if (!(params instanceof Array))
+		throw new Error('`params` argument must be an Array in requiredPostParamsMiddleware.');
+
+	return function (req, res, next) {
+		for (var i = 0; i < params.length; i++) {
+			if (!req.body[params[i]]) {
+				console.error('Missing body parameters to POST request', params, req.body);
+				return res.status(400).json({
+					error: 'Missing body parameters to POST request'
+				});
+			}
+		}
+		next();
+	}
+}
+
+
+
+express.post('/claim/:token',
+	needAuthentifiedUserMiddleware,
+	requiredPostParamsMiddleware(['username', 'password']),
+	ReCaptchaMiddleware('recaptcha'),
+	function (req, res, next) {
+
+		Token.query()
+			.first()
+			.where({type: 'claim', 'value': req.params.token})
+			.then(function (token) {
+				if (!token)
+					throw new Error('Token not found');
+
+				return objection.transaction(User, function (User) {
+					return User.query()
+						.patchAndFetchById(token.user_id, {
+							unclaimed: false,
+							username: req.body.username,
+							password: req.body.password
+						})
+						.then(function (updatedUser) {
+							return updatedUser
+								.$relatedQuery('tokens')
+								.whereIn('type', ['claim', 'connect'])
+								.del()
+								.return(updatedUser);
+						});
+				});
+			})
+			.then(function (updatedUser) {
+				res.json({
+					success: true,
+					updatedUser: updatedUser
+				});
+			})
+			.catch(next);
+});
+
+
+express.use(function (err, req, res, next) {
+	console.error(err);
+	console.error(err.stack)
+	res.status(500).send('Something broke!');
+});
 express.listen(8080);
