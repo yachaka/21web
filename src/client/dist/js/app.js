@@ -31826,7 +31826,7 @@ var ClaimAccount = React.createClass({
             React.createElement(
                 'a',
                 { href: '#', onClick: this.setState.bind(this, { modalIsOpen: true }, null) },
-                'Claim account'
+                'Récupérer mon compte'
             )
         );
     }
@@ -31903,7 +31903,7 @@ var FeedScreen = React.createClass({
             React.createElement(
                 'button',
                 { className: 'startShare', onClick: AppStateCreator.setActiveModal.bind(Creator, 'shareStepOne') },
-                'Share a post'
+                'Localisez un post'
             )
         );
     }
@@ -32114,23 +32114,23 @@ var Post = React.createClass({
 				React.createElement(
 					'p',
 					{ className: 'username' },
-					this.props.data.user ? this.props.data.user.username : '[deleted user]'
+					this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
 				),
 				React.createElement(
 					'p',
 					{ className: 'time' },
-					'9 hours ago'
+					'il y a 9 heures'
 				),
 				React.createElement('img', { src: '/img/spinner.gif', className: 'spinner' })
 			),
 			React.createElement(
 				'p',
 				{ className: 'location' },
-				'Located ',
+				'Situé à ',
 				React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
 				' ',
 				Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
-				' km away'
+				' km'
 			),
 			React.createElement(
 				'p',
@@ -32199,7 +32199,7 @@ var RegisteredUser = React.createClass({
                 React.createElement(
                     'span',
                     { className: 'secondary' },
-                    'Logged in as'
+                    'Connecté en tant que'
                 ),
                 React.createElement('br', null),
                 this.props.user.username
@@ -32365,7 +32365,7 @@ var ShareStepOne = React.createClass({
             React.createElement(
                 'button',
                 { className: 'cancel', onClick: AppStateCreator.closeActiveModal.bind(Creator) },
-                'Cancel'
+                'Annuler'
             ),
             React.createElement(
                 'div',
@@ -32384,17 +32384,17 @@ var ShareStepOne = React.createClass({
             React.createElement(
                 ErrorDisplayer,
                 { errors: this.errors('url') },
-                React.createElement('input', { ref: this.registerFor('url'), autoFocus: true, placeholder: 'URL of the post you want to locate', type: 'text' })
+                React.createElement('input', { ref: this.registerFor('url'), autoFocus: true, placeholder: 'URL du post', type: 'text' })
             ),
             React.createElement(
                 ErrorDisplayer,
                 { errors: this.errors('text') },
-                React.createElement('textarea', { ref: this.registerFor('text'), placeholder: 'What\'s fun in this post ?' })
+                React.createElement('textarea', { ref: this.registerFor('text'), placeholder: 'Parlez-nous du post' })
             ),
             React.createElement(
                 'button',
                 { onClick: this.goToStep2, className: 'next' },
-                'Next'
+                'Continuer'
             )
         );
     }
@@ -32501,7 +32501,7 @@ var LocationChooser = React.createClass({
 				React.createElement(
 					'button',
 					{ className: 'cancel', onClick: AppStateCreator.closeActiveModal.bind(Creator) },
-					'Cancel'
+					'Annuler'
 				),
 				React.createElement(
 					'div',
@@ -32530,7 +32530,7 @@ var LocationChooser = React.createClass({
 			React.createElement(
 				'button',
 				{ className: 'share', onClick: this.sharePost },
-				'Set location'
+				'Localiser'
 			)
 		);
 	}

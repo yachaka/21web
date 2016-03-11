@@ -55,11 +55,11 @@ var Post = React.createClass({
             <div className={className}>
 				<div className="top">
 					<div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
-					<p className="username">{this.props.data.user ? this.props.data.user.username : '[deleted user]'}</p>
-					<p className="time">9 hours ago</p>
+					<p className="username">{this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'}</p>
+					<p className="time">il y a 9 heures</p>
 					<img src="/img/spinner.gif" className="spinner"/>
 				</div>
-				<p className="location">Located <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"/> {Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K'))} km away</p>
+				<p className="location">Situé à <img src="https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png"/> {Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K'))} km</p>
 				<p className="title">
 					<a href={this.props.data.url}>{this.props.data.text}</a>
 				</p>

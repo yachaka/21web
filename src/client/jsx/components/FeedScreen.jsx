@@ -24,7 +24,7 @@ var FeedScreen = React.createClass({
 	            <div id="blackOverlay"></div>
 	            <Feed/>
 
-	            <button className="startShare" onClick={AppStateCreator.setActiveModal.bind(Creator, 'shareStepOne')}>Share a post</button>
+	            <button className="startShare" onClick={AppStateCreator.setActiveModal.bind(Creator, 'shareStepOne')}>Localisez un post</button>
 	        </Screen>
         );
     }

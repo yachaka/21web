@@ -79,7 +79,7 @@ var ClaimAccount = React.createClass({
         			/>
         			<button onClick={this.test}>Go</button>
         		</Modal>
-	            <a href="#" onClick={this.setState.bind(this, {modalIsOpen: true}, null)}>Claim account</a>
+	            <a href="#" onClick={this.setState.bind(this, {modalIsOpen: true}, null)}>Récupérer mon compte</a>
 	        </div>
         );
     }

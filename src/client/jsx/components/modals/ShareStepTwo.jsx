@@ -89,7 +89,7 @@ var LocationChooser = React.createClass({
         return (
             <div id="locateModal" className="modal fullheight-modal fullwidth-modal">
             	<div id="userPostInfos">
-		            <button className="cancel" onClick={AppStateCreator.closeActiveModal.bind(Creator)}>Cancel</button>
+		            <button className="cancel" onClick={AppStateCreator.closeActiveModal.bind(Creator)}>Annuler</button>
             		<div className="user">
 						<div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>
 						<p className="username">yachaka</p>
@@ -104,7 +104,7 @@ var LocationChooser = React.createClass({
             	<div id="map" ref="map">
             	</div>
 
-            	<button className="share" onClick={this.sharePost}>Set location</button>
+            	<button className="share" onClick={this.sharePost}>Localiser</button>
             </div>
         );
     }
