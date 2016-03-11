@@ -13,7 +13,9 @@ var expressS = require('express')
 
 	, objection = require('objection')
 	, Model = objection.Model
-	, Knex = require('knex');
+	, Knex = require('knex')
+
+	, Responses = require('./responses');
 
 var Post = require('./models/Post')
 	, User = require('./models/User')
@@ -193,7 +195,24 @@ function requiredPostParamsMiddleware(params) {
 	}
 }
 
+express.post('/login',
+	requiredPostParamsMiddleware(['username', 'password']),
+	function (req, res, next) {
 
+		User.query()
+			.first()
+			.where({username: req.body.username, password: req.body.password})
+			.then(function (user) {
+				if (!user)
+					return res.json(Responses.ValidationError({__global: ['Utilisateur ou mot de passe incorrect']}));
+				req.login(user, function (err) {
+					if (err) return res.json(Responses.SomethingError(err.name, err.message));
+					return res.json(Responses.Success({user: user}));
+				});
+			})
+			.catch(next);
+	}
+);
 
 express.post('/claim/:token',
 	needAuthentifiedUserMiddleware,

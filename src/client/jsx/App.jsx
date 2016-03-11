@@ -10,7 +10,6 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx')
     , RegisteredUser = require('./components/RegisteredUser.jsx')
     , GpsScreen = require('./components/GpsScreen.jsx')
     , FeedScreen = require('./components/FeedScreen.jsx')
-	, LoginRegisterScreen = require('./components/LoginRegisterScreen.jsx')
     , Modal = require('react-modal');
 
 var Dispatcher = require('./Dispatcher')
@@ -41,6 +40,7 @@ var App = React.createClass({
         calculateState: function (prevState) {
             return {
                 screen: AppStateStore.whichScreen(),
+                appModal: AppStateStore.appModal,
                 loggedUser: UserStore.getLoggedUser()
             };
         }
@@ -54,12 +54,10 @@ var App = React.createClass({
     },
 
     render() {
-        var loggedUser = this.state.loggedUser.newUser ? <AnonymousUser user={this.state.loggedUser}/> : <RegisteredUser user={this.state.loggedUser}/>;
+        var loggedUser = this.state.loggedUser.anonymous ? <AnonymousUser user={this.state.loggedUser}/> : <RegisteredUser user={this.state.loggedUser}/>;
+        // var loggedUser = <AnonymousUser user={this.state.loggedUser}/>;
         var screen;
         switch (this.state.screen) {
-            case k.Screens.LOGIN_REGISTER:
-                screen = <LoginRegisterScreen/>;
-                break;
             case k.Screens.GPS:
                 screen = <GpsScreen/>;
                 break;
@@ -69,20 +67,33 @@ var App = React.createClass({
         }
 
         return (
-            <div id="app">
+            <div className="container">
+                <div className="row">
+                    <div className="col-xs-12">
+                        {loggedUser}
+                    </div>
+                </div>
 
-                {loggedUser}
+                <div className="row">
+                    <div className="col-xs-12">
+                        <p id="appTheme">#skate</p>
+                    </div>
+                </div>
 
-                <p id="appTheme">#skate</p>
+                <div className="row">
+                    <div className="col-xs-12">
+                        <div id="wrapper">
+                            <ReactCSSTransitionGroup component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
+                                {this.state.appModal}
+                            </ReactCSSTransitionGroup>
 
-                <ReactCSSTransitionGroup id="screenWrapper" component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
-
-                    {screen}
-
-                    
-                </ReactCSSTransitionGroup>
-
-			</div>
+                            <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
+                                {screen}
+                            </ReactCSSTransitionGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
 		);
     }
 });

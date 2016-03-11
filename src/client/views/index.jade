@@ -3,9 +3,9 @@ extends ./layouts/base.jade
 block content
 	div(id="welcome").
 		Bienvenue sur Locate#skate.<br/>Commencez à localiser les posts de skate sur Paris dès maintenant.
-	div(id="appholder")
+	div(id="app")
 	script.
 		ReactDOM.render(
 			React.createElement(App),
-			document.getElementById('appholder')
+			document.getElementById('app')
 		);

@@ -11,6 +11,8 @@ class AppStateStore extends FluxStore {
 		this.location = k.LocationState.PENDING;
 		this.screen = k.Screens.GPS;
 		this.modal = null;
+		var Login = require('../components/modals/Login.jsx');
+		this.appModal = <Login/>;
 
 		this.currentShareData = {};
 	}

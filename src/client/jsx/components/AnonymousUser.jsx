@@ -7,9 +7,19 @@ var AnonymousUser = React.createClass({
         return (
             <div id="loggedUser">
                 <p className="username">
-                    Totally<br/>
-                    anonymous
+                    <br/>
+                   Vous êtes anonyme.
                 </p>
+
+                <div className="actions">
+                    <div className="action">
+                        <a href="#">Se connecter</a>
+                    </div>
+
+                    <div className="action">
+                        <a href="#">Inscription</a>
+                    </div>
+                </div>
             </div>
         );
     }

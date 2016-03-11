@@ -31428,7 +31428,6 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx'),
     RegisteredUser = require('./components/RegisteredUser.jsx'),
     GpsScreen = require('./components/GpsScreen.jsx'),
     FeedScreen = require('./components/FeedScreen.jsx'),
-    LoginRegisterScreen = require('./components/LoginRegisterScreen.jsx'),
     Modal = require('react-modal');
 
 var Dispatcher = require('./Dispatcher'),
@@ -31459,6 +31458,7 @@ var App = React.createClass({
         calculateState: function calculateState(prevState) {
             return {
                 screen: AppStateStore.whichScreen(),
+                appModal: AppStateStore.appModal,
                 loggedUser: UserStore.getLoggedUser()
             };
         }
@@ -31471,12 +31471,10 @@ var App = React.createClass({
         Creator.fetchPosts();
     },
     render: function render() {
-        var loggedUser = this.state.loggedUser.newUser ? React.createElement(AnonymousUser, { user: this.state.loggedUser }) : React.createElement(RegisteredUser, { user: this.state.loggedUser });
+        var loggedUser = this.state.loggedUser.anonymous ? React.createElement(AnonymousUser, { user: this.state.loggedUser }) : React.createElement(RegisteredUser, { user: this.state.loggedUser });
+        // var loggedUser = <AnonymousUser user={this.state.loggedUser}/>;
         var screen;
         switch (this.state.screen) {
-            case k.Screens.LOGIN_REGISTER:
-                screen = React.createElement(LoginRegisterScreen, null);
-                break;
             case k.Screens.GPS:
                 screen = React.createElement(GpsScreen, null);
                 break;
@@ -31487,17 +31485,50 @@ var App = React.createClass({
 
         return React.createElement(
             'div',
-            { id: 'app' },
-            loggedUser,
+            { className: 'container' },
             React.createElement(
-                'p',
-                { id: 'appTheme' },
-                '#skate'
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-12' },
+                    loggedUser
+                )
             ),
             React.createElement(
-                ReactCSSTransitionGroup,
-                { id: 'screenWrapper', component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
-                screen
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-12' },
+                    React.createElement(
+                        'p',
+                        { id: 'appTheme' },
+                        '#skate'
+                    )
+                )
+            ),
+            React.createElement(
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-12' },
+                    React.createElement(
+                        'div',
+                        { id: 'wrapper' },
+                        React.createElement(
+                            ReactCSSTransitionGroup,
+                            { component: 'div', transitionName: 'modal', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
+                            this.state.appModal
+                        ),
+                        React.createElement(
+                            ReactCSSTransitionGroup,
+                            { component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
+                            screen
+                        )
+                    )
+                )
             )
         );
     }
@@ -31516,7 +31547,7 @@ var App = React.createClass({
                     </div>*/
 window.App = App;
 
-},{"./Dispatcher":278,"./actions":281,"./actions/Creator":280,"./components/AnonymousUser.jsx":282,"./components/FeedScreen.jsx":285,"./components/GpsScreen.jsx":286,"./components/LoginRegisterScreen.jsx":287,"./components/PostActionsCircle.jsx":289,"./components/RegisteredUser.jsx":290,"./k":297,"./stores/AppStateStore":299,"./stores/PostsStore":300,"./stores/UserStore":301,"flux/utils":105,"react":274,"react-addons-css-transition-group":119,"react-dom":127,"react-modal":140,"reqwest":275}],278:[function(require,module,exports){
+},{"./Dispatcher":278,"./actions":281,"./actions/Creator":280,"./components/AnonymousUser.jsx":282,"./components/FeedScreen.jsx":285,"./components/GpsScreen.jsx":286,"./components/PostActionsCircle.jsx":288,"./components/RegisteredUser.jsx":289,"./k":297,"./stores/AppStateStore":299,"./stores/PostsStore":300,"./stores/UserStore":301,"flux/utils":105,"react":274,"react-addons-css-transition-group":119,"react-dom":127,"react-modal":140,"reqwest":275}],278:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -31731,9 +31762,30 @@ var AnonymousUser = React.createClass({
             React.createElement(
                 'p',
                 { className: 'username' },
-                'Totally',
                 React.createElement('br', null),
-                'anonymous'
+                'Vous êtes anonyme.'
+            ),
+            React.createElement(
+                'div',
+                { className: 'actions' },
+                React.createElement(
+                    'div',
+                    { className: 'action' },
+                    React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Se connecter'
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'action' },
+                    React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Inscription'
+                    )
+                )
             )
         );
     }
@@ -31874,7 +31926,7 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":278,"../actions":281,"../stores/PostsStore":300,"./Post.jsx":288,"flux/utils":105,"react":274,"react-dom":127}],285:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../stores/PostsStore":300,"./Post.jsx":287,"flux/utils":105,"react":274,"react-dom":127}],285:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -31911,7 +31963,7 @@ var FeedScreen = React.createClass({
 
 module.exports = FeedScreen;
 
-},{"../actions":281,"../actions/AppStateCreator":279,"../actions/Creator":280,"./Feed.jsx":284,"./common/Screen.jsx":293,"./modals/ShareStepOne.jsx":294,"./modals/ShareStepTwo.jsx":295,"react":274}],286:[function(require,module,exports){
+},{"../actions":281,"../actions/AppStateCreator":279,"../actions/Creator":280,"./Feed.jsx":284,"./common/Screen.jsx":292,"./modals/ShareStepOne.jsx":294,"./modals/ShareStepTwo.jsx":295,"react":274}],286:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -31991,55 +32043,6 @@ var GpsScreen = React.createClass({
 module.exports = GpsScreen;
 
 },{"../actions/Creator":280,"../k":297,"../stores/AppStateStore":299,"flux/utils":105,"react":274}],287:[function(require,module,exports){
-'use strict';
-
-var React = require('react'),
-    Creator = require('../actions/Creator'),
-    k = require('../k');
-
-var LoginRegisterScreen = React.createClass({
-    displayName: 'LoginRegisterScreen',
-    render: function render() {
-        return React.createElement(
-            'div',
-            { id: 'loginRegisterScreen', className: 'screen grey' },
-            React.createElement(
-                'p',
-                { className: 'title' },
-                'Welcome on',
-                React.createElement('br', null),
-                React.createElement('img', { src: '/img/locate.png', height: '62' })
-            ),
-            React.createElement(
-                'p',
-                { className: 'action' },
-                React.createElement(
-                    'a',
-                    { href: '#', onClick: Creator.goToScreen.bind(Creator, k.Screens.GPS) },
-                    'Go anonymous'
-                )
-            ),
-            React.createElement(
-                'p',
-                { className: 'or' },
-                'or'
-            ),
-            React.createElement(
-                'p',
-                { className: 'action' },
-                React.createElement(
-                    'a',
-                    { href: '#' },
-                    'Log in'
-                )
-            )
-        );
-    }
-});
-
-module.exports = LoginRegisterScreen;
-
-},{"../actions/Creator":280,"../k":297,"react":274}],288:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32152,7 +32155,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":296,"../stores/AppStateStore":299,"../stores/UserStore":301,"classnames":3,"flux/utils":105,"react":274}],289:[function(require,module,exports){
+},{"../helpers/PostTextParser":296,"../stores/AppStateStore":299,"../stores/UserStore":301,"classnames":3,"flux/utils":105,"react":274}],288:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32173,7 +32176,7 @@ var PostActionsCircle = React.createClass({
 
 module.exports = PostActionsCircle;
 
-},{"react":274}],290:[function(require,module,exports){
+},{"react":274}],289:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -32215,7 +32218,7 @@ var RegisteredUser = React.createClass({
 
 module.exports = RegisteredUser;
 
-},{"./ClaimAccount.jsx":283,"react":274}],291:[function(require,module,exports){
+},{"./ClaimAccount.jsx":283,"react":274}],290:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32243,7 +32246,7 @@ var ErrorDisplayer = React.createClass({
 
 module.exports = ErrorDisplayer;
 
-},{"react":274}],292:[function(require,module,exports){
+},{"react":274}],291:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32268,7 +32271,7 @@ var Input = React.createClass({
 
 module.exports = Input;
 
-},{"./ErrorDisplayer.jsx":291,"react":274}],293:[function(require,module,exports){
+},{"./ErrorDisplayer.jsx":290,"react":274}],292:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -32325,7 +32328,71 @@ var Screen = React.createClass({
 
 module.exports = Screen;
 
-},{"../../stores/AppStateStore":299,"flux/utils":105,"react":274,"react-addons-css-transition-group":119}],294:[function(require,module,exports){
+},{"../../stores/AppStateStore":299,"flux/utils":105,"react":274,"react-addons-css-transition-group":119}],293:[function(require,module,exports){
+'use strict';
+
+var React = require('react'),
+    reqwest = require('reqwest'),
+    Dispatcher = require('../../Dispatcher'),
+    ActionsTypes = require('../../actions');
+
+var Login = React.createClass({
+    displayName: 'Login',
+
+    logIn: function logIn() {
+
+        reqwest({
+            url: '/login',
+            method: 'post',
+            data: { username: this.refs.username.value, password: this.refs.password.value },
+            type: 'json'
+        }).then(function (json) {
+            console.log('Json!', json);
+            if (json.success) Dispatcher.dispatch({
+                type: ActionsTypes('USER_LOGGED_IN'),
+                user: json.user
+            });
+        }).fail(function (err, msg) {
+            console.log(err, msg);
+        });
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { id: 'loginModal', className: 'modal full-width full-height grey' },
+            React.createElement(
+                'div',
+                { className: 'box' },
+                React.createElement(
+                    'h3',
+                    null,
+                    'Connexion'
+                ),
+                React.createElement(
+                    'label',
+                    null,
+                    'Identifiant'
+                ),
+                React.createElement('input', { ref: 'username', type: 'text' }),
+                React.createElement(
+                    'label',
+                    null,
+                    'Pass'
+                ),
+                React.createElement('input', { ref: 'password', type: 'password' }),
+                React.createElement(
+                    'button',
+                    { onClick: this.logIn },
+                    'Connexion'
+                )
+            )
+        );
+    }
+});
+
+module.exports = Login;
+
+},{"../../Dispatcher":278,"../../actions":281,"react":274,"reqwest":275}],294:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32361,7 +32428,7 @@ var ShareStepOne = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { id: 'enterDescriptionModal', className: 'modal fullwidth-modal white' },
+            { id: 'enterDescriptionModal', className: 'modal full-width white' },
             React.createElement(
                 'button',
                 { className: 'cancel', onClick: AppStateCreator.closeActiveModal.bind(Creator) },
@@ -32402,7 +32469,7 @@ var ShareStepOne = React.createClass({
 
 module.exports = ShareStepOne;
 
-},{"../../../../shared/schemas/PostSchema":302,"../../actions/AppStateCreator":279,"../../actions/Creator":280,"../../mixins/ValidateMixin":298,"../../stores/UserStore":301,"../common/ErrorDisplayer.jsx":291,"../common/Input.jsx":292,"flux/utils":105,"react":274,"validate.js":276}],295:[function(require,module,exports){
+},{"../../../../shared/schemas/PostSchema":302,"../../actions/AppStateCreator":279,"../../actions/Creator":280,"../../mixins/ValidateMixin":298,"../../stores/UserStore":301,"../common/ErrorDisplayer.jsx":290,"../common/Input.jsx":291,"flux/utils":105,"react":274,"validate.js":276}],295:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -32494,7 +32561,7 @@ var LocationChooser = React.createClass({
 	render: function render() {
 		return React.createElement(
 			'div',
-			{ id: 'locateModal', className: 'modal fullheight-modal fullwidth-modal' },
+			{ id: 'locateModal', className: 'modal full-height full-width' },
 			React.createElement(
 				'div',
 				{ id: 'userPostInfos' },
@@ -32675,6 +32742,8 @@ var AppStateStore = function (_FluxStore) {
 		_this.location = k.LocationState.PENDING;
 		_this.screen = k.Screens.GPS;
 		_this.modal = null;
+		var Login = require('../components/modals/Login.jsx');
+		_this.appModal = React.createElement(Login, null);
 
 		_this.currentShareData = {};
 		return _this;
@@ -32718,7 +32787,7 @@ var AppStateStore = function (_FluxStore) {
 
 module.exports = new AppStateStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"../k":297,"flux/utils":105}],300:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../components/modals/Login.jsx":293,"../k":297,"flux/utils":105}],300:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

@@ -87,7 +87,7 @@ var LocationChooser = React.createClass({
 
     render() {
         return (
-            <div id="locateModal" className="modal fullheight-modal fullwidth-modal">
+            <div id="locateModal" className="modal full-height full-width">
             	<div id="userPostInfos">
 		            <button className="cancel" onClick={AppStateCreator.closeActiveModal.bind(Creator)}>Annuler</button>
             		<div className="user">

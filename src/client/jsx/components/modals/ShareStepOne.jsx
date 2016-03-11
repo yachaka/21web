@@ -34,7 +34,7 @@ var ShareStepOne = React.createClass({
 
     render() {
         return (
-            <div id="enterDescriptionModal" className="modal fullwidth-modal white">
+            <div id="enterDescriptionModal" className="modal full-width white">
                 <button className="cancel" onClick={AppStateCreator.closeActiveModal.bind(Creator)}>Annuler</button>
                 <div className="user-info">
                     <div className="avatar"><img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" /></div>

@@ -11,20 +11,21 @@ body { font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial;}
 
 #welcome { font-size: 42px; margin: 100px 0 40px 0; color: #D1D1D1; text-align: center;}
  
-#app {margin:auto; width: 1200px; position: relative; overflow-y: hidden; overflow-x: visible;}
+#app { overflow: hidden;}
 
 /*********
 * Logged User
 *****/
-#app #loggedUser { overflow: hidden; margin-bottom: 5px;}
+#app #loggedUser { overflow: hidden; margin-bottom: 5px; height: 48px;}
 	#app #loggedUser .avatar { float:left; margin-right: 20px;}
 		#app #loggedUser .avatar img { width: 48px; height: 48px; border-radius: 24px;}
 	#app #loggedUser .username { padding-top: 7px; font-size: 15px; float: left; margin-right: 20px;}
 		#app #loggedUser .username .secondary { color: #aaa; font-size: 13px; line-height: 15px;}
 
-	#app #loggedUser .actions {}
-		#app #loggedUser .actions a { height: 48px; line-height: 48px; padding: 0 20px; display: inline-block; color: #3b5998; text-decoration: none;}
-			#app #loggedUser .actions a:hover {text-decoration: underline;}
+	#app #loggedUser .actions { overflow: hidden;}
+		#app #loggedUser .actions .action { margin-right: 10px; float:left;  margin-top: 6px;}
+			#app #loggedUser .actions .action a { display: inline-block; padding: 10px 16px; border-radius: 4px; border: 1px solid #3b5998; color: #3b5998; text-decoration: none;}
+				#app #loggedUser .actions .action a:hover { color: #3284BA; border-color: #3284BA;}
 /*********
 * Title
 *****/
@@ -49,67 +50,49 @@ body { font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial;}
 **/
 #app button.startShare { position: absolute; bottom: 0; left: 0; z-index: 5;}
 
-/********
-* BLACK OVERLAY
-**/
-#app #feedScreen #blackOverlay { z-index:4; backdrop-filter: blur(100px);background-color: black; opacity: 0; position: absolute; top: 0; left: 0; bottom:0; right:0; transition: opacity 500ms ease-out; pointer-events: none;}
-	#app #feedScreen.modal-active #blackOverlay { opacity: 0.1; display: block; pointer-events: auto;}
 
 /********
-* Screens
+* Wrapper for SCREENS and MODALS
 **/
-#screenWrapper {width: 1200px; height: 800px; position: relative;}
-	#screenWrapper .screen { position: absolute; top:0; left:0; bottom:0; width: 100%;}
-	#screenWrapper .screen.grey {background-color: #ddd; }
+#wrapper {height: 800px; position: relative;}
+	#wrapper .screen { position: absolute; top:0; left:0; bottom:0; width: 100%; z-index: 1;}
+	#wrapper .screen.grey {background-color: #ddd; }
 
-/**
-** LOGIN/REGISTER SCREEN
-**
+	#wrapper .modal { position: absolute;  z-index: 5; border:1px solid #ccc;}
+	#wrapper .modal.full-width { left:0; width: 100%;}
+	#wrapper .modal.full-height { top: 0; bottom: 0;}
+	#wrapper .modal.white { background-color: white;}
+	#wrapper .modal.grey {background-color: #ddd; }
+
+/********
+* FEED BLACK OVERLAY
 **/
-#loginRegisterScreen { padding-top: 23%;}
-	#loginRegisterScreen p { text-align: center; font-size: 22px; margin-bottom: 6%;}
-	#loginRegisterScreen p.title { color: white; font-size: 38px; margin-bottom: 12%;}
-	#loginRegisterScreen p.action a { color: #0076BF; text-decoration: none; display: inline-block; padding: 12px 14px; border:1px solid #3473B3; border-radius: 4px;}
-		/*#loginRegisterScreen p.action a:hover { border-bottom-color:#3473B3;}*/
-
+#feedScreen #blackOverlay { z-index:4; backdrop-filter: blur(100px);background-color: black; opacity: 0; position: absolute; top: 0; left: 0; bottom:0; right:0; transition: opacity 500ms ease-out; pointer-events: none;}
+	#feedScreen.modal-active #blackOverlay { opacity: 0.1; display: block; pointer-events: auto;}
 
 /********	
 * FEED
 **/
-#app #feed { border: 1px solid #ddd; border-top: none; position: absolute; top: 10px; bottom: 0; left:0; right:0; /*padding: 15px 10px 10px;*/ overflow: auto; z-index: 1;}
+#feedScreen #feed { border: 1px solid #ddd; border-top: none; position: absolute; top: 10px; bottom: 0; left:0; right:0; /*padding: 15px 10px 10px;*/ overflow: auto; z-index: 1;}
+	#feedScreen #feed .post { padding: 12px 16px;}
+	#feedScreen #feed .post.odd {}
+		#feedScreen #feed .post .top {overflow: hidden; margin-bottom: 10px;}
+			#feedScreen #feed .post .top .avatar { float: left; margin-right: 15px;}
+				#feedScreen #feed .post .top .avatar img { border-radius: 16px; width: 32px; height: 32px;}
+			#feedScreen #feed .post .top .username { float: left; line-height: 32px; margin-right: 6px;}
+			#feedScreen #feed .post .top .time { color: #777; line-height: 32px; font-size: 13px; float: right;}
+			#feedScreen #feed .post .top .spinner { display: none;}
 
-.post { padding: 12px 16px;}
-.post.odd {}
-	.post .top {overflow: hidden; margin-bottom: 10px;}
-		.post .top .avatar { float: left; margin-right: 15px;}
-			.post .top .avatar img { border-radius: 16px; width: 32px; height: 32px;}
-		.post .top .username { float: left; line-height: 32px; margin-right: 6px;}
-		.post .top .time { color: #777; line-height: 32px; font-size: 13px; float: right;}
-		.post .top .spinner { display: none;}
+		#feedScreen #feed .post .title { font-size: 20px; margin-bottom: 5px;}
+			#feedScreen #feed .post .title a {text-decoration: none; color: #4991C4; font-weight: 300;}
+		#feedScreen #feed .post .from { font-size: 13px; color: #888;}
+		#feedScreen #feed .post .content.image img { width: 100%;}
 
-	.post .title { font-size: 20px; margin-bottom: 5px;}
-		.post .title a {text-decoration: none; color: #4991C4; font-weight: 300;}
-	.post .from { font-size: 13px; color: #888;}
-	.post .content.image img { width: 100%;}
+		#feedScreen #feed .post .comments { color:#999; }
 
-	.post .comments { color:#999; }
+		#feedScreen #feed .post .location { color:#86247E; font-size: 14px;}
+			#feedScreen #feed .post .location img { vertical-align: middle; height: 24px;}
 
-	.post .location { color:#86247E; font-size: 14px;}
-		.post .location img { vertical-align: middle; height: 24px;}
-
-/*.post.my-post { margin-left: auto; margin-right: 3%;}
-	.post.my-post.pending { opacity: 0.6; }
-
-	.post.my-post .top .avatar { float: right; margin-right: 0; margin-left: 15px;}
-	.post.my-post .top .time { text-align: right; float: right;}
-	.post.my-post .top .spinner { float: right; height: 20px; display: block; margin: 6px 12px 0 0; display: none;}
-		.post.my-post.pending .top .spinner { display: block;}
-
-	.post.my-post .content.text {background-color: #e0edff;}
-	.post.my-post .content.first { border-radius: 6px 0 6px 6px;}
-
-	.post.my-post .comments, .post.my-post .location { text-align: right;}
-*/
 /********
 * MODALS
 **/
@@ -129,10 +112,15 @@ body { font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial;}
 	}
 }
 
-.modal { position: absolute; border: 1px solid #ddd;}
-.modal.fullwidth-modal { left:0; right: 0;}
-.modal.fullheight-modal { top: 0; bottom: 0;}
-.modal.white { background-color: white;}
+/********
+* Login MODAL
+**/
+#loginModal {}
+	#loginModal .box {position: absolute; width: 300px; height: 300px; left: 50%; top: 50%; margin-left: -150px; margin-top: -150px;}
+		#loginModal .box h3 { font-size: 24px; color: #86247E; margin-bottom: 15px;}
+		#loginModal .box label, #loginModal .box input {display: block; margin-bottom: 8px;} 
+		#loginModal .box label { font-size: 15px;}
+		#loginModal .box input { font-size: 15px; padding: 6px 8px; width: 100%;}
 
 /********
 * Enter description MODAL
