@@ -1,7 +1,7 @@
 
 var React = require('react')
 	, ActionsType = require('../actions')
-    , AppStateCreator = require('../actions/AppStateCreator')
+    , AppStateCreator = require('../actions/NavigationCreator')
     , Creator = require('../actions/Creator')
 
     , Screen = require('./common/Screen.jsx')
@@ -18,14 +18,15 @@ var FeedScreen = React.createClass({
         };
 
         return (
-            <Screen id="feedScreen" modals={modals}>
-	            <div id="top"></div>
-
-	            <div id="blackOverlay"></div>
+            <div id="feedScreen" className="screen">
 	            <Feed/>
 
-	            <button className="startShare" onClick={AppStateCreator.setActiveModal.bind(Creator, 'shareStepOne')}>Localisez un post</button>
-	        </Screen>
+                <div className="row">
+                    <div className="col-xs-12">
+        	            <button className="startShare" onClick={null}>Localisez un post</button>
+                    </div>
+                </div>
+	        </div>
         );
     }
 });

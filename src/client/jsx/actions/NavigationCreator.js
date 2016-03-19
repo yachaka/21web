@@ -27,19 +27,17 @@ var Dispatcher = require('../Dispatcher')
 
 module.exports = {
 
-    setActiveModal: function (modal) {
+    pushModal: function (modal) {
         Dispatcher.dispatch({
-            type: ActionsType('SET_MODAL'),
+            type: ActionsType('PUSH_MODAL'),
             modal: modal
         });
     },
-    closeActiveModal: function () {
+    popModal: function () {
         Dispatcher.dispatch({
-            type: ActionsType('SET_MODAL'),
-            modal: null
+            type: ActionsType('POP_MODAL')
         });
     },
-
 
     setShareData: function (data) {
         Dispatcher.dispatch({

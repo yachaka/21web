@@ -1,8 +1,10 @@
 
 module.exports = function (type) {
 	var types = {
+		PUSH_MODAL: "PUSH_MODAL",
+		POP_MODAL: "POP_MODAL",
+		
 		SET_SHARE_DATA: "SET_SHARE_DATA",
-		SET_MODAL: "SET_MODAL",
 		SET_LOCATION: "SET_LOCATION",
 
 		GO_TO_SCREEN: "GO_TO_SCREEN",
@@ -16,7 +18,7 @@ module.exports = function (type) {
 		NEW_POSTS: "NEW_POSTS"
 	};
 
-	if (!types[type]) {
+	if (types[type] === undefined || types[type] === "" || types[type] === null) {
 		throw new Error('`'+type+'` type isn\'t a valid type.');
 	}
 

@@ -3,7 +3,7 @@ var React = require('react')
 	, GoogleMapsLoader = require('google-maps');
 
 var Creator = require('../../actions/Creator')
-	, AppStateCreator = require('../../actions/AppStateCreator')
+	, AppStateCreator = require('../../actions/NavigationCreator')
 	, FluxContainerMixin = require('flux/utils').Mixin
 	, UserStore = require('../../stores/UserStore')
 	, AppStateStore = require('../../stores/AppStateStore');

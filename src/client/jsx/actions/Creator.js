@@ -3,7 +3,7 @@ var reqwest = require('reqwest');
 
 var Dispatcher = require('../Dispatcher')
 	, ActionsType = require('./')
-    , AppStateCreator = require('./AppStateCreator');
+    , AppStateCreator = require('./NavigationCreator');
 
 var _dispatch = function (ActionType, argumentsKeys) {
 

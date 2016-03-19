@@ -31437,6 +31437,7 @@ var Dispatcher = require('./Dispatcher'),
     PostsStore = require('./stores/PostsStore'),
     UserStore = require('./stores/UserStore'),
     AppStateStore = require('./stores/AppStateStore'),
+    ModalsStore = require('./stores/ModalsStore'),
     k = require('./k');
 
 /*
@@ -31453,11 +31454,12 @@ var Dispatcher = require('./Dispatcher'),
 var App = React.createClass({
     displayName: 'App',
 
-    mixins: [FluxContainerMixin([UserStore, AppStateStore])],
+    mixins: [FluxContainerMixin([UserStore, AppStateStore, ModalsStore])],
     statics: {
         calculateState: function calculateState(prevState) {
             return {
                 screen: AppStateStore.whichScreen(),
+                modals: ModalsStore.modals(),
                 appModal: AppStateStore.appModal,
                 loggedUser: UserStore.getLoggedUser()
             };
@@ -31495,45 +31497,19 @@ var App = React.createClass({
                     loggedUser
                 )
             ),
-            React.createElement(
-                'div',
-                { className: 'row' },
-                React.createElement(
-                    'div',
-                    { className: 'col-xs-12' },
-                    React.createElement(
-                        'p',
-                        { id: 'appTheme' },
-                        '#skate'
-                    )
-                )
-            ),
-            React.createElement(
-                'div',
-                { className: 'row' },
-                React.createElement(
-                    'div',
-                    { className: 'col-xs-12' },
-                    React.createElement(
-                        'div',
-                        { id: 'wrapper' },
-                        React.createElement(
-                            ReactCSSTransitionGroup,
-                            { component: 'div', transitionName: 'modal', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
-                            this.state.appModal
-                        ),
-                        React.createElement(
-                            ReactCSSTransitionGroup,
-                            { component: 'div', transitionName: 'screen', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
-                            screen
-                        )
-                    )
-                )
-            )
+            screen
         );
     }
 });
-/*<div id="feedScreen" className="screen">
+/*
+
+                <div className="row">
+                    <div className="col-xs-12">
+                        <p id="appTheme">#skate</p>
+                    </div>
+                </div>
+
+<div id="feedScreen" className="screen">
                         <div id="top"></div>
 
                         <div id="blackOverlay" className={this.state.modalDisplayed > 0 ? 'active' : null}></div>
@@ -31547,7 +31523,7 @@ var App = React.createClass({
                     </div>*/
 window.App = App;
 
-},{"./Dispatcher":278,"./actions":281,"./actions/Creator":280,"./components/AnonymousUser.jsx":282,"./components/FeedScreen.jsx":285,"./components/GpsScreen.jsx":286,"./components/PostActionsCircle.jsx":288,"./components/RegisteredUser.jsx":289,"./k":297,"./stores/AppStateStore":299,"./stores/PostsStore":300,"./stores/UserStore":301,"flux/utils":105,"react":274,"react-addons-css-transition-group":119,"react-dom":127,"react-modal":140,"reqwest":275}],278:[function(require,module,exports){
+},{"./Dispatcher":278,"./actions":281,"./actions/Creator":279,"./components/AnonymousUser.jsx":282,"./components/FeedScreen.jsx":285,"./components/GpsScreen.jsx":286,"./components/PostActionsCircle.jsx":288,"./components/RegisteredUser.jsx":289,"./k":297,"./stores/AppStateStore":299,"./stores/ModalsStore":300,"./stores/PostsStore":301,"./stores/UserStore":302,"flux/utils":105,"react":274,"react-addons-css-transition-group":119,"react-dom":127,"react-modal":140,"reqwest":275}],278:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -31558,61 +31534,8 @@ module.exports = new (require('flux').Dispatcher)();
 var reqwest = require('reqwest');
 
 var Dispatcher = require('../Dispatcher'),
-    ActionsType = require('./');
-
-// var _dispatch = function (ActionType, argumentsKeys) {
-
-//     return function () {
-//         var payload = {
-//             type: ActionType
-//         };
-
-//         if (argumentsKeys && argumentsKeys.length > arguments.length) {
-//             console.error('Arguments required:', argumentsKeys);
-//             console.error('Arguments provided:', arguments);
-//             throw new Error('Arguments mismatch required arguments in a call to Creator. See console debug');
-//         }
-//         if (argumentsKeys) {
-//             for (var i = 0; i < argumentsKeys.length; i++) {
-//                 payload[argumentsKeys[i]] = arguments[i];
-//             }
-//         }
-//         Dispatcher.dispatch(payload);
-//     }
-// };
-
-module.exports = {
-
-    setActiveModal: function setActiveModal(modal) {
-        Dispatcher.dispatch({
-            type: ActionsType('SET_MODAL'),
-            modal: modal
-        });
-    },
-    closeActiveModal: function closeActiveModal() {
-        Dispatcher.dispatch({
-            type: ActionsType('SET_MODAL'),
-            modal: null
-        });
-    },
-
-    setShareData: function setShareData(data) {
-        Dispatcher.dispatch({
-            type: ActionsType('SET_SHARE_DATA'),
-            data: data
-        });
-    }
-
-};
-
-},{"../Dispatcher":278,"./":281,"reqwest":275}],280:[function(require,module,exports){
-'use strict';
-
-var reqwest = require('reqwest');
-
-var Dispatcher = require('../Dispatcher'),
     ActionsType = require('./'),
-    AppStateCreator = require('./AppStateCreator');
+    AppStateCreator = require('./NavigationCreator');
 
 var _dispatch = function _dispatch(ActionType, argumentsKeys) {
 
@@ -31721,13 +31644,67 @@ module.exports = {
 
 };
 
-},{"../Dispatcher":278,"./":281,"./AppStateCreator":279,"reqwest":275}],281:[function(require,module,exports){
+},{"../Dispatcher":278,"./":281,"./NavigationCreator":280,"reqwest":275}],280:[function(require,module,exports){
+'use strict';
+
+var reqwest = require('reqwest');
+
+var Dispatcher = require('../Dispatcher'),
+    ActionsType = require('./');
+
+// var _dispatch = function (ActionType, argumentsKeys) {
+
+//     return function () {
+//         var payload = {
+//             type: ActionType
+//         };
+
+//         if (argumentsKeys && argumentsKeys.length > arguments.length) {
+//             console.error('Arguments required:', argumentsKeys);
+//             console.error('Arguments provided:', arguments);
+//             throw new Error('Arguments mismatch required arguments in a call to Creator. See console debug');
+//         }
+//         if (argumentsKeys) {
+//             for (var i = 0; i < argumentsKeys.length; i++) {
+//                 payload[argumentsKeys[i]] = arguments[i];
+//             }
+//         }
+//         Dispatcher.dispatch(payload);
+//     }
+// };
+
+module.exports = {
+
+    pushModal: function pushModal(modal) {
+        Dispatcher.dispatch({
+            type: ActionsType('PUSH_MODAL'),
+            modal: modal
+        });
+    },
+    popModal: function popModal() {
+        Dispatcher.dispatch({
+            type: ActionsType('POP_MODAL')
+        });
+    },
+
+    setShareData: function setShareData(data) {
+        Dispatcher.dispatch({
+            type: ActionsType('SET_SHARE_DATA'),
+            data: data
+        });
+    }
+
+};
+
+},{"../Dispatcher":278,"./":281,"reqwest":275}],281:[function(require,module,exports){
 "use strict";
 
 module.exports = function (type) {
 	var types = {
+		PUSH_MODAL: "PUSH_MODAL",
+		POP_MODAL: "POP_MODAL",
+
 		SET_SHARE_DATA: "SET_SHARE_DATA",
-		SET_MODAL: "SET_MODAL",
 		SET_LOCATION: "SET_LOCATION",
 
 		GO_TO_SCREEN: "GO_TO_SCREEN",
@@ -31741,7 +31718,7 @@ module.exports = function (type) {
 		NEW_POSTS: "NEW_POSTS"
 	};
 
-	if (!types[type]) {
+	if (types[type] === undefined || types[type] === "" || types[type] === null) {
 		throw new Error('`' + type + '` type isn\'t a valid type.');
 	}
 
@@ -31751,21 +31728,61 @@ module.exports = function (type) {
 },{}],282:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react'),
+    FluxContainerMixin = require('flux/utils').Mixin,
+    NavigationCreator = require('../actions/NavigationCreator'),
+    ModalsStore = require('../stores/ModalsStore'),
+    LoginModal = require('./modals/Login.jsx'),
+    classNames = require('classnames');
 
 var AnonymousUser = React.createClass({
     displayName: 'AnonymousUser',
+    getInitialState: function getInitialState() {
+        return {
+            showConnectForm: true
+        };
+    },
+    toggleForm: function toggleForm() {
+        this.setState({
+            showConnectForm: !this.state.showConnectForm
+        });
+    },
     render: function render() {
-        return React.createElement(
-            'div',
-            { id: 'loggedUser' },
-            React.createElement(
-                'p',
-                { className: 'username' },
-                React.createElement('br', null),
-                'Vous êtes anonyme.'
-            ),
-            React.createElement(
+        var actions;
+
+        if (this.state.showConnectForm) {
+            actions = React.createElement(
+                'div',
+                { className: 'actions' },
+                React.createElement(
+                    'div',
+                    { className: 'action orange' },
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.toggleForm },
+                        'Annuler'
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'action blue' },
+                    React.createElement(
+                        'a',
+                        { href: '#' },
+                        'Go!'
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'connect-form' },
+                    React.createElement('input', { type: 'text', placeholder: 'Identifiant' }),
+                    React.createElement('input', { type: 'password', placeholder: 'Mot de passe' }),
+                    React.createElement('input', { type: 'checkbox' }),
+                    ' Se souvenir de moi'
+                )
+            );
+        } else {
+            actions = React.createElement(
                 'div',
                 { className: 'actions' },
                 React.createElement(
@@ -31773,7 +31790,7 @@ var AnonymousUser = React.createClass({
                     { className: 'action' },
                     React.createElement(
                         'a',
-                        { href: '#' },
+                        { href: '#', onClick: this.toggleForm },
                         'Se connecter'
                     )
                 ),
@@ -31786,14 +31803,26 @@ var AnonymousUser = React.createClass({
                         'Inscription'
                     )
                 )
-            )
+            );
+        }
+
+        return React.createElement(
+            'div',
+            { id: 'loggedUser' },
+            React.createElement(
+                'p',
+                { className: 'username' },
+                React.createElement('br', null),
+                'Vous êtes anonyme.'
+            ),
+            actions
         );
     }
 });
 
 module.exports = AnonymousUser;
 
-},{"react":274}],283:[function(require,module,exports){
+},{"../actions/NavigationCreator":280,"../stores/ModalsStore":300,"./modals/Login.jsx":293,"classnames":3,"flux/utils":105,"react":274}],283:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -31886,7 +31915,7 @@ var ClaimAccount = React.createClass({
 
 module.exports = ClaimAccount;
 
-},{"../Dispatcher":278,"../actions":281,"../stores/UserStore":301,"flux/utils":105,"react":274,"react-google-recaptcha":128,"react-modal":140,"reqwest":275}],284:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../stores/UserStore":302,"flux/utils":105,"react":274,"react-google-recaptcha":128,"react-modal":140,"reqwest":275}],284:[function(require,module,exports){
 'use strict';
 
 var Dispatcher = require('../Dispatcher'),
@@ -31926,12 +31955,12 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":278,"../actions":281,"../stores/PostsStore":300,"./Post.jsx":287,"flux/utils":105,"react":274,"react-dom":127}],285:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../stores/PostsStore":301,"./Post.jsx":287,"flux/utils":105,"react":274,"react-dom":127}],285:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
     ActionsType = require('../actions'),
-    AppStateCreator = require('../actions/AppStateCreator'),
+    AppStateCreator = require('../actions/NavigationCreator'),
     Creator = require('../actions/Creator'),
     Screen = require('./common/Screen.jsx'),
     Feed = require('./Feed.jsx'),
@@ -31947,15 +31976,21 @@ var FeedScreen = React.createClass({
         };
 
         return React.createElement(
-            Screen,
-            { id: 'feedScreen', modals: modals },
-            React.createElement('div', { id: 'top' }),
-            React.createElement('div', { id: 'blackOverlay' }),
+            'div',
+            { id: 'feedScreen', className: 'screen' },
             React.createElement(Feed, null),
             React.createElement(
-                'button',
-                { className: 'startShare', onClick: AppStateCreator.setActiveModal.bind(Creator, 'shareStepOne') },
-                'Localisez un post'
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-12' },
+                    React.createElement(
+                        'button',
+                        { className: 'startShare', onClick: null },
+                        'Localisez un post'
+                    )
+                )
             )
         );
     }
@@ -31963,7 +31998,7 @@ var FeedScreen = React.createClass({
 
 module.exports = FeedScreen;
 
-},{"../actions":281,"../actions/AppStateCreator":279,"../actions/Creator":280,"./Feed.jsx":284,"./common/Screen.jsx":292,"./modals/ShareStepOne.jsx":294,"./modals/ShareStepTwo.jsx":295,"react":274}],286:[function(require,module,exports){
+},{"../actions":281,"../actions/Creator":279,"../actions/NavigationCreator":280,"./Feed.jsx":284,"./common/Screen.jsx":292,"./modals/ShareStepOne.jsx":294,"./modals/ShareStepTwo.jsx":295,"react":274}],286:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -32042,7 +32077,7 @@ var GpsScreen = React.createClass({
 
 module.exports = GpsScreen;
 
-},{"../actions/Creator":280,"../k":297,"../stores/AppStateStore":299,"flux/utils":105,"react":274}],287:[function(require,module,exports){
+},{"../actions/Creator":279,"../k":297,"../stores/AppStateStore":299,"flux/utils":105,"react":274}],287:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32101,61 +32136,59 @@ var Post = React.createClass({
 	},
 
 	render: function render() {
-		var className = classNames('post', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
+		var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
 
 		return React.createElement(
 			'div',
 			{ className: className },
 			React.createElement(
 				'div',
-				{ className: 'top' },
-				React.createElement(
-					'div',
-					{ className: 'avatar' },
-					React.createElement('img', { src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
-				),
-				React.createElement(
-					'p',
-					{ className: 'username' },
-					this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
-				),
+				{ className: 'inner col-xs-12' },
 				React.createElement(
 					'p',
 					{ className: 'time' },
 					'il y a 9 heures'
 				),
-				React.createElement('img', { src: '/img/spinner.gif', className: 'spinner' })
-			),
-			React.createElement(
-				'p',
-				{ className: 'location' },
-				'Situé à ',
-				React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
-				' ',
-				Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
-				' km'
-			),
-			React.createElement(
-				'p',
-				{ className: 'title' },
 				React.createElement(
-					'a',
-					{ href: this.props.data.url },
-					this.props.data.text
+					'p',
+					{ className: 'location' },
+					'Situé à ',
+					React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
+					' ',
+					Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
+					' km'
+				),
+				React.createElement(
+					'p',
+					{ className: 'title' },
+					React.createElement(
+						'a',
+						{ href: this.props.data.url },
+						this.props.data.text
+					)
+				),
+				React.createElement(
+					'p',
+					{ className: 'from-and-shared' },
+					getHost(this.props.data.url),
+					' partagé par ',
+					React.createElement(
+						'span',
+						{ className: 'shared-username' },
+						this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
+					),
+					React.createElement('img', { className: 'avatar', src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
 				)
-			),
-			React.createElement(
-				'p',
-				{ className: 'from' },
-				getHost(this.props.data.url)
 			)
 		);
 	}
 });
 
+/*<img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />*/
+
 module.exports = Post;
 
-},{"../helpers/PostTextParser":296,"../stores/AppStateStore":299,"../stores/UserStore":301,"classnames":3,"flux/utils":105,"react":274}],288:[function(require,module,exports){
+},{"../helpers/PostTextParser":296,"../stores/AppStateStore":299,"../stores/UserStore":302,"classnames":3,"flux/utils":105,"react":274}],288:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32333,6 +32366,7 @@ module.exports = Screen;
 
 var React = require('react'),
     reqwest = require('reqwest'),
+    NavigationCreator = require('../../actions/NavigationCreator'),
     Dispatcher = require('../../Dispatcher'),
     ActionsTypes = require('../../actions');
 
@@ -32348,10 +32382,16 @@ var Login = React.createClass({
             type: 'json'
         }).then(function (json) {
             console.log('Json!', json);
-            if (json.success) Dispatcher.dispatch({
-                type: ActionsTypes('USER_LOGGED_IN'),
-                user: json.user
-            });
+            if (json.success) {
+                Dispatcher.dispatch({
+                    type: ActionsTypes('USER_LOGGED_IN'),
+                    user: json.user
+                });
+                Dispatcher.dispatch({
+                    type: ActionsTypes('SET_APP_MODAL'),
+                    appModal: null
+                });
+            }
         }).fail(function (err, msg) {
             console.log(err, msg);
         });
@@ -32359,7 +32399,7 @@ var Login = React.createClass({
     render: function render() {
         return React.createElement(
             'div',
-            { id: 'loginModal', className: 'modal full-width full-height grey' },
+            { id: 'loginModal', className: 'modal full-width full-height slide-from-top grey', style: this.props.style },
             React.createElement(
                 'div',
                 { className: 'box' },
@@ -32384,6 +32424,11 @@ var Login = React.createClass({
                     'button',
                     { onClick: this.logIn },
                     'Connexion'
+                ),
+                React.createElement(
+                    'a',
+                    { onClick: NavigationCreator.popModal.bind(NavigationCreator) },
+                    'Pop'
                 )
             )
         );
@@ -32392,12 +32437,12 @@ var Login = React.createClass({
 
 module.exports = Login;
 
-},{"../../Dispatcher":278,"../../actions":281,"react":274,"reqwest":275}],294:[function(require,module,exports){
+},{"../../Dispatcher":278,"../../actions":281,"../../actions/NavigationCreator":280,"react":274,"reqwest":275}],294:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 
-var AppStateCreator = require('../../actions/AppStateCreator'),
+var AppStateCreator = require('../../actions/NavigationCreator'),
     Creator = require('../../actions/Creator'),
     ValidateMixin = require('../../mixins/ValidateMixin'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -32469,14 +32514,14 @@ var ShareStepOne = React.createClass({
 
 module.exports = ShareStepOne;
 
-},{"../../../../shared/schemas/PostSchema":302,"../../actions/AppStateCreator":279,"../../actions/Creator":280,"../../mixins/ValidateMixin":298,"../../stores/UserStore":301,"../common/ErrorDisplayer.jsx":290,"../common/Input.jsx":291,"flux/utils":105,"react":274,"validate.js":276}],295:[function(require,module,exports){
+},{"../../../../shared/schemas/PostSchema":303,"../../actions/Creator":279,"../../actions/NavigationCreator":280,"../../mixins/ValidateMixin":298,"../../stores/UserStore":302,"../common/ErrorDisplayer.jsx":290,"../common/Input.jsx":291,"flux/utils":105,"react":274,"validate.js":276}],295:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
     GoogleMapsLoader = require('google-maps');
 
 var Creator = require('../../actions/Creator'),
-    AppStateCreator = require('../../actions/AppStateCreator'),
+    AppStateCreator = require('../../actions/NavigationCreator'),
     FluxContainerMixin = require('flux/utils').Mixin,
     UserStore = require('../../stores/UserStore'),
     AppStateStore = require('../../stores/AppStateStore');
@@ -32605,7 +32650,7 @@ var LocationChooser = React.createClass({
 
 module.exports = LocationChooser;
 
-},{"../../actions/AppStateCreator":279,"../../actions/Creator":280,"../../stores/AppStateStore":299,"../../stores/UserStore":301,"flux/utils":105,"google-maps":106,"react":274}],296:[function(require,module,exports){
+},{"../../actions/Creator":279,"../../actions/NavigationCreator":280,"../../stores/AppStateStore":299,"../../stores/UserStore":302,"flux/utils":105,"google-maps":106,"react":274}],296:[function(require,module,exports){
 'use strict';
 
 module.exports = function (text) {
@@ -32622,6 +32667,9 @@ module.exports = function (text) {
 'use strict';
 
 module.exports = {
+	Modals: {
+		LOGIN: 'LoginModal'
+	},
 	Screens: {
 		LOGIN_REGISTER: 'login_register',
 		GPS: 'gps',
@@ -32741,9 +32789,6 @@ var AppStateStore = function (_FluxStore) {
 
 		_this.location = k.LocationState.PENDING;
 		_this.screen = k.Screens.GPS;
-		_this.modal = null;
-		var Login = require('../components/modals/Login.jsx');
-		_this.appModal = React.createElement(Login, null);
 
 		_this.currentShareData = {};
 		return _this;
@@ -32759,13 +32804,7 @@ var AppStateStore = function (_FluxStore) {
 		value: function __onDispatch(action) {
 			switch (action.type) {
 				case ActionsType('SET_SHARE_DATA'):
-					console.log(action.data);
 					this.currentShareData = action.data;
-					this.__emitChange();
-					break;
-
-				case ActionsType('SET_MODAL'):
-					this.modal = action.modal;
 					this.__emitChange();
 					break;
 
@@ -32787,7 +32826,79 @@ var AppStateStore = function (_FluxStore) {
 
 module.exports = new AppStateStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"../components/modals/Login.jsx":293,"../k":297,"flux/utils":105}],300:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../k":297,"flux/utils":105}],300:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react'),
+    Dispatcher = require('../Dispatcher'),
+    FluxStore = require('flux/utils').Store,
+    ActionsType = require('../actions');
+
+var BASE_ZINDEX = 10;
+
+var ModalsStore = function (_FluxStore) {
+	_inherits(ModalsStore, _FluxStore);
+
+	function ModalsStore(Dispatcher) {
+		_classCallCheck(this, ModalsStore);
+
+		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ModalsStore).call(this, Dispatcher));
+
+		_this.__modals = [];
+		return _this;
+	}
+
+	_createClass(ModalsStore, [{
+		key: 'modals',
+		value: function modals() {
+			return this.__modals;
+		}
+	}, {
+		key: 'isModalActive',
+		value: function isModalActive(name) {
+			for (var i = 0; i < this.__modals.length; i++) {
+				if (this.__modals[i].type.displayName == name) return true;
+			}
+			return false;
+		}
+	}, {
+		key: '__pushModal',
+		value: function __pushModal(modal) {
+			var zIndexedModal = React.cloneElement(modal, { key: this.__modals.length, style: { zIndex: BASE_ZINDEX + this.__modals.length } });
+
+			this.__modals.push(zIndexedModal);
+		}
+	}, {
+		key: '__onDispatch',
+		value: function __onDispatch(action) {
+			switch (action.type) {
+				case ActionsType('PUSH_MODAL'):
+					this.__pushModal(action.modal);
+					this.__emitChange();
+					break;
+
+				case ActionsType('POP_MODAL'):
+					this.__modals.pop();
+					this.__emitChange();
+					break;
+			}
+		}
+	}]);
+
+	return ModalsStore;
+}(FluxStore);
+
+module.exports = new ModalsStore(Dispatcher);
+
+},{"../Dispatcher":278,"../actions":281,"flux/utils":105,"react":274}],301:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -32847,7 +32958,7 @@ var PostsStore = function (_FluxStore) {
 
 module.exports = new PostsStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],301:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],302:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -32930,7 +33041,7 @@ var UserStore = function (_FluxStore) {
 
 module.exports = new UserStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],302:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],303:[function(require,module,exports){
 "use strict";
 
 module.exports = {

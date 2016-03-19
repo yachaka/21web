@@ -21,6 +21,7 @@ var Dispatcher = require('./Dispatcher')
     , PostsStore = require('./stores/PostsStore')
     , UserStore = require('./stores/UserStore')
     , AppStateStore = require('./stores/AppStateStore')
+    , ModalsStore = require('./stores/ModalsStore')
     , k = require('./k');
 
 /*
@@ -35,11 +36,12 @@ var Dispatcher = require('./Dispatcher')
                         </div>
                         */
 var App = React.createClass({
-    mixins: [FluxContainerMixin([UserStore, AppStateStore])],
+    mixins: [FluxContainerMixin([UserStore, AppStateStore, ModalsStore])],
     statics: {
         calculateState: function (prevState) {
             return {
                 screen: AppStateStore.whichScreen(),
+                modals: ModalsStore.modals(),
                 appModal: AppStateStore.appModal,
                 loggedUser: UserStore.getLoggedUser()
             };
@@ -74,30 +76,21 @@ var App = React.createClass({
                     </div>
                 </div>
 
+                {screen}
+                
+            </div>
+		);
+    }
+});
+/*
+
                 <div className="row">
                     <div className="col-xs-12">
                         <p id="appTheme">#skate</p>
                     </div>
                 </div>
 
-                <div className="row">
-                    <div className="col-xs-12">
-                        <div id="wrapper">
-                            <ReactCSSTransitionGroup component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
-                                {this.state.appModal}
-                            </ReactCSSTransitionGroup>
-
-                            <ReactCSSTransitionGroup component="div" transitionName="screen" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
-                                {screen}
-                            </ReactCSSTransitionGroup>
-                        </div>
-                    </div>
-                </div>
-            </div>
-		);
-    }
-});
-/*<div id="feedScreen" className="screen">
+<div id="feedScreen" className="screen">
                         <div id="top"></div>
 
                         <div id="blackOverlay" className={this.state.modalDisplayed > 0 ? 'active' : null}></div>

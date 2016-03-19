@@ -1,6 +1,6 @@
 var React = require('react');
 
-var AppStateCreator = require('../../actions/AppStateCreator')
+var AppStateCreator = require('../../actions/NavigationCreator')
     , Creator = require('../../actions/Creator')
     , ValidateMixin = require('../../mixins/ValidateMixin')
     , FluxContainerMixin = require('flux/utils').Mixin

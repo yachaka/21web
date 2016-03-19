@@ -1,5 +1,8 @@
 
 module.exports = {
+	Modals: {
+		LOGIN: 'LoginModal'
+	},
 	Screens: {
 		LOGIN_REGISTER: 'login_register',
 		GPS: 'gps',
