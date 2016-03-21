@@ -70,6 +70,8 @@ var App = React.createClass({
 
         return (
             <div className="container">
+                <div id="colLeft"></div>
+                <div id="colRight"></div>
                 <div className="row">
                     <div className="col-xs-12">
                         {loggedUser}

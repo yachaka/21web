@@ -50,7 +50,11 @@ var Post = React.createClass({
 
     render() {
     	var className = classNames('post row', {'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd});
-
+    	var test = this.props.data.id == 4 ? <div className="col-xs-12" style={{marginBottom: '25px'}}>
+					<iframe id="ytplayer" type="text/html" width="640" height="390"
+					  src="http://www.youtube.com/embed/M7lc1UVf-VE?autoplay=0&origin=http://example.com"
+					  frameborder="0"/>
+  				</div>: null;
         return (
             <div className={className}>
             	<div className="inner col-xs-12">
@@ -63,7 +67,8 @@ var Post = React.createClass({
 					<p className="from-and-shared">
 						{getHost(this.props.data.url)} partagé par <span className="shared-username">{this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'}</span><img className="avatar" src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />
 					</p>
-				</div>			
+				</div>
+				{test}
 			</div>
         );
     }

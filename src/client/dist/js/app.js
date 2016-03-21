@@ -31488,6 +31488,8 @@ var App = React.createClass({
         return React.createElement(
             'div',
             { className: 'container' },
+            React.createElement('div', { id: 'colLeft' }),
+            React.createElement('div', { id: 'colRight' }),
             React.createElement(
                 'div',
                 { className: 'row' },
@@ -32137,7 +32139,13 @@ var Post = React.createClass({
 
 	render: function render() {
 		var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
-
+		var test = this.props.data.id == 4 ? React.createElement(
+			'div',
+			{ className: 'col-xs-12', style: { marginBottom: '25px' } },
+			React.createElement('iframe', { id: 'ytplayer', type: 'text/html', width: '640', height: '390',
+				src: 'http://www.youtube.com/embed/M7lc1UVf-VE?autoplay=0&origin=http://example.com',
+				frameborder: '0' })
+		) : null;
 		return React.createElement(
 			'div',
 			{ className: className },
@@ -32179,7 +32187,8 @@ var Post = React.createClass({
 					),
 					React.createElement('img', { className: 'avatar', src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
 				)
-			)
+			),
+			test
 		);
 	}
 });

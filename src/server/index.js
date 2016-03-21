@@ -1,5 +1,6 @@
 
-var path = require('path');
+var path = require('path')
+	, reqwest = require('reqwest');
 
 var expressS = require('express')
 	, express = expressS()
@@ -103,9 +104,110 @@ express.use(function (req, res, next) {
 /*******************/
 
 
+function formatOEmbedResponse(url, oembed) {
+	var type_data;
+
+	if (oembed.type == 'photo')
+		type_data = {
+			url: oembed.url,
+			width: oembed.width,
+			height: oembed.height
+		};
+	else if (oembed.type == 'video' || oembed.type == 'rich')
+		type_data = {
+			html: oembed.html,
+			width: oembed.width,
+			height: oembed.height
+		};
+	else
+		type_data = {};
+
+	return {
+		url: url,
+		author_name: oembed.author_name,
+		author_url: oembed.author_url,
+		provider_name: oembed.provider_name,
+		provider_url: oembed.provider_url,
+		thumbnail_url: oembed.thumbnail_url,
+		type: oembed.type,
+		type_data: type_data
+	};
+}
+
+var PreviewGenerators = [
+	{
+		pattern: /https?:\/\/www.facebook.com(\/.*)/,
+		fn: function (url, done) {
+
+			var FACEBOOK_VIDEO_OEMBED_ENDPOINT = 'https://www.facebook.com/plugins/video/oembed.json/?url=';
+
+			var postUrlSchemes = [
+				/https?:\/\/www.facebook.com\/[a-zA-Z0-9\.]+\/posts\/[0-9]+/,
+				/https?:\/\/www.facebook.com\/[a-zA-Z0-9\.]+\/posts\/[0-9]+/,
+				/https?:\/\/www.facebook.com\/[a-zA-Z0-9\.]+\/activity\/[0-9]+/,
+				/https?:\/\/www.facebook.com\/photo\.php\?fbid=[0-9]+/,
+				/https?:\/\/www.facebook.com\/photos\/[0-9]+/,
+				/https?:\/\/www.facebook.com\/permalink\.php\?story_fbid=[0-9]+/,
+				/https?:\/\/www.facebook.com\/media\/set\?set=[0-9]+/,
+				/https?:\/\/www.facebook.com\/questions\/[0-9]+/,
+				/https?:\/\/www.facebook.com\/notes\/[a-zA-Z0-9\.]\/(.*)\/[0-9]+/
+			];
+
+			var videoUrlSchemes = [
+				/https?:\/\/www.facebook.com\/[a-zA-Z0-9\.]+\/videos\/[0-9]+/,
+				/https?:\/\/www.facebook.com\/video.php\?id=[0-9]+/,
+				/https?:\/\/www.facebook.com\/video.php\?v=[0-9]+/
+			];
+
+			for (var i = 0; i < postUrlSchemes.length; i++) {
+				if (url.match(postUrlSchemes[i])) {
+				}
+			}
+
+			for (var i = 0; i < videoUrlSchemes.length; i++) {
+				if (url.match(videoUrlSchemes[i])) {
+					reqwest({
+						url: FACEBOOK_VIDEO_OEMBED_ENDPOINT + url,
+						type: 'json'
+					})
+					.then(function (json) {
+						done(formatOEmbedResponse(url, json));
+					});
+				}
+			}
+		}
+	}
+];
+
+var oEmbedPreviewGenerator = function (url) {
+
+	reqwest({
+		url: 'http://oembed.com/providers.json',
+		type: 'json'
+	})
+	.then(function (providers) {
+		console.log(providers[0]);
+	});
+
+};
+
+function generatePreview(url, done) {
+	for (var i = 0; i < PreviewGenerators.length; i++) {
+		if (url.match(PreviewGenerators[i].pattern)) {
+			console.log('Matched with generator!', PreviewGenerators[i].pattern);
+			PreviewGenerators[i].fn(url, done);
+			break ;
+		}
+	}
+}
 
 express.get('/', function (req, res) {
-	console.log('Path ', req.path, ', user: ', req.user);
+// oEmbedPreviewGenerator();
+	// generatePreview('https://www.facebook.com/B2OUF/videos/926159704167131/', function (preview) {
+	// 	console.log('got preview!', preview);
+	// });
+
+	// console.log('Path ', req.path, ', user: ', req.user);
 	res.render('index');
 	// res.sendStatus(200);
 	// res.sendFile(path.join(__dirname, '../client/index.html'));

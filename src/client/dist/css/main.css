@@ -7,12 +7,15 @@ html, body {box-sizing: border-box;}
 a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
 /** END RESET **/
 
-body {background-color: #f5f5f5;}
+body {background-color: #fff;}
 
 #welcome { font-size: 42px; margin: 40px 0 40px 0; color: #D1D1D1; text-align: center; background-color: #ffffff; padding: 40px;}
 	#welcome .close { font-size: 28px;}
  
-#app { overflow: hidden;}
+#app { overflow: hidden; margin-top: 40px;}
+	#app .container { background-color: rgba(255, 255, 255, 0.6); position: relative;}
+		#app .container #colLeft {width: 396px; height: 5000px; position: absolute; left: -360px; background: url('/img/logos.png') repeat-y;}
+		#app .container #colRight {width: 185px; height: 5000px; position: absolute; right: -300px; top: 90px; background: url('/img/girl.png') no-repeat;}
 
 /*********
 * Logged User
