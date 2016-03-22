@@ -32092,30 +32092,30 @@ var FluxContainerMixin = require('flux/utils').Mixin,
     AppStateStore = require('../stores/AppStateStore');
 
 function htmlEntities(str) {
-	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function getHost(url) {
-	var pattern = /(https?:\/\/)(www\.)?([a-zA-Z0-9\.]+)(\/(.*))?/;
-	return url.replace(pattern, "$3");
+				var pattern = /(https?:\/\/)(www\.)?([a-zA-Z0-9\.]+)(\/(.*))?/;
+				return url.replace(pattern, "$3");
 }
 
 function distance(lat1, lon1, lat2, lon2, unit) {
-	var radlat1 = Math.PI * lat1 / 180;
-	var radlat2 = Math.PI * lat2 / 180;
-	var theta = lon1 - lon2;
-	var radtheta = Math.PI * theta / 180;
-	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-	dist = Math.acos(dist);
-	dist = dist * 180 / Math.PI;
-	dist = dist * 60 * 1.1515;
-	if (unit == "K") {
-		dist = dist * 1.609344;
-	}
-	if (unit == "N") {
-		dist = dist * 0.8684;
-	}
-	return dist;
+				var radlat1 = Math.PI * lat1 / 180;
+				var radlat2 = Math.PI * lat2 / 180;
+				var theta = lon1 - lon2;
+				var radtheta = Math.PI * theta / 180;
+				var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+				dist = Math.acos(dist);
+				dist = dist * 180 / Math.PI;
+				dist = dist * 60 * 1.1515;
+				if (unit == "K") {
+								dist = dist * 1.609344;
+				}
+				if (unit == "N") {
+								dist = dist * 0.8684;
+				}
+				return dist;
 }
 
 /*
@@ -32125,72 +32125,69 @@ function distance(lat1, lon1, lat2, lon2, unit) {
 				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
-	displayName: 'Post',
+				displayName: 'Post',
 
-	mixins: [FluxContainerMixin([UserStore, AppStateStore])],
-	statics: {
-		calculateState: function calculateState(prevState) {
-			return {
-				loggedUser: UserStore.getLoggedUser(),
-				userLocation: AppStateStore.location
-			};
-		}
-	},
+				mixins: [FluxContainerMixin([UserStore, AppStateStore])],
+				statics: {
+								calculateState: function calculateState(prevState) {
+												return {
+																loggedUser: UserStore.getLoggedUser(),
+																userLocation: AppStateStore.location
+												};
+								}
+				},
+				componentDidMount: function componentDidMount() {
+								window.iframely.load(this.refs.preview.firstChild);
+				},
+				render: function render() {
+								console.log(this.props.data);
+								var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
 
-	render: function render() {
-		var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
-		var test = this.props.data.id == 4 ? React.createElement(
-			'div',
-			{ className: 'col-xs-12', style: { marginBottom: '25px' } },
-			React.createElement('iframe', { id: 'ytplayer', type: 'text/html', width: '640', height: '390',
-				src: 'http://www.youtube.com/embed/M7lc1UVf-VE?autoplay=0&origin=http://example.com',
-				frameborder: '0' })
-		) : null;
-		return React.createElement(
-			'div',
-			{ className: className },
-			React.createElement(
-				'div',
-				{ className: 'inner col-xs-12' },
-				React.createElement(
-					'p',
-					{ className: 'time' },
-					'il y a 9 heures'
-				),
-				React.createElement(
-					'p',
-					{ className: 'location' },
-					'Situé à ',
-					React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
-					' ',
-					Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
-					' km'
-				),
-				React.createElement(
-					'p',
-					{ className: 'title' },
-					React.createElement(
-						'a',
-						{ href: this.props.data.url },
-						this.props.data.text
-					)
-				),
-				React.createElement(
-					'p',
-					{ className: 'from-and-shared' },
-					getHost(this.props.data.url),
-					' partagé par ',
-					React.createElement(
-						'span',
-						{ className: 'shared-username' },
-						this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
-					),
-					React.createElement('img', { className: 'avatar', src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
-				)
-			),
-			test
-		);
-	}
+								return React.createElement(
+												'div',
+												{ className: className },
+												React.createElement(
+																'div',
+																{ className: 'inner col-xs-12' },
+																React.createElement(
+																				'p',
+																				{ className: 'time' },
+																				'il y a 9 heures'
+																),
+																React.createElement(
+																				'p',
+																				{ className: 'location' },
+																				'Situé à ',
+																				React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
+																				' ',
+																				Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
+																				' km'
+																),
+																React.createElement(
+																				'p',
+																				{ className: 'title' },
+																				React.createElement(
+																								'a',
+																								{ href: this.props.data.url },
+																								this.props.data.text
+																				)
+																),
+																React.createElement(
+																				'p',
+																				{ className: 'from-and-shared' },
+																				getHost(this.props.data.url),
+																				' partagé par ',
+																				React.createElement(
+																								'span',
+																								{ className: 'shared-username' },
+																								this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
+																				),
+																				React.createElement('img', { className: 'avatar', src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+																)
+												),
+												React.createElement('div', { ref: 'preview', className: 'preview col-xs-12', dangerouslySetInnerHTML: { __html: this.props.data.preview.html } })
+								);
+				}
 });
 
 /*<img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />*/

@@ -13,7 +13,7 @@ body {background-color: #fff;}
 	#welcome .close { font-size: 28px;}
  
 #app { overflow: hidden; margin-top: 40px;}
-	#app .container { background-color: rgba(255, 255, 255, 0.6); position: relative;}
+	#app .container { background-color: rgba(255, 255, 255, 0.6); position: relative; max-width: 980px;}
 		#app .container #colLeft {width: 396px; height: 5000px; position: absolute; left: -360px; background: url('/img/logos.png') repeat-y;}
 		#app .container #colRight {width: 185px; height: 5000px; position: absolute; right: -300px; top: 90px; background: url('/img/girl.png') no-repeat;}
 

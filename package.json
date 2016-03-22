@@ -25,6 +25,7 @@
     "classnames": "^2.2.3",
     "consolidate": "^0.14.0",
     "cookie-parser": "^1.4.1",
+    "escape-string-regexp": "^1.0.5",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "flux": "^2.1.1",

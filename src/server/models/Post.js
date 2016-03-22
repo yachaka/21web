@@ -2,6 +2,7 @@
 var objection = require('objection')
 	, Model = require('objection').Model
 	, User = require('./User')
+	, Preview = require('./Preview')
 	, ValidateObjectionBridge = require('../ValidateObjectionBridge');
 
 function Post() {
@@ -20,6 +21,14 @@ Post.relationMappings = {
 		join: {
 			from: 'posts.user_id',
 			to: 'users.id'
+		}
+	},
+	preview: {
+		relation: Model.OneToOneRelation,
+		modelClass: Preview,
+		join: {
+			from: 'posts.preview_id',
+			to: 'previews.id'
 		}
 	}
 };
