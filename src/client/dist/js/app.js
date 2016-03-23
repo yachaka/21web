@@ -31487,18 +31487,7 @@ var App = React.createClass({
 
         return React.createElement(
             'div',
-            { className: 'container' },
-            React.createElement('div', { id: 'colLeft' }),
-            React.createElement('div', { id: 'colRight' }),
-            React.createElement(
-                'div',
-                { className: 'row' },
-                React.createElement(
-                    'div',
-                    { className: 'col-xs-12' },
-                    loggedUser
-                )
-            ),
+            null,
             screen
         );
     }
@@ -32092,30 +32081,57 @@ var FluxContainerMixin = require('flux/utils').Mixin,
     AppStateStore = require('../stores/AppStateStore');
 
 function htmlEntities(str) {
-				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function getHost(url) {
-				var pattern = /(https?:\/\/)(www\.)?([a-zA-Z0-9\.]+)(\/(.*))?/;
-				return url.replace(pattern, "$3");
+	var pattern = /(https?:\/\/)(www\.)?([a-zA-Z0-9\.]+)(\/(.*))?/;
+	return url.replace(pattern, "$3");
 }
 
 function distance(lat1, lon1, lat2, lon2, unit) {
-				var radlat1 = Math.PI * lat1 / 180;
-				var radlat2 = Math.PI * lat2 / 180;
-				var theta = lon1 - lon2;
-				var radtheta = Math.PI * theta / 180;
-				var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-				dist = Math.acos(dist);
-				dist = dist * 180 / Math.PI;
-				dist = dist * 60 * 1.1515;
-				if (unit == "K") {
-								dist = dist * 1.609344;
-				}
-				if (unit == "N") {
-								dist = dist * 0.8684;
-				}
-				return dist;
+	var radlat1 = Math.PI * lat1 / 180;
+	var radlat2 = Math.PI * lat2 / 180;
+	var theta = lon1 - lon2;
+	var radtheta = Math.PI * theta / 180;
+	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+	dist = Math.acos(dist);
+	dist = dist * 180 / Math.PI;
+	dist = dist * 60 * 1.1515;
+	if (unit == "K") {
+		dist = dist * 1.609344;
+	}
+	if (unit == "N") {
+		dist = dist * 0.8684;
+	}
+	return dist;
+}
+
+function rgbToHex(r, g, b) {
+	return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function hexToRgb(hex) {
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
+}
+
+function mixColors(color1, color2, progress) {
+	color1 = hexToRgb(color1);
+	color2 = hexToRgb(color2);
+	var rGap = Math.abs(color1.r - color2.r);
+	var gGap = Math.abs(color1.g - color2.g);
+	var bGap = Math.abs(color1.b - color2.b);
+
+	var newR = color1.r < color2.r ? color1.r + Math.round(rGap * progress) : color2.r + Math.round(rGap * progress);
+	var newG = color1.g < color2.g ? color1.g + Math.round(gGap * progress) : color2.g + Math.round(gGap * progress);
+	var newB = color1.b < color2.b ? color1.b + Math.round(bGap * progress) : color2.b + Math.round(bGap * progress);
+
+	return rgbToHex(newR, newG, newB);
 }
 
 /*
@@ -32125,72 +32141,115 @@ function distance(lat1, lon1, lat2, lon2, unit) {
 				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
-				displayName: 'Post',
+	displayName: 'Post',
 
-				mixins: [FluxContainerMixin([UserStore, AppStateStore])],
-				statics: {
-								calculateState: function calculateState(prevState) {
-												return {
-																loggedUser: UserStore.getLoggedUser(),
-																userLocation: AppStateStore.location
-												};
-								}
-				},
-				componentDidMount: function componentDidMount() {
-								window.iframely.load(this.refs.preview.firstChild);
-				},
-				render: function render() {
-								console.log(this.props.data);
-								var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
-
-								return React.createElement(
-												'div',
-												{ className: className },
-												React.createElement(
-																'div',
-																{ className: 'inner col-xs-12' },
-																React.createElement(
-																				'p',
-																				{ className: 'time' },
-																				'il y a 9 heures'
-																),
-																React.createElement(
-																				'p',
-																				{ className: 'location' },
-																				'Situé à ',
-																				React.createElement('img', { src: 'https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-23-32.png' }),
-																				' ',
-																				Math.ceil(distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K')),
-																				' km'
-																),
-																React.createElement(
-																				'p',
-																				{ className: 'title' },
-																				React.createElement(
-																								'a',
-																								{ href: this.props.data.url },
-																								this.props.data.text
-																				)
-																),
-																React.createElement(
-																				'p',
-																				{ className: 'from-and-shared' },
-																				getHost(this.props.data.url),
-																				' partagé par ',
-																				React.createElement(
-																								'span',
-																								{ className: 'shared-username' },
-																								this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
-																				),
-																				React.createElement('img', { className: 'avatar', src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
-																)
-												),
-												React.createElement('div', { ref: 'preview', className: 'preview col-xs-12', dangerouslySetInnerHTML: { __html: this.props.data.preview.html } })
-								);
+	mixins: [FluxContainerMixin([UserStore, AppStateStore])],
+	statics: {
+		calculateState: function calculateState(prevState) {
+			return {
+				loggedUser: UserStore.getLoggedUser(),
+				userLocation: {
+					coords: {
+						latitude: 48.896619799999996,
+						longitude: 2.3184486
+					}
 				}
+			};
+		}
+	},
+	componentDidMount: function componentDidMount() {
+		window.iframely.load(this.refs.preview.firstChild);
+	},
+	render: function render() {
+		console.log(this.state.userLocation);
+		var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
+
+		var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K');
+		var progress = distanceN / 8;
+		progress = progress > 1 ? 1 : progress;
+		var color = mixColors('#86247E', '#999999', progress);
+		return React.createElement(
+			'div',
+			{ className: className },
+			React.createElement(
+				'div',
+				{ className: 'distance col-xs-2', style: { color: color } },
+				'A ',
+				Math.round(distanceN),
+				'km'
+			),
+			React.createElement(
+				'div',
+				{ className: 'inner col-xs-22' },
+				React.createElement(
+					'div',
+					{ className: 'row top' },
+					React.createElement(
+						'div',
+						{ className: 'col-xs-12' },
+						React.createElement(
+							'p',
+							{ className: 'time' },
+							'9 heures'
+						),
+						React.createElement(
+							'p',
+							{ className: 'title' },
+							React.createElement(
+								'a',
+								{ href: this.props.data.url },
+								this.props.data.text
+							)
+						),
+						React.createElement(
+							'p',
+							{ className: 'from-and-shared' },
+							getHost(this.props.data.url),
+							' partagé par ',
+							React.createElement(
+								'span',
+								{ className: 'shared-username' },
+								this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'
+							),
+							React.createElement('img', { className: 'avatar', src: 'https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg' })
+						)
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row preview' },
+					React.createElement(
+						'div',
+						{ className: 'col-xs-12' },
+						React.createElement('div', { ref: 'preview', className: 'true-preview', dangerouslySetInnerHTML: { __html: this.props.data.preview.html } })
+					),
+					React.createElement(
+						'a',
+						{ href: this.props.data.preview.canonical, className: 'see-more' },
+						React.createElement(
+							'span',
+							{ className: 'caret' },
+							'►'
+						),
+						React.createElement(
+							'span',
+							{ className: 'info' },
+							'@',
+							this.props.data.preview.author,
+							React.createElement('br', null),
+							'Voir plus sur ',
+							this.props.data.preview.provider
+						)
+					)
+				)
+			)
+		);
+	}
 });
 
-/*<img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />*/
+/*<img src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />
+
+*/
 
 module.exports = Post;
 
@@ -32794,7 +32853,7 @@ var AppStateStore = function (_FluxStore) {
 		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AppStateStore).call(this, Dispatcher));
 
 		_this.location = k.LocationState.PENDING;
-		_this.screen = k.Screens.GPS;
+		_this.screen = k.Screens.FEED;
 
 		_this.currentShareData = {};
 		return _this;

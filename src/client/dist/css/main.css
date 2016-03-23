@@ -7,15 +7,16 @@ html, body {box-sizing: border-box;}
 a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
 /** END RESET **/
 
-body {background-color: #fff;}
+body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/}
+
+#everything { position: relative; max-width: 980px;}
+		#everything #colLeft {height: 5000px; position: absolute; right: 100%; left:-400%; background: url('/img/logos.png') top right repeat;}
+		#everything #colRight {height: 5000px; position: absolute; left: 100%; right:-400%; background: url('/img/logos.png') top left repeat;}
 
 #welcome { font-size: 42px; margin: 40px 0 40px 0; color: #D1D1D1; text-align: center; background-color: #ffffff; padding: 40px;}
 	#welcome .close { font-size: 28px;}
  
-#app { overflow: hidden; margin-top: 40px;}
-	#app .container { background-color: rgba(255, 255, 255, 0.6); position: relative; max-width: 980px;}
-		#app .container #colLeft {width: 396px; height: 5000px; position: absolute; left: -360px; background: url('/img/logos.png') repeat-y;}
-		#app .container #colRight {width: 185px; height: 5000px; position: absolute; right: -300px; top: 90px; background: url('/img/girl.png') no-repeat;}
+#app { background-color: #fff; background: url('/img/background-line.png') #fff 0px top repeat-y; padding-left: 50px; overflow: hidden; padding-top: 40px; margin-left: 200px;}
 
 /*********
 * Logged User
@@ -86,13 +87,13 @@ body {background-color: #fff;}
 * FEED
 **/
 #feedScreen #feed { }
-	#feedScreen #feed .post {  border-top: 1px solid #ddd;}
-	#feedScreen #feed .post .inner { padding-top: 18px; padding-bottom: 18px;}
-	#feedScreen #feed .post.odd {}
+	#feedScreen #feed .post {  border-bottom: 1px solid #ddd; padding: 20px 0;}
+	#feedScreen #feed .post .top { margin-bottom: 15px;}
+		#feedScreen #feed .post .distance { font-size: 20px; line-height: 40px; color: #999;}
 
 		#feedScreen #feed .post .time { color: #777; line-height: 32px; font-size: 13px; float: right;}
 
-		#feedScreen #feed .post .title { font-size: 20px; margin-bottom: 5px;}
+		#feedScreen #feed .post .title { font-size: 22px; margin-bottom: 5px;}
 			#feedScreen #feed .post .title a {text-decoration: none; color: #559DD9; font-weight: 300;}
 
 		#feedScreen #feed .post .from-and-shared { font-size: 13px; color: #888;}
@@ -103,6 +104,14 @@ body {background-color: #fff;}
 
 		#feedScreen #feed .post .location { color:#86247E; font-size: 14px;}
 			#feedScreen #feed .post .location img { vertical-align: middle; height: 24px;}
+
+		#feedScreen #feed .post .preview { position: relative;}
+			#feedScreen #feed .post .preview .see-more { position: absolute; top: 50%; left: 50%; margin-left: 10px; padding: 10px; margin-top: -25px; font-size: 14px;}
+				#feedScreen #feed .post .preview .see-more:hover { background-color: #efefef;}
+				#feedScreen #feed .post .preview .see-more .caret { display: inline-block; line-height: 28px; float: left; margin-right: 8px;}
+				#feedScreen #feed .post .preview .see-more .info { display: inline-block; overflow: hidden;}
+
+		#feedScreen #feed .post .true-preview { background-color: #202020;}
 
 /********
 * MODALS

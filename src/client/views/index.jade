@@ -1,13 +1,13 @@
 extends ./layouts/base.jade
 
 block content
-	div(id="welcome")
-		button(type="button", class="close", aria-label="Close")
-			span(aria-hidden="true") &times;
-		| Bienvenue sur Locate#skate.<br/>Commencez à localiser les posts de skate sur Paris dès maintenant.
-	div(id="app")
+	div(id="app", class="container")
 	script.
 		ReactDOM.render(
 			React.createElement(App),
 			document.getElementById('app')
 		);
+	//- div(id="welcome")
+	//- 	button(type="button", class="close", aria-label="Close")
+	//- 		span(aria-hidden="true") &times;
+	//- 	| Bienvenue sur Locate#skate.<br/>Commencez à localiser les posts de skate sur Paris dès maintenant.

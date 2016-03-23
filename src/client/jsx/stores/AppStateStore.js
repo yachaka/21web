@@ -9,7 +9,7 @@ class AppStateStore extends FluxStore {
 	constructor(Dispatcher) {
 		super(Dispatcher);
 		this.location = k.LocationState.PENDING;
-		this.screen = k.Screens.GPS;
+		this.screen = k.Screens.FEED;
 
 		this.currentShareData = {};
 	}
