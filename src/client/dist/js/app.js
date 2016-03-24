@@ -31488,6 +31488,44 @@ var App = React.createClass({
         return React.createElement(
             'div',
             null,
+            React.createElement(
+                'div',
+                { id: 'header' },
+                React.createElement(
+                    'div',
+                    { id: 'fixed' },
+                    React.createElement(
+                        'div',
+                        { id: 'l', className: 'block' },
+                        React.createElement('img', { src: '/img/locate-l.png' })
+                    ),
+                    React.createElement(
+                        'div',
+                        { id: 'user', className: 'block' },
+                        'User'
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'row' },
+                    React.createElement(
+                        'div',
+                        { className: 'col-xs-23 col-xs-offset-1' },
+                        React.createElement('img', { id: 'logo', src: '/img/locate.png' })
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'row' },
+                    React.createElement(
+                        'p',
+                        { id: 'headerText', className: 'col-xs-23 col-xs-offset-1' },
+                        'Bienvenue sur Locate Skate.',
+                        React.createElement('br', null),
+                        'Commencez à localiser les posts de skate sur Paris dès maintenant.'
+                    )
+                )
+            ),
             screen
         );
     }
@@ -32173,24 +32211,24 @@ var Post = React.createClass({
 			{ className: className },
 			React.createElement(
 				'div',
-				{ className: 'distance col-xs-2', style: { color: color } },
+				{ className: 'distance col-xs-22 col-xs-offset-1 col-md-2 col-md-offset-1', style: { color: color } },
 				'A ',
 				Math.round(distanceN),
 				'km'
 			),
 			React.createElement(
 				'div',
-				{ className: 'inner col-xs-22' },
+				{ className: 'inner col-xs-22 col-xs-offset-1 col-md-21 col-md-offset-0' },
 				React.createElement(
 					'div',
 					{ className: 'row top' },
 					React.createElement(
 						'div',
-						{ className: 'col-xs-12' },
+						{ className: 'col-md-12' },
 						React.createElement(
 							'p',
 							{ className: 'time' },
-							'9 heures'
+							' 9 heures'
 						),
 						React.createElement(
 							'p',
@@ -32220,12 +32258,34 @@ var Post = React.createClass({
 					{ className: 'row preview' },
 					React.createElement(
 						'div',
-						{ className: 'col-xs-12' },
+						{ className: 'col-xs-24 col-md-12' },
 						React.createElement('div', { ref: 'preview', className: 'true-preview', dangerouslySetInnerHTML: { __html: this.props.data.preview.html } })
 					),
 					React.createElement(
 						'a',
-						{ href: this.props.data.preview.canonical, className: 'see-more' },
+						{ href: this.props.data.preview.canonical, className: 'see-more hidden-xs hidden-sm' },
+						React.createElement(
+							'span',
+							{ className: 'caret' },
+							'►'
+						),
+						React.createElement(
+							'span',
+							{ className: 'info' },
+							'@',
+							this.props.data.preview.author,
+							React.createElement('br', null),
+							'Voir plus sur ',
+							this.props.data.preview.provider
+						)
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row see-more-sm-row visible-xs-block visible-sm-block' },
+					React.createElement(
+						'a',
+						{ href: this.props.data.preview.canonical, className: 'col-xs-24' },
 						React.createElement(
 							'span',
 							{ className: 'caret' },

@@ -93,14 +93,14 @@ var Post = React.createClass({
     	var color = mixColors('#86247E', '#999999', progress);
         return (
             <div className={className}>
-            	<div className="distance col-xs-2" style={{color: color}}>
+            	<div className="distance col-xs-22 col-xs-offset-1 col-md-2 col-md-offset-1" style={{color: color}}>
             		A {Math.round(distanceN)}km
             	</div>
 
-            	<div className="inner col-xs-22">
+            	<div className="inner col-xs-22 col-xs-offset-1 col-md-21 col-md-offset-0">
             		<div className="row top">
-            			<div className="col-xs-12">
-							<p className="time">9 heures</p>
+            			<div className="col-md-12">
+							<p className="time"> 9 heures</p>
 							<p className="title">
 								<a href={this.props.data.url}>{this.props.data.text}</a>
 							</p>
@@ -111,11 +111,21 @@ var Post = React.createClass({
 					</div>
 
 					<div className="row preview">
-						<div className="col-xs-12">
+						<div className="col-xs-24 col-md-12">
 							<div ref="preview" className="true-preview" dangerouslySetInnerHTML={{__html: this.props.data.preview.html}}></div>
 						</div>
 
-						<a href={this.props.data.preview.canonical} className="see-more">
+						<a href={this.props.data.preview.canonical} className="see-more hidden-xs hidden-sm">
+							<span className="caret">►</span>
+							<span className="info">
+								@{this.props.data.preview.author}<br/>
+								Voir plus sur {this.props.data.preview.provider}
+							</span>
+						</a>
+					</div>
+
+					<div className="row see-more-sm-row visible-xs-block visible-sm-block">
+						<a href={this.props.data.preview.canonical} className="col-xs-24">
 							<span className="caret">►</span>
 							<span className="info">
 								@{this.props.data.preview.author}<br/>

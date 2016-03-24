@@ -70,7 +70,28 @@ var App = React.createClass({
 
         return (
             <div>
+                <div id="header">
+                    <div id="fixed">
+                        <div id="l" className="block">
+                            <img src="/img/locate-l.png"/>
+                        </div>
+                        <div id="user" className="block">
+                            User
+                        </div>
+                    </div>
 
+                    <div className="row">
+                        <div className="col-xs-23 col-xs-offset-1">
+                            <img id="logo" src="/img/locate.png"/>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <p id="headerText" className="col-xs-23 col-xs-offset-1">
+                            Bienvenue sur Locate Skate.<br/>
+                            Commencez à localiser les posts de skate sur Paris dès maintenant.
+                        </p>
+                    </div>
+                </div>
 
                 {screen}
                 

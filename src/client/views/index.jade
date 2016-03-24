@@ -7,6 +7,16 @@ block content
 			React.createElement(App),
 			document.getElementById('app')
 		);
+
+		var fixed = document.getElementById('fixed');
+		window.addEventListener('scroll', function (e) {
+			
+			if (document.body.scrollTop > 155 && fixed.className == '') {
+				fixed.className = 'visible';
+			} else if (document.body.scrollTop <= 155 && fixed.className == 'visible') {
+				fixed.className = '';
+			}
+		});
 	//- div(id="welcome")
 	//- 	button(type="button", class="close", aria-label="Close")
 	//- 		span(aria-hidden="true") &times;
