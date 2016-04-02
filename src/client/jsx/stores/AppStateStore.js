@@ -8,14 +8,7 @@ class AppStateStore extends FluxStore {
 
 	constructor(Dispatcher) {
 		super(Dispatcher);
-		this.location = k.LocationState.PENDING;
-		this.screen = k.Screens.FEED;
-
-		this.currentShareData = {};
-	}
-
-	whichScreen() {
-		return this.screen;
+		this.screen = k.Screens('GPS');
 	}
 
 	__onDispatch(action) {
@@ -27,11 +20,6 @@ class AppStateStore extends FluxStore {
 
 			case ActionsType('GO_TO_SCREEN'):
 				this.screen = action.screen;
-				this.__emitChange();
-				break;
-
-			case ActionsType('SET_LOCATION'):
-				this.location = action.newLocation;
 				this.__emitChange();
 				break;
 		}

@@ -69,13 +69,8 @@ var Post = React.createClass({
     statics: {
         calculateState: function (prevState) {
             return {
-                loggedUser: UserStore.getLoggedUser(),
-                userLocation: {
-                	coords: {
-                		latitude: 48.896619799999996,
-                		longitude: 2.3184486
-                	}
-                }
+                user: UserStore.user,
+                userLocation: UserStore.location
             };
         }
     },
@@ -84,8 +79,7 @@ var Post = React.createClass({
     },
 
     render() {
-    	console.log(this.state.userLocation);
-    	var className = classNames('post row', {'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd});
+    	var className = classNames('post row', {'my-post': this.state.user.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd});
 
     	var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K');
     	var progress = distanceN / 8;

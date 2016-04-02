@@ -10,7 +10,7 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx')
     , RegisteredUser = require('./components/RegisteredUser.jsx')
     , GpsScreen = require('./components/GpsScreen.jsx')
     , FeedScreen = require('./components/FeedScreen.jsx')
-    , Modal = require('react-modal');
+    , Login = require('./components/modals/Login.jsx');
 
 var Dispatcher = require('./Dispatcher')
     , FluxContainerMixin = require('flux/utils').Mixin
@@ -36,37 +36,34 @@ var Dispatcher = require('./Dispatcher')
                         </div>
                         */
 var App = React.createClass({
-    mixins: [FluxContainerMixin([UserStore, AppStateStore, ModalsStore])],
+    mixins: [FluxContainerMixin([UserStore])],
     statics: {
         calculateState: function (prevState) {
             return {
-                screen: AppStateStore.whichScreen(),
-                modals: ModalsStore.modals(),
-                appModal: AppStateStore.appModal,
-                loggedUser: UserStore.getLoggedUser()
+                user: UserStore.user,
+                location: UserStore.location,
+                modal: null
             };
         }
     },
 
     componentWillMount() {
-        Modal.setAppElement('body');
     },
     componentDidMount() {
         Creator.fetchPosts();
     },
 
     render() {
-        var loggedUser = this.state.loggedUser.anonymous ? <AnonymousUser user={this.state.loggedUser}/> : <RegisteredUser user={this.state.loggedUser}/>;
+        var loggedUser = this.state.user.anonymous ? <AnonymousUser user={this.state.user}/> : <RegisteredUser user={this.state.user}/>;
         // var loggedUser = <AnonymousUser user={this.state.loggedUser}/>;
-        var screen;
-        switch (this.state.screen) {
-            case k.Screens.GPS:
-                screen = <GpsScreen/>;
-                break;
-            case k.Screens.FEED:
-                screen = <FeedScreen/>;
-                break;
-        }
+        console.log(this.state.location);
+        // if (typeof this.state.location === 'object'
+        //     && typeof this.state.location.coords === 'object'
+        //     && typeof this.state.location.coords.latitude === 'number'
+        //     && typeof this.state.location.coords.longitude === 'number')
+        //     screen = <FeedScreen/>;
+        // else
+            screen = <GpsScreen/>;
 
         return (
             <div>
@@ -89,9 +86,16 @@ var App = React.createClass({
                         <p id="headerText" className="col-xs-23 col-xs-offset-1">
                             Bienvenue sur Locate Skate.<br/>
                             Commencez à localiser les posts de skate sur Paris dès maintenant.
+
+                            <br/>
+                            <a href="javascript:;" onClick={this.setState.bind(this, {modal: <Login/>})}>Login</a>
                         </p>
                     </div>
                 </div>
+
+                 <ReactCSSTransitionGroup id="modals" component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={250}>
+                    {this.state.modal}
+                </ReactCSSTransitionGroup>
 
                 {screen}
                 

@@ -34,7 +34,7 @@ body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/}
 /*************
 **** APP *****/
 
-#app { background-color: #fff; background: url('/img/background-line.png') #fff 0px top repeat-y; overflow: hidden; padding-top: 40px; margin: auto; min-height: 100vh; position: relative;}
+#app { background-color: #fff; background: url('/img/background-line.png') #fff 0px top repeat-y; overflow: hidden; padding-top: 40px; margin: auto;}
 
 /*********
 * Logged User
@@ -83,20 +83,23 @@ body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/}
 #app button.startShare { }
 
 
-/********	
-* MODALS
+/********
+* Wrapper for SCREENS and MODALS
 **/
-#modals .modal { position: absolute; top: 0; left: 2px; bottom: 0; right: -2px; background-color: rgba(255, 255, 255, 0.96); z-index: 20; padding-top: 120px;}
-	#modals .modal h2 { margin-bottom: 40px; font-size: 3em; }
+#wrapper {height: 800px; position: relative; overflow: hidden;}
+	#wrapper .screen { position: absolute; top:0; left:0; bottom:0; width: 100%; z-index: 1;}
+	#wrapper .screen.grey {background-color: #ddd; }
 
-	#modals .modal.modal-enter, #modals .modal.modal-appear { left: 30%; right: -30%; opacity: 0; }
-		#modals .modal.modal-enter-active, #modals .modal.modal-appear-active { left: 2px; right: -2px; opacity: 1; transition: all 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#wrapper .modal { position: absolute;  z-index: 5; border:1px solid #ccc;}
+	#wrapper .modal.full-width { left:0; width: 100%;}
+	#wrapper .modal.full-height { top: 0; bottom: 0;}
+	#wrapper .modal.white { background-color: white;}
+	#wrapper .modal.grey {background-color: #ddd; }
 
-/********	
-* LOGIN MODAL
-**/
-#loginModal {}
-	#loginModal input[type=text], #loginModal input[type=password] { display: block; max-width: 300px; width: 100%; padding: 8px; font-size: 17px; margin-bottom: 10px; border-radius: 3px; border: 1px solid #bbb;}
+	#wrapper .modal.slide-from-top.modal-appear, #wrapper .modal.slide-from-top.modal-enter {top: -100%; bottom: 100%;}
+		#wrapper .modal.slide-from-top.modal-appear.modal-appear-active, #wrapper .modal.slide-from-top.modal-enter.modal-enter-active {top: 0; bottom: 0; transition: all 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#wrapper .modal.slide-from-top.modal-leave { top: 0; bottom: 0;}
+		#wrapper .modal.slide-from-top.modal-leave-active { top: -100%; bottom: 100%; transition: all 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
 
 /********	
 * FEED
@@ -151,12 +154,77 @@ body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/}
 }
 
 /********
-* GPS Screen
+* Login MODAL
 **/
-#gpsScreen {}
-	#gpsScreen #gpsMsg { margin-top: 10%; font-size: 24px; line-height: 32px; color: #999;}
-		#gpsScreen #gpsMsg img { display: inline-block; margin-right: 20px; vertical-align: middle;}
-		#gpsScreen #gpsMsg a { font-size: 20px; line-height: 28px; }
+#loginModal {}
+	#loginModal .box {position: absolute; width: 300px; height: 300px; left: 50%; top: 50%; margin-left: -150px; margin-top: -150px;}
+		#loginModal .box h3 { font-size: 24px; color: #86247E; margin-bottom: 15px;}
+		#loginModal .box label, #loginModal .box input {display: block; margin-bottom: 8px;} 
+		#loginModal .box label { font-size: 15px;}
+		#loginModal .box input { font-size: 15px; padding: 6px 8px; width: 100%;}
+
+/********
+* Enter description MODAL
+**/
+#enterDescriptionModal { z-index: 5; top: auto; bottom: 0; height: 350px; border-top: 1px solid #86247e;}
+	#enterDescriptionModal button.cancel { float:right; width: 100px; font-size: 14px; color: #86247e; line-height: 62px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
+		#enterDescriptionModal button.cancel:hover {background-color: #f4f4f4;}
+		#enterDescriptionModal button.cancel:active {background-color: #e2e2e2;}
+
+	#enterDescriptionModal .user-info { padding: 15px;}
+		#enterDescriptionModal .user-info .avatar { float: left; margin-right: 15px;}
+			#enterDescriptionModal .user-info .avatar img { border-radius: 16px; width: 32px; height: 32px;}
+		#enterDescriptionModal .user-info .username { color: #777; line-height: 32px; font-size: 16px;}
+
+	#enterDescriptionModal input { height: 42px; width: 100%; font-size: 16px; padding: 0 20px; border: 1px solid #ddd; border-left: none; border-right: none; outline: none;}
+		#enterDescriptionModal input:focus { border-color: #49ACF2;}
+		#enterDescriptionModal .error input:focus { border-color: red; outline-color: red;}
+	#enterDescriptionModal textarea {resize: none; width: 100%; font-size: 16px; padding: 20px; display: block; border: none; height: 160px; outline: none;}
+		#enterDescriptionModal textarea:focus { border-bottom: 1px solid #49ACF2;}
+		#enterDescriptionModal .error textarea:focus { border-bottom-color: red;}
+
+	#enterDescriptionModal .next {
+		height: 35px; width: 80%; margin: auto; display: block; margin-top: 24px;
+		background-color: transparent; border: 1px solid #86247e; color: #86247e; border-radius: 4px; font-size: 15px; cursor: pointer;
+	}
+	#enterDescriptionModal .next:hover { color: #A83DA0; border-color: #A83DA0;}
+	#enterDescriptionModal .next:active { background-color: #86247e; color: white; outline: 0;}
+
+	#enterDescriptionModal.modal-appear, #enterDescriptionModal.modal-enter {bottom: -350px;}
+		#enterDescriptionModal.modal-appear.modal-appear-active, #enterDescriptionModal.modal-enter.modal-enter-active {bottom: 0; transition: bottom 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#enterDescriptionModal.modal-leave { bottom: 0;}
+		#enterDescriptionModal.modal-leave-active { bottom: -350px; transition: bottom 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+
+/********
+* Locate MODAL
+**/
+#locateModal { z-index: 6; background-color: grey;}
+
+	#locateModal button.cancel { float:right; width: 100px; font-size: 14px; color: #CFC0CD; line-height: 24px; background-color: transparent; border: none; cursor: pointer; outline: 0;}
+		#locateModal button.cancel:hover {background-color: #f4f4f4; color: #86247e;}
+		#locateModal button.cancel:active {background-color: #e2e2e2; color: #86247e;}
+
+	#locateModal #userPostInfos { color: #bbb; position: absolute; top: 0; left: 0; right: 0; padding: 15px 20px 20px; padding-bottom: 60px; z-index: 10; /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+60,000000+92&0.65+0,0.5+60,0+92 */
+background: -moz-linear-gradient(top,  rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 92%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.5) 60%,rgba(0,0,0,0) 92%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.5) 60%,rgba(0,0,0,0) 92%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+
+
+}
+		#locateModal #userPostInfos .user { overflow: hidden; margin-bottom: 15px;}
+			#locateModal #userPostInfos .user .avatar { float: left; margin-right: 15px;}
+				#locateModal #userPostInfos .user .avatar img { border-radius: 16px; width: 32px; height: 32px;}
+			#locateModal #userPostInfos .user .username { color: white; line-height: 32px; font-size: 16px;}
+
+	#locateModal #map { position: absolute; left: 0; right: 0; top:0; bottom: 0;}
+	#locateModal .marker {position: absolute; top: 50%; left: 50%; margin-top: -40px; margin-left: -11px; z-index: 10;}
+	#locateModal button.share { position: absolute; bottom: 40px; margin-left: -50px; left: 50%; width: 100px; height: 40px; z-index: 10;}
+
+	#locateModal.modal-appear, #locateModal.modal-enter {left: 0;}
+		#locateModal.modal-appear.modal-appear-active, #locateModal.modal-enter.modal-enter-active {left: 0; transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
+	#locateModal.modal-leave {opacity: 1;}
+		#locateModal.modal-leave-active { animation: modalDisappear 250ms cubic-bezier(0.215, 0.610, 0.355, 1.000);}
 
 
 /**

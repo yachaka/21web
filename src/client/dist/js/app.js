@@ -31428,7 +31428,7 @@ var PostActionsCircle = require('./components/PostActionsCircle.jsx'),
     RegisteredUser = require('./components/RegisteredUser.jsx'),
     GpsScreen = require('./components/GpsScreen.jsx'),
     FeedScreen = require('./components/FeedScreen.jsx'),
-    Modal = require('react-modal');
+    Login = require('./components/modals/Login.jsx');
 
 var Dispatcher = require('./Dispatcher'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -31454,36 +31454,32 @@ var Dispatcher = require('./Dispatcher'),
 var App = React.createClass({
     displayName: 'App',
 
-    mixins: [FluxContainerMixin([UserStore, AppStateStore, ModalsStore])],
+    mixins: [FluxContainerMixin([UserStore])],
     statics: {
         calculateState: function calculateState(prevState) {
             return {
-                screen: AppStateStore.whichScreen(),
-                modals: ModalsStore.modals(),
-                appModal: AppStateStore.appModal,
-                loggedUser: UserStore.getLoggedUser()
+                user: UserStore.user,
+                location: UserStore.location,
+                modal: null
             };
         }
     },
 
-    componentWillMount: function componentWillMount() {
-        Modal.setAppElement('body');
-    },
+    componentWillMount: function componentWillMount() {},
     componentDidMount: function componentDidMount() {
         Creator.fetchPosts();
     },
     render: function render() {
-        var loggedUser = this.state.loggedUser.anonymous ? React.createElement(AnonymousUser, { user: this.state.loggedUser }) : React.createElement(RegisteredUser, { user: this.state.loggedUser });
+        var loggedUser = this.state.user.anonymous ? React.createElement(AnonymousUser, { user: this.state.user }) : React.createElement(RegisteredUser, { user: this.state.user });
         // var loggedUser = <AnonymousUser user={this.state.loggedUser}/>;
-        var screen;
-        switch (this.state.screen) {
-            case k.Screens.GPS:
-                screen = React.createElement(GpsScreen, null);
-                break;
-            case k.Screens.FEED:
-                screen = React.createElement(FeedScreen, null);
-                break;
-        }
+        console.log(this.state.location);
+        // if (typeof this.state.location === 'object'
+        //     && typeof this.state.location.coords === 'object'
+        //     && typeof this.state.location.coords.latitude === 'number'
+        //     && typeof this.state.location.coords.longitude === 'number')
+        //     screen = <FeedScreen/>;
+        // else
+        screen = React.createElement(GpsScreen, null);
 
         return React.createElement(
             'div',
@@ -31522,9 +31518,20 @@ var App = React.createClass({
                         { id: 'headerText', className: 'col-xs-23 col-xs-offset-1' },
                         'Bienvenue sur Locate Skate.',
                         React.createElement('br', null),
-                        'Commencez à localiser les posts de skate sur Paris dès maintenant.'
+                        'Commencez à localiser les posts de skate sur Paris dès maintenant.',
+                        React.createElement('br', null),
+                        React.createElement(
+                            'a',
+                            { href: 'javascript:;', onClick: this.setState.bind(this, { modal: React.createElement(Login, null) }) },
+                            'Login'
+                        )
                     )
                 )
+            ),
+            React.createElement(
+                ReactCSSTransitionGroup,
+                { id: 'modals', component: 'div', transitionName: 'modal', transitionAppear: true, transitionAppearTimeout: 500, transitionEnterTimeout: 500, transitionLeaveTimeout: 250 },
+                this.state.modal
             ),
             screen
         );
@@ -31552,7 +31559,7 @@ var App = React.createClass({
                     </div>*/
 window.App = App;
 
-},{"./Dispatcher":278,"./actions":281,"./actions/Creator":279,"./components/AnonymousUser.jsx":282,"./components/FeedScreen.jsx":285,"./components/GpsScreen.jsx":286,"./components/PostActionsCircle.jsx":288,"./components/RegisteredUser.jsx":289,"./k":297,"./stores/AppStateStore":299,"./stores/ModalsStore":300,"./stores/PostsStore":301,"./stores/UserStore":302,"flux/utils":105,"react":274,"react-addons-css-transition-group":119,"react-dom":127,"react-modal":140,"reqwest":275}],278:[function(require,module,exports){
+},{"./Dispatcher":278,"./actions":281,"./actions/Creator":279,"./components/AnonymousUser.jsx":282,"./components/FeedScreen.jsx":285,"./components/GpsScreen.jsx":286,"./components/PostActionsCircle.jsx":288,"./components/RegisteredUser.jsx":289,"./components/modals/Login.jsx":294,"./k":298,"./stores/AppStateStore":300,"./stores/ModalsStore":301,"./stores/PostsStore":302,"./stores/UserStore":303,"flux/utils":105,"react":274,"react-addons-css-transition-group":119,"react-dom":127,"reqwest":275}],278:[function(require,module,exports){
 'use strict';
 
 module.exports = new (require('flux').Dispatcher)();
@@ -31589,6 +31596,7 @@ var _dispatch = function _dispatch(ActionType, argumentsKeys) {
 
 module.exports = {
 
+    setUserLocation: _dispatch(ActionsType('SET_USER_LOCATION'), ['newLocation']),
     // fetchNewLoggedUserData: function () {
     //     reqwest({
     //         url: '/me',
@@ -31658,8 +31666,6 @@ module.exports = {
             console.error(err, msg);
         });
     },
-
-    setLocation: _dispatch(ActionsType('SET_LOCATION'), ['newLocation']),
 
     goToScreen: _dispatch(ActionsType('GO_TO_SCREEN'), ['screen']),
 
@@ -31734,7 +31740,7 @@ module.exports = function (type) {
 		POP_MODAL: "POP_MODAL",
 
 		SET_SHARE_DATA: "SET_SHARE_DATA",
-		SET_LOCATION: "SET_LOCATION",
+		SET_USER_LOCATION: "SET_USER_LOCATION",
 
 		GO_TO_SCREEN: "GO_TO_SCREEN",
 
@@ -31851,7 +31857,7 @@ var AnonymousUser = React.createClass({
 
 module.exports = AnonymousUser;
 
-},{"../actions/NavigationCreator":280,"../stores/ModalsStore":300,"./modals/Login.jsx":293,"classnames":3,"flux/utils":105,"react":274}],283:[function(require,module,exports){
+},{"../actions/NavigationCreator":280,"../stores/ModalsStore":301,"./modals/Login.jsx":294,"classnames":3,"flux/utils":105,"react":274}],283:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -31944,7 +31950,7 @@ var ClaimAccount = React.createClass({
 
 module.exports = ClaimAccount;
 
-},{"../Dispatcher":278,"../actions":281,"../stores/UserStore":302,"flux/utils":105,"react":274,"react-google-recaptcha":128,"react-modal":140,"reqwest":275}],284:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../stores/UserStore":303,"flux/utils":105,"react":274,"react-google-recaptcha":128,"react-modal":140,"reqwest":275}],284:[function(require,module,exports){
 'use strict';
 
 var Dispatcher = require('../Dispatcher'),
@@ -31984,7 +31990,7 @@ var Feed = React.createClass({
 
 module.exports = Feed;
 
-},{"../Dispatcher":278,"../actions":281,"../stores/PostsStore":301,"./Post.jsx":287,"flux/utils":105,"react":274,"react-dom":127}],285:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../stores/PostsStore":302,"./Post.jsx":287,"flux/utils":105,"react":274,"react-dom":127}],285:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -32027,86 +32033,103 @@ var FeedScreen = React.createClass({
 
 module.exports = FeedScreen;
 
-},{"../actions":281,"../actions/Creator":279,"../actions/NavigationCreator":280,"./Feed.jsx":284,"./common/Screen.jsx":292,"./modals/ShareStepOne.jsx":294,"./modals/ShareStepTwo.jsx":295,"react":274}],286:[function(require,module,exports){
+},{"../actions":281,"../actions/Creator":279,"../actions/NavigationCreator":280,"./Feed.jsx":284,"./common/Screen.jsx":293,"./modals/ShareStepOne.jsx":295,"./modals/ShareStepTwo.jsx":296,"react":274}],286:[function(require,module,exports){
 'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var React = require('react'),
     FluxContainerMixin = require('flux/utils').Mixin,
     Creator = require('../actions/Creator'),
-    AppStateStore = require('../stores/AppStateStore'),
+    UserStore = require('../stores/UserStore'),
     k = require('../k');
 
 var GpsScreen = React.createClass({
     displayName: 'GpsScreen',
 
-    mixins: [FluxContainerMixin([AppStateStore])],
+    mixins: [FluxContainerMixin([UserStore])],
     statics: {
         calculateState: function calculateState(prevState) {
             return {
-                location: AppStateStore.location
+                // location: k.LocationState('UNKNOWN_ERROR')
+                location: UserStore.location
             };
         }
     },
 
     componentDidMount: function componentDidMount() {
         navigator.geolocation.getCurrentPosition(function (newLocation) {
-            Creator.setLocation(newLocation);
-            Creator.goToScreen(k.Screens.FEED);
+            Creator.setUserLocation(newLocation);
+            // Creator.goToScreen(k.Screens.FEED);
         }, function (error) {
             var newLocation = null;
             switch (error.code) {
                 case error.TIMEOUT:
-                    newLocation = k.LocationState.TIMEOUT;
+                    newLocation = k.LocationState('TIMEOUT');
                     break;
                 case error.PERMISSION_DENIED:
-                    newLocation = k.LocationState.DENIED;
+                    newLocation = k.LocationState('DENIED');
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    newLocation = k.LocationState.UNAVAILABLE;
+                    newLocation = k.LocationState('UNAVAILABLE');
                     break;
                 default:
-                    newLocation = k.LocationState.UNKNOWN_ERROR;
+                    newLocation = k.LocationState('UNKNOWN_ERROR');
                     break;
             }
-            Creator.setLocation(newLocation);
+            Creator.setUserLocation(newLocation);
         });
     },
     render: function render() {
         var msg = null;
 
         switch (this.state.location) {
-            case k.LocationState.PENDING:
-                msg = 'Waiting for user to accept being located...';
+            case k.LocationState('PENDING'):
+                msg = [React.createElement('img', { src: '/img/pin.png', height: '30' }), 'En attente de localisation...'];
                 break;
-            case k.LocationState.TIMEOUT:
-                msg = 'Timed out';
+            case k.LocationState('TIMEOUT'):
+                msg = 'Délai de connexion dépassé. Êtes-vous toujours connecté à Internet ?';
                 break;
-            case k.LocationState.DENIED:
-                msg = 'User denied access to his location.';
+            case k.LocationState('DENIED'):
+                msg = ['Vous avez refusé l\'accès à votre localisation.', React.createElement('br', null), React.createElement(
+                    'a',
+                    null,
+                    'Comment puis-je annuler mon choix ?'
+                )];
                 break;
-            case k.LocationState.UNAVAILABLE:
-                msg = 'Position unavailable';
+            case k.LocationState('UNAVAILABLE'):
+                msg = 'Impossible de récupérer votre position.';
                 break;
-            case k.LocationState.UNKNOWN_ERROR:
-                msg = 'Unknow error';
-                break;
-            default:
-                console.log(this.state.location.coords);
-                msg = 'Seems like we got it?' + JSON.stringify(this.state.location.coords);
+            case k.LocationState('UNKNOWN_ERROR'):
+                msg = 'Une erreur inconnue s\'est produite... On en sait pas plus :/';
                 break;
         }
 
+        if (_typeof(this.state.location) === 'object' && this.state.location.coords) msg = 'Géolocalisé !';
+
         return React.createElement(
             'div',
-            { id: 'gpsScreen', className: 'screen grey' },
-            msg
+            { id: 'gpsScreen', className: 'screen' },
+            React.createElement(
+                'div',
+                { className: 'row' },
+                React.createElement(
+                    'div',
+                    { className: 'col-xs-23 col-xs-offset-1' },
+                    React.createElement(
+                        'p',
+                        { id: 'gpsMsg' },
+                        msg
+                    )
+                )
+            )
         );
     }
 });
 
 module.exports = GpsScreen;
 
-},{"../actions/Creator":279,"../k":297,"../stores/AppStateStore":299,"flux/utils":105,"react":274}],287:[function(require,module,exports){
+},{"../actions/Creator":279,"../k":298,"../stores/UserStore":303,"flux/utils":105,"react":274}],287:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32185,13 +32208,8 @@ var Post = React.createClass({
 	statics: {
 		calculateState: function calculateState(prevState) {
 			return {
-				loggedUser: UserStore.getLoggedUser(),
-				userLocation: {
-					coords: {
-						latitude: 48.896619799999996,
-						longitude: 2.3184486
-					}
-				}
+				user: UserStore.user,
+				userLocation: UserStore.location
 			};
 		}
 	},
@@ -32199,8 +32217,7 @@ var Post = React.createClass({
 		window.iframely.load(this.refs.preview.firstChild);
 	},
 	render: function render() {
-		console.log(this.state.userLocation);
-		var className = classNames('post row', { 'my-post': this.state.loggedUser.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
+		var className = classNames('post row', { 'my-post': this.state.user.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd });
 
 		var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K');
 		var progress = distanceN / 8;
@@ -32313,7 +32330,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":296,"../stores/AppStateStore":299,"../stores/UserStore":302,"classnames":3,"flux/utils":105,"react":274}],288:[function(require,module,exports){
+},{"../helpers/PostTextParser":297,"../stores/AppStateStore":300,"../stores/UserStore":303,"classnames":3,"flux/utils":105,"react":274}],288:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32432,6 +32449,24 @@ module.exports = Input;
 },{"./ErrorDisplayer.jsx":290,"react":274}],292:[function(require,module,exports){
 'use strict';
 
+var React = require('react');
+
+var Modal = React.createClass({
+    displayName: 'Modal',
+    render: function render() {
+        return React.createElement(
+            'div',
+            { id: this.props.id, className: 'modal container' },
+            this.props.children
+        );
+    }
+});
+
+module.exports = Modal;
+
+},{"react":274}],293:[function(require,module,exports){
+'use strict';
+
 var React = require('react'),
     ReactCSSTransitionGroup = require('react-addons-css-transition-group'),
     FluxContainerMixin = require('flux/utils').Mixin,
@@ -32486,74 +32521,40 @@ var Screen = React.createClass({
 
 module.exports = Screen;
 
-},{"../../stores/AppStateStore":299,"flux/utils":105,"react":274,"react-addons-css-transition-group":119}],293:[function(require,module,exports){
+},{"../../stores/AppStateStore":300,"flux/utils":105,"react":274,"react-addons-css-transition-group":119}],294:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
-    reqwest = require('reqwest'),
-    NavigationCreator = require('../../actions/NavigationCreator'),
-    Dispatcher = require('../../Dispatcher'),
-    ActionsTypes = require('../../actions');
+    Modal = require('../common/Modal.jsx');
 
 var Login = React.createClass({
     displayName: 'Login',
-
-    logIn: function logIn() {
-
-        reqwest({
-            url: '/login',
-            method: 'post',
-            data: { username: this.refs.username.value, password: this.refs.password.value },
-            type: 'json'
-        }).then(function (json) {
-            console.log('Json!', json);
-            if (json.success) {
-                Dispatcher.dispatch({
-                    type: ActionsTypes('USER_LOGGED_IN'),
-                    user: json.user
-                });
-                Dispatcher.dispatch({
-                    type: ActionsTypes('SET_APP_MODAL'),
-                    appModal: null
-                });
-            }
-        }).fail(function (err, msg) {
-            console.log(err, msg);
-        });
-    },
     render: function render() {
         return React.createElement(
-            'div',
-            { id: 'loginModal', className: 'modal full-width full-height slide-from-top grey', style: this.props.style },
+            Modal,
+            { id: 'loginModal' },
             React.createElement(
                 'div',
-                { className: 'box' },
+                { className: 'row' },
                 React.createElement(
-                    'h3',
-                    null,
-                    'Connexion'
-                ),
+                    'h2',
+                    { className: 'col-xs-23 col-xs-offset-1' },
+                    'Se connecter'
+                )
+            ),
+            React.createElement(
+                'div',
+                { className: 'row' },
                 React.createElement(
-                    'label',
-                    null,
-                    'Identifiant'
-                ),
-                React.createElement('input', { ref: 'username', type: 'text' }),
-                React.createElement(
-                    'label',
-                    null,
-                    'Pass'
-                ),
-                React.createElement('input', { ref: 'password', type: 'password' }),
-                React.createElement(
-                    'button',
-                    { onClick: this.logIn },
-                    'Connexion'
-                ),
-                React.createElement(
-                    'a',
-                    { onClick: NavigationCreator.popModal.bind(NavigationCreator) },
-                    'Pop'
+                    'div',
+                    { className: 'col-xs-23 col-xs-offset-1' },
+                    React.createElement('input', { type: 'text', placeholder: 'Identifiant' }),
+                    React.createElement('input', { type: 'password', placeholder: 'Password' }),
+                    React.createElement(
+                        'button',
+                        null,
+                        'Se connecter'
+                    )
                 )
             )
         );
@@ -32562,7 +32563,7 @@ var Login = React.createClass({
 
 module.exports = Login;
 
-},{"../../Dispatcher":278,"../../actions":281,"../../actions/NavigationCreator":280,"react":274,"reqwest":275}],294:[function(require,module,exports){
+},{"../common/Modal.jsx":292,"react":274}],295:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32639,7 +32640,7 @@ var ShareStepOne = React.createClass({
 
 module.exports = ShareStepOne;
 
-},{"../../../../shared/schemas/PostSchema":303,"../../actions/Creator":279,"../../actions/NavigationCreator":280,"../../mixins/ValidateMixin":298,"../../stores/UserStore":302,"../common/ErrorDisplayer.jsx":290,"../common/Input.jsx":291,"flux/utils":105,"react":274,"validate.js":276}],295:[function(require,module,exports){
+},{"../../../../shared/schemas/PostSchema":304,"../../actions/Creator":279,"../../actions/NavigationCreator":280,"../../mixins/ValidateMixin":299,"../../stores/UserStore":303,"../common/ErrorDisplayer.jsx":290,"../common/Input.jsx":291,"flux/utils":105,"react":274,"validate.js":276}],296:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -32775,7 +32776,7 @@ var LocationChooser = React.createClass({
 
 module.exports = LocationChooser;
 
-},{"../../actions/Creator":279,"../../actions/NavigationCreator":280,"../../stores/AppStateStore":299,"../../stores/UserStore":302,"flux/utils":105,"google-maps":106,"react":274}],296:[function(require,module,exports){
+},{"../../actions/Creator":279,"../../actions/NavigationCreator":280,"../../stores/AppStateStore":300,"../../stores/UserStore":303,"flux/utils":105,"google-maps":106,"react":274}],297:[function(require,module,exports){
 'use strict';
 
 module.exports = function (text) {
@@ -32788,28 +32789,35 @@ module.exports = function (text) {
 	return text;
 };
 
-},{}],297:[function(require,module,exports){
+},{}],298:[function(require,module,exports){
 'use strict';
+
+function _between(obj) {
+	return function (prop) {
+		if (!obj[prop]) throw new Error('Asked for k `' + prop + '` which was not found ; check stack');
+		return obj[prop];
+	};
+}
 
 module.exports = {
 	Modals: {
 		LOGIN: 'LoginModal'
 	},
-	Screens: {
+	Screens: _between({
 		LOGIN_REGISTER: 'login_register',
 		GPS: 'gps',
 		FEED: 'feed'
-	},
-	LocationState: {
+	}),
+	LocationState: _between({
 		PENDING: 1,
 		TIMEOUT: 2,
 		DENIED: 3,
 		UNAVAILABLE: 4,
 		UNKNOWN_ERROR: 5
-	}
+	})
 };
 
-},{}],298:[function(require,module,exports){
+},{}],299:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32888,7 +32896,7 @@ function ValidateFactory(Validate) {
 
 module.exports = ValidateFactory;
 
-},{"react":274}],299:[function(require,module,exports){
+},{"react":274}],300:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -32912,19 +32920,11 @@ var AppStateStore = function (_FluxStore) {
 
 		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AppStateStore).call(this, Dispatcher));
 
-		_this.location = k.LocationState.PENDING;
-		_this.screen = k.Screens.FEED;
-
-		_this.currentShareData = {};
+		_this.screen = k.Screens('GPS');
 		return _this;
 	}
 
 	_createClass(AppStateStore, [{
-		key: 'whichScreen',
-		value: function whichScreen() {
-			return this.screen;
-		}
-	}, {
 		key: '__onDispatch',
 		value: function __onDispatch(action) {
 			switch (action.type) {
@@ -32937,11 +32937,6 @@ var AppStateStore = function (_FluxStore) {
 					this.screen = action.screen;
 					this.__emitChange();
 					break;
-
-				case ActionsType('SET_LOCATION'):
-					this.location = action.newLocation;
-					this.__emitChange();
-					break;
 			}
 		}
 	}]);
@@ -32951,7 +32946,7 @@ var AppStateStore = function (_FluxStore) {
 
 module.exports = new AppStateStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"../k":297,"flux/utils":105}],300:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../k":298,"flux/utils":105}],301:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -33023,7 +33018,7 @@ var ModalsStore = function (_FluxStore) {
 
 module.exports = new ModalsStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"flux/utils":105,"react":274}],301:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"flux/utils":105,"react":274}],302:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -33083,7 +33078,7 @@ var PostsStore = function (_FluxStore) {
 
 module.exports = new PostsStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],302:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],303:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -33096,7 +33091,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Dispatcher = require('../Dispatcher'),
     FluxStore = require('flux/utils').Store,
-    ActionsType = require('../actions');
+    ActionsType = require('../actions'),
+    k = require('../k');
 
 var UserStore = function (_FluxStore) {
 	_inherits(UserStore, _FluxStore);
@@ -33106,21 +33102,12 @@ var UserStore = function (_FluxStore) {
 
 		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserStore).call(this, Dispatcher));
 
-		_this._loggedUser = window.LOGGED_USER;
+		_this.user = window.LOGGED_USER;
+		_this.location = k.LocationState('PENDING');
 		return _this;
 	}
 
 	_createClass(UserStore, [{
-		key: 'isLogged',
-		value: function isLogged() {
-			return this._loggedUser != null;
-		}
-	}, {
-		key: 'isAnonymous',
-		value: function isAnonymous() {
-			return this._loggedUser == null;
-		}
-	}, {
 		key: 'getClaimToken',
 		value: function getClaimToken() {
 			if (!this._loggedUser.tokens) return null;
@@ -33139,7 +33126,11 @@ var UserStore = function (_FluxStore) {
 		value: function __onDispatch(action) {
 			switch (action.type) {
 				case ActionsType('USER_LOGGED_IN'):
-					this._loggedUser = action.user;
+					this.user = action.user;
+					this.__emitChange();
+					break;
+				case ActionsType('SET_USER_LOCATION'):
+					this.location = action.newLocation;
 					this.__emitChange();
 					break;
 				// case ActionsType('NEW_POSTS')
@@ -33166,7 +33157,7 @@ var UserStore = function (_FluxStore) {
 
 module.exports = new UserStore(Dispatcher);
 
-},{"../Dispatcher":278,"../actions":281,"flux/utils":105}],303:[function(require,module,exports){
+},{"../Dispatcher":278,"../actions":281,"../k":298,"flux/utils":105}],304:[function(require,module,exports){
 "use strict";
 
 module.exports = {

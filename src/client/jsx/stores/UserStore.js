@@ -1,22 +1,16 @@
 
 var Dispatcher = require('../Dispatcher')
 	, FluxStore = require('flux/utils').Store
-	, ActionsType = require('../actions');
+	, ActionsType = require('../actions')
+	, k = require('../k');
 
 class UserStore extends FluxStore {
 
 	constructor(Dispatcher) {
 		super(Dispatcher);
-		this._loggedUser = window.LOGGED_USER;
-	}	
-
-	isLogged() {
-		return this._loggedUser != null;
+		this.user = window.LOGGED_USER;
+		this.location = k.LocationState('PENDING');
 	}
-	isAnonymous() {
-		return this._loggedUser == null;
-	}
-
 
 	getClaimToken() {
 		if (!this._loggedUser.tokens)
@@ -34,7 +28,11 @@ class UserStore extends FluxStore {
 	__onDispatch(action) {
 		switch (action.type) {
 			case ActionsType('USER_LOGGED_IN'):
-				this._loggedUser = action.user;
+				this.user = action.user;
+				this.__emitChange();
+				break;
+			case ActionsType('SET_USER_LOCATION'):
+				this.location = action.newLocation;
 				this.__emitChange();
 				break;
 			// case ActionsType('NEW_POSTS')

@@ -5,7 +5,7 @@ module.exports = function (type) {
 		POP_MODAL: "POP_MODAL",
 		
 		SET_SHARE_DATA: "SET_SHARE_DATA",
-		SET_LOCATION: "SET_LOCATION",
+		SET_USER_LOCATION: "SET_USER_LOCATION",
 
 		GO_TO_SCREEN: "GO_TO_SCREEN",
 

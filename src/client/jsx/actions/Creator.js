@@ -28,6 +28,7 @@ var _dispatch = function (ActionType, argumentsKeys) {
 
 module.exports = {
 
+    setUserLocation: _dispatch(ActionsType('SET_USER_LOCATION'), ['newLocation']),
     // fetchNewLoggedUserData: function () {
     //     reqwest({
     //         url: '/me',
@@ -40,7 +41,7 @@ module.exports = {
     //     });
     // },
 
-	goToSharePostStepTwo: function (url, text) {
+    goToSharePostStepTwo: function (url, text) {
         Dispatcher.dispatch({
             type: ActionsType('SET_SHARE_DATA'),
             data: {
@@ -51,7 +52,7 @@ module.exports = {
 
         AppStateCreator.setActiveModal('shareStepTwo');
     },
-	sharePost: function (post) {
+    sharePost: function (post) {
         post._clientIdentifier = new Date().getTime();
 
         _dispatch(ActionsType('SHARE_POST'))();
@@ -84,10 +85,10 @@ module.exports = {
             }
         });
     },
-	cancelSharePost: _dispatch(ActionsType('CANCEL_SHARE_POST')),
+    cancelSharePost: _dispatch(ActionsType('CANCEL_SHARE_POST')),
 
-	fetchPosts: function () {
-		reqwest({
+    fetchPosts: function () {
+        reqwest({
             url:'/posts',
             method: 'get',
             type: 'json'
@@ -101,9 +102,8 @@ module.exports = {
         }, function (err, msg) {
             console.error(err, msg);
         });
-	},
+    },
 
-    setLocation: _dispatch(ActionsType('SET_LOCATION'), ['newLocation']),
 
     goToScreen: _dispatch(ActionsType('GO_TO_SCREEN'), ['screen']),
 

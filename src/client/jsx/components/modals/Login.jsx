@@ -1,56 +1,23 @@
 
 var React = require('react')
-	, reqwest = require('reqwest')
-
-    , NavigationCreator = require('../../actions/NavigationCreator')
-	, Dispatcher = require('../../Dispatcher')
-	, ActionsTypes = require('../../actions');
+    , Modal = require('../common/Modal.jsx');
 
 var Login = React.createClass({
-    displayName: 'Login',
-
-    logIn() {
-
-    	reqwest({
-    		url: '/login',
-    		method: 'post',
-    		data: {username: this.refs.username.value, password: this.refs.password.value},
-    		type: 'json'
-    	})
-    	.then(function (json) {
-    		console.log('Json!', json);
-    		if (json.success) {
-    			Dispatcher.dispatch({
-    				type: ActionsTypes('USER_LOGGED_IN'),
-    				user: json.user
-    			});
-                Dispatcher.dispatch({
-                    type: ActionsTypes('SET_APP_MODAL'),
-                    appModal: null
-                });
-            }
-    	})
-    	.fail(function (err, msg) {
-    		console.log(err, msg);
-    	});
-
-    },
-
     render() {
         return (
-            <div id="loginModal" className="modal full-width full-height slide-from-top grey" style={this.props.style}>
-            	<div className="box">
-            		<h3>Connexion</h3>
+            <Modal id="loginModal">
+                <div className="row">
+                    <h2 className="col-xs-23 col-xs-offset-1">Se connecter</h2>
+                </div>
 
-            		<label>Identifiant</label>
-            		<input ref="username" type="text"/>
-            		<label>Pass</label>
-            		<input ref="password" type="password"/>
-
-            		<button onClick={this.logIn}>Connexion</button>
-                    <a onClick={NavigationCreator.popModal.bind(NavigationCreator)}>Pop</a>
-            	</div>
-            </div>
+                <div className="row">
+                    <div className="col-xs-23 col-xs-offset-1">
+                        <input type="text" placeholder="Identifiant"/>
+                        <input type="password" placeholder="Password"/>
+                        <button>Se connecter</button>
+                    </div>
+                </div>
+            </Modal>
         );
     }
 });
