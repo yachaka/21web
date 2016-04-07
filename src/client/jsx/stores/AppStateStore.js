@@ -8,18 +8,19 @@ class AppStateStore extends FluxStore {
 
 	constructor(Dispatcher) {
 		super(Dispatcher);
-		this.screen = k.Screens('GPS');
+		// var S = require('../components/modals/SharePost.jsx');
+		this.modal = null;
 	}
 
 	__onDispatch(action) {
 		switch (action.type) {
-			case ActionsType('SET_SHARE_DATA'):
-				this.currentShareData = action.data;
+			case ActionsType('SET_MODAL'):
+				this.modal = action.modal;
 				this.__emitChange();
 				break;
 
-			case ActionsType('GO_TO_SCREEN'):
-				this.screen = action.screen;
+			case ActionsType('CLOSE_MODAL'):
+				this.modal = null;
 				this.__emitChange();
 				break;
 		}

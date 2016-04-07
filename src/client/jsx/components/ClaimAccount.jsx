@@ -3,7 +3,6 @@ var React = require('react')
 	, reqwest = require('reqwest')
 	, Dispatcher = require('../Dispatcher')
 	, ActionsType = require('../actions')
-	, Modal = require('react-modal')
 	, ReCAPTCHA = require('react-google-recaptcha')
 
     , FluxContainerMixin = require('flux/utils').Mixin

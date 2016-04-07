@@ -44,6 +44,14 @@ User.relationMappings = {
 			from: 'users.id',
 			to: 'tokens.user_id'
 		}
+	},
+	permissions: {
+		relation: Model.OneToManyRelation,
+		modelClass: __dirname + '/Permission',
+		join: {
+			from: 'users.id',
+			to: 'user_permissions.user_id'
+		}
 	}
 };
 

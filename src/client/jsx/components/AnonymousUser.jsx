@@ -3,7 +3,6 @@ var React = require('react')
     , FluxContainerMixin = require('flux/utils').Mixin
     
     , NavigationCreator = require('../actions/NavigationCreator')
-    , ModalsStore = require('../stores/ModalsStore')
     , LoginModal = require('./modals/Login.jsx')
 
     , classNames = require('classnames');

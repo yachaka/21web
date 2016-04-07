@@ -28,7 +28,7 @@ class UserStore extends FluxStore {
 	__onDispatch(action) {
 		switch (action.type) {
 			case ActionsType('USER_LOGGED_IN'):
-				this.user = action.user;
+				this.user = action.newUser;
 				this.__emitChange();
 				break;
 			case ActionsType('SET_USER_LOCATION'):

@@ -2,6 +2,7 @@
 var reqwest = require('reqwest');
 
 var Dispatcher = require('../Dispatcher')
+    , Payload = require('./Payload')
 	, ActionsType = require('./');
 
 // var _dispatch = function (ActionType, argumentsKeys) {
@@ -27,16 +28,13 @@ var Dispatcher = require('../Dispatcher')
 
 module.exports = {
 
-    pushModal: function (modal) {
-        Dispatcher.dispatch({
-            type: ActionsType('PUSH_MODAL'),
+    setModal: function (modal) {
+        Dispatcher.dispatch(Payload('SET_MODAL', {
             modal: modal
-        });
+        }));
     },
-    popModal: function () {
-        Dispatcher.dispatch({
-            type: ActionsType('POP_MODAL')
-        });
+    closeModal: function () {
+       Dispatcher.dispatch(Payload('CLOSE_MODAL'));
     },
 
     setShareData: function (data) {

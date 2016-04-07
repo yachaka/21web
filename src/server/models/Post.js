@@ -30,6 +30,18 @@ Post.relationMappings = {
 			from: 'posts.preview_id',
 			to: 'previews.id'
 		}
+	},
+	subs: {
+		relation: Model.ManyToManyRelation,
+		modelClass: __dirname + '/Sub',
+		join: {
+			from: 'posts.id',
+			through: {
+				from: 'posts_to_subs.post_id',
+				to: 'posts_to_subs.sub_id'
+			},
+			to: 'subs.id'
+		}
 	}
 };
 

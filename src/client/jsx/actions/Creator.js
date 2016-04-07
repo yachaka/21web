@@ -61,7 +61,7 @@ module.exports = {
             posts: [post]
         });
         reqwest({
-            url: '/posts',
+            url: '/'+SUB+'/posts',
             method: 'post',
             type: 'json',
             data: post
@@ -87,9 +87,9 @@ module.exports = {
     },
     cancelSharePost: _dispatch(ActionsType('CANCEL_SHARE_POST')),
 
-    fetchPosts: function () {
+    fetchPosts: function (sub) {
         reqwest({
-            url:'/posts',
+            url:'/'+SUB+'/posts',
             method: 'get',
             type: 'json'
         })

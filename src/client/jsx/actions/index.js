@@ -1,8 +1,8 @@
 
 module.exports = function (type) {
 	var types = {
-		PUSH_MODAL: "PUSH_MODAL",
-		POP_MODAL: "POP_MODAL",
+		SET_MODAL: "SET_MODAL",
+		CLOSE_MODAL: "CLOSE_MODAL",
 		
 		SET_SHARE_DATA: "SET_SHARE_DATA",
 		SET_USER_LOCATION: "SET_USER_LOCATION",

@@ -3,6 +3,7 @@ extends ./layouts/base.jade
 block content
 	div(id="app", class="container")
 	script.
+		SUB = '#{sub}';
 		ReactDOM.render(
 			React.createElement(App),
 			document.getElementById('app')

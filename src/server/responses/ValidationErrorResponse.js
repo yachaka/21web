@@ -1,10 +1,11 @@
 
-function ValidationErrorResponse(errors) {
-	return {
-		success: false,
-		state: 'ValidationError',
-		errors: errors
-	};
+var ErrorResponse = require('./ErrorResponse');
+
+function ValidationErrorResponse(err) {
+	var d = ErrorResponse(err.name);
+	d.errors = err.errors;
+
+	return d;
 }
 
 module.exports = ValidationErrorResponse;

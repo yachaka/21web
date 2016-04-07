@@ -70,7 +70,10 @@ var Post = React.createClass({
         calculateState: function (prevState) {
             return {
                 user: UserStore.user,
-                userLocation: UserStore.location
+                userLocation: {coords: {
+                	latitude: 30,
+                	longitude: 20
+                }}
             };
         }
     },
