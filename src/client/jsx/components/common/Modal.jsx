@@ -1,23 +1,28 @@
 
-var React = require('react')
-    , NavigationCreator = require('../../actions/NavigationCreator');
+import { Component } from 'react'
+import { connect } from 'react-redux'
+import { closeModal } from '../../actions'
+var NavigationCreator = require('../../actions/NavigationCreator');
 
-var Modal = React.createClass({
-    displayName: 'Modal',
-    render() {
-        return (
-            <div id={this.props.id} className="modal container">
-            	
-            	<div className="close-modal row">
-            		<p className="col-xs-23 col-xs-offset-1">
-	            		<a href="javascript:void(0);" onClick={NavigationCreator.closeModal}><img src="/img/close.png" alt="Fermer"/>Fermer</a>
-            		</p>
-            	</div>
+let Modal = ({id, children, close}) => (
+    <div id={id} className="modal container">
+    	
+    	<div className="close-modal row">
+    		<p className="col-xs-23 col-xs-offset-1">
+        		<a href="javascript:void(0);" onClick={close}><img src="/img/close.png" alt="Fermer"/>Fermer</a>
+    		</p>
+    	</div>
 
-            	{this.props.children}
-            </div>
-        );
+    	{children}
+    </div>
+);
+
+module.exports = connect(
+    (state, ownProps) => ({
+        id: ownProps.id,
+        children: ownProps.children
+    }),
+    {
+        close: closeModal
     }
-});
-
-module.exports = Modal;
+)(Modal);

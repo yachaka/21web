@@ -5,30 +5,21 @@ var React = require('react')
     , Creator = require('../actions/Creator')
 
     , Screen = require('./common/Screen.jsx')
-    , Feed = require('./Feed.jsx')
     , ShareStepOne = require('./modals/ShareStepOne.jsx')
     , ShareStepTwo = require('./modals/ShareStepTwo.jsx');
 
-var FeedScreen = React.createClass({
+import ConnectedFeed from './Feed.jsx'
 
-    render() {
-    	var modals = {
-            shareStepOne: <ShareStepOne key="step1"/>,
-            shareStepTwo: <ShareStepTwo postData={{}} key="step2"/>
-        };
+let FeedScreen = () => (
+    <div id="feedScreen" className="screen">
+        <ConnectedFeed/>
 
-        return (
-            <div id="feedScreen" className="screen">
-	            <Feed/>
-
-                <div className="row">
-                    <div className="col-xs-12">
-        	            <button className="startShare" onClick={null}>Localisez un post</button>
-                    </div>
-                </div>
-	        </div>
-        );
-    }
-});
+        <div className="row">
+            <div className="col-xs-12">
+	            <button className="startShare" onClick={null}>Localisez un post</button>
+            </div>
+        </div>
+    </div>
+);
 
 module.exports = FeedScreen;

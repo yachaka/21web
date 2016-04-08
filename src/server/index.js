@@ -258,6 +258,11 @@ AdminRouter.get('/:sub([a-zA-Z0-9]+)', fetchSubMiddleware, needRankOnSubMiddlewa
 express.use('/admin', AdminRouter);
 
 var SubRouter = expressS.Router({mergeParams: true});
+express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
+SubRouter.use(function (req, res, next) {
+	console.log('hiho');
+	next();
+});
 SubRouter.get('/', function (req, res, next) {
 // oEmbedPreviewGenerator('https://www.instagram.com/p/BDOqXXAMVlQ/');
 	// generatePreview('https://www.facebook.com/B2OUF/videos/926159704167131/', function (preview) {
@@ -312,7 +317,6 @@ SubRouter.get('/posts', function (req, res) {
 		});
 });
 
-express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
 
 express.use(function (err, req, res, next) {
 	

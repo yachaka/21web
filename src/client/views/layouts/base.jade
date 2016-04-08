@@ -6,11 +6,11 @@ html
 		block css
 			link(rel="stylesheet", type="text/css", href="/css/bootstrap.min.css")
 			link(rel="stylesheet", type="text/css", href="/css/main.css")
+	body
+		block content
 		block scripts
 			script.
 				var LOGGED_USER = !{JSON.stringify(user)};
 			script(type='text/javascript', src="/js/geolocation.polyfill.js")
 			script(type='text/javascript', src="/js/app.js")
 			script(type='text/javascript', src="//cdn.iframe.ly/embed.js?key=e788d1ee1f6a783106da3dbaa5b1f2f6")
-	body
-		block content

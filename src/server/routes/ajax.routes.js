@@ -1,8 +1,5 @@
 
-import {
-	onlyAjaxMiddleware,
-	needUserCreationMiddleware
-} from '../middlewares'
+import { * } form '../middlewares'
 
 module.exports = function (express) {
 

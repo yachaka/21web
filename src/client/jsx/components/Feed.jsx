@@ -1,37 +1,24 @@
 
 var Dispatcher = require('../Dispatcher')
 	, ActionsType = require('../actions')
-    , FluxContainerMixin = require('flux/utils').Mixin
 
     , PostsStore = require('../stores/PostsStore');
+
+import { connect } from 'react-redux';
 
 var React = require('react')
 	, ReactDOM = require('react-dom');
 
 var Post = require('./Post.jsx');
 
-var Feed = React.createClass({
-	mixins: [FluxContainerMixin([PostsStore])],
-	statics: {
-        calculateState: function (prevState) {
-            return {
-                posts: PostsStore.getAll()
-            };
-        }
-    },
+let Feed = ({posts}) => (
+	<div id="feed">
+		{ posts.map((post, i) => <Post key={post.id} odd={i % 2} data={post}/>) }
+	</div>
+);
 
-	render() {
-		var posts = this.state.posts.map(function (post, i) {
-			return <Post key={post.id} odd={i % 2} data={post}/>;
-		}.bind(this));
-
-		return (
-			<div id="feed">
-				{posts}
-			</div>
-		);
-	}
-
-});
-
-module.exports = Feed;
+export default connect(
+	state => ({
+		posts: state.get('posts') || []
+	})
+)(Feed);

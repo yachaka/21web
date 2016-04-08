@@ -82,9 +82,9 @@ var Post = React.createClass({
     },
 
     render() {
-    	var className = classNames('post row', {'my-post': this.state.user.id == this.props.data.user_id, 'pending': this.props.data.pending, 'bounceIn': this.props.data.justShared, 'odd': this.props.odd});
+    	var className = classNames('post row', {'my-post': this.state.user.id == this.props.data.get('user_id'), 'pending': this.props.data.get('pending'), 'bounceIn': this.props.data.get('justShared'), 'odd': this.props.odd});
 
-    	var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.lat, this.props.data.lng, 'K');
+    	var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.get('lat'), this.props.data.get('lng'), 'K');
     	var progress = distanceN / 8;
     	progress = progress > 1 ? 1 : progress;
     	var color = mixColors('#86247E', '#999999', progress);
@@ -99,34 +99,34 @@ var Post = React.createClass({
             			<div className="col-md-12">
 							<p className="time"> 9 heures</p>
 							<p className="title">
-								<a href={this.props.data.url}>{this.props.data.text}</a>
+								<a href={this.props.data.get('url')}>{this.props.data.get('text')}</a>
 							</p>
 							<p className="from-and-shared">
-								{getHost(this.props.data.url)} partagé par <span className="shared-username">{this.props.data.user ? this.props.data.user.username : '[utilisateur supprimé]'}</span><img className="avatar" src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />
+								{getHost(this.props.data.get('url'))} partagé par <span className="shared-username">{this.props.data.get('user') ? this.props.data.get('user').get('username') : '[utilisateur supprimé]'}</span><img className="avatar" src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />
 							</p>
 						</div>
 					</div>
 
 					<div className="row preview">
 						<div className="col-xs-24 col-md-12">
-							<div ref="preview" className="true-preview" dangerouslySetInnerHTML={{__html: this.props.data.preview.html}}></div>
+							<div ref="preview" className="true-preview" dangerouslySetInnerHTML={{__html: this.props.data.get('preview').get('html')}}></div>
 						</div>
 
-						<a href={this.props.data.preview.canonical} className="see-more hidden-xs hidden-sm">
+						<a href={this.props.data.get('preview').get('canonical')} className="see-more hidden-xs hidden-sm">
 							<span className="caret">►</span>
 							<span className="info">
-								@{this.props.data.preview.author}<br/>
-								Voir plus sur {this.props.data.preview.provider}
+								@{this.props.data.get('preview').get('author')}<br/>
+								Voir plus sur {this.props.data.get('preview').get('provider')}
 							</span>
 						</a>
 					</div>
 
 					<div className="row see-more-sm-row visible-xs-block visible-sm-block">
-						<a href={this.props.data.preview.canonical} className="col-xs-24">
+						<a href={this.props.data.get('preview').get('canonical')} className="col-xs-24">
 							<span className="caret">►</span>
 							<span className="info">
-								@{this.props.data.preview.author}<br/>
-								Voir plus sur {this.props.data.preview.provider}
+								@{this.props.data.get('preview').get('author')}<br/>
+								Voir plus sur {this.props.data.get('preview').get('provider')}
 							</span>
 						</a>
 					</div>

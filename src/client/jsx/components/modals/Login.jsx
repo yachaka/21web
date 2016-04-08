@@ -6,7 +6,12 @@ var React = require('react')
     , NavigationCreator = require('../../actions/NavigationCreator')
     , AuthCreator = require('../../actions/AuthCreator');
 
-var Login = React.createClass({
+import { connect } from 'react-redux'
+
+import { setModal } from '../../actions'
+
+class Login extends React.Component {
+
     render() {
         return (
             <Modal id="loginModal">
@@ -18,7 +23,7 @@ var Login = React.createClass({
 
                     <div className="row">
                         <p className="col-xs-23 col-xs-offset-1 no-account">
-                            <a onClick={() => NavigationCreator.setModal(Register())}>Pas encore de compte ?</a>
+                            <a onClick={this.props.goToRegisterModal}>Pas encore de compte ?</a>
                         </p>
                     </div>
                 </div>
@@ -28,12 +33,7 @@ var Login = React.createClass({
                         <input autoFocus ref="username" type="text" placeholder="Identifiant" className="classic"/>
                         <input ref="password" type="password" placeholder="Password" className="classic"/>
                         <button 
-                            onClick={() => {
-                                AuthCreator.login(this.refs.username.value, this.refs.password.value)
-                                .then(() => {
-                                    NavigationCreator.closeModal();
-                                });
-                            }}>
+                            onClick={this.props.login}>
                             Se connecter
                         </button>
                     </div>
@@ -41,6 +41,14 @@ var Login = React.createClass({
             </Modal>
         );
     }
-});
+}
 
-module.exports = () => <Login key="loginModal"/>;
+export default connect(
+    () => ({
+        key: 'loginModal'
+    }),
+    {
+        goToRegisterModal: () => setModal(Register()),
+        login: () => console.log('lol')
+    }
+)(Login);

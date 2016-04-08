@@ -2,12 +2,10 @@ extends ./layouts/base.jade
 
 block content
 	div(id="app", class="container")
+
+append scripts
 	script.
 		SUB = '#{sub}';
-		ReactDOM.render(
-			React.createElement(App),
-			document.getElementById('app')
-		);
 
 		var fixed = document.getElementById('fixed');
 		window.addEventListener('scroll', function (e) {
