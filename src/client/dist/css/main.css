@@ -19,7 +19,7 @@ textarea.classic { padding: 8px; font-size: 17px; border-radius: 3px; border: 1p
 
 /**************/
 
-body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/ background-color: #f1f1f1;}
+body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/ background-color: #ffffff;}
 body.modal-active { overflow: hidden; }
 
 #everything { position: relative; max-width: 980px;}

@@ -1,4 +1,10 @@
 
+// import request from 'request-promise'
+import superagent from 'superagent'
+import superagentPromisePlugin from 'superagent-promise-plugin'
+const request = superagentPromisePlugin.patch(superagent);
+
+import {commonErrorsHandler, default as wrap} from './Request'
 
 /*****
 * Modals
@@ -34,10 +40,43 @@ export function newPosts(posts) {
 /*******
 * Users
 ****/
-// export const LOGIN = 'LOGIN';
+export const LOGIN = 'LOGIN';
+export const USER_LOGGED_IN = 'USER_LOGGED_IN';
 
-// export function login(username, password) {
-// 	return {
-// 		type: LOGIN
-// 	}
-// }
+export function login(username, password) {
+	return function (dispatch)  {
+		return wrap(
+			request.post('/login')
+			.type('form')
+			.accept('json')
+			.send({
+				username: username,
+				password: password
+			})
+		)
+		.then(function (json) {
+			dispatch(userLoggedIn(json.user));
+			return json.user;
+		});
+	}
+}
+
+export function userLoggedIn(user) {
+	return {
+		type: USER_LOGGED_IN,
+		user: user
+	}
+}
+
+
+/*******
+* ERRORS
+****/
+export const VALIDATION_ERROR  = 'ValidationError';
+
+export function newValidationError(errors) {
+	return {
+		type: VALIDATION_ERROR,
+		errors: errors
+	}
+}

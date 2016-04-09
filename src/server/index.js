@@ -1,6 +1,10 @@
 
+import cfg from './config'
+
 var path = require('path')
 	, reqwest = require('reqwest');
+
+import md5 from 'md5'
 
 var expressS = require('express')
 	, express = expressS()
@@ -293,7 +297,8 @@ SubRouter.get('/', function (req, res, next) {
 	// 	.catch(next);
 // res.send('Ok!');
 	res.render('index', {
-		sub: req.params.sub
+		sub: req.params.sub,
+		__IFRAMELY_HASH_KEY__: md5(cfg.IFRAMELY_API_KEY)
 	});
 	// res.sendStatus(200);
 	// res.sendFile(path.join(__dirname, '../client/index.html'));

@@ -8,18 +8,29 @@ var React = require('react')
     , ShareStepOne = require('./modals/ShareStepOne.jsx')
     , ShareStepTwo = require('./modals/ShareStepTwo.jsx');
 
-import ConnectedFeed from './Feed.jsx'
+import { connect } from 'react-redux'
+import { setModal } from '../actions'
 
-let FeedScreen = () => (
+import ConnectedFeed from './Feed.jsx'
+import SharePost from './modals/SharePost.jsx'
+
+let FeedScreen = ({locateAPost}) => (
     <div id="feedScreen" className="screen">
         <ConnectedFeed/>
 
         <div className="row">
             <div className="col-xs-12">
-	            <button className="startShare" onClick={null}>Localisez un post</button>
+	            <button className="startShare" onClick={locateAPost}>Localisez un post</button>
             </div>
         </div>
     </div>
 );
+module.exports.FeedScreen = FeedScreen;
 
-module.exports = FeedScreen;
+let _setShareModal = () => setModal(<SharePost/>);
+export default connect(
+    null,
+    {
+        locateAPost: _setShareModal
+    }
+)(FeedScreen);

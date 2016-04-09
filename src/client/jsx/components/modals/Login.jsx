@@ -8,9 +8,28 @@ var React = require('react')
 
 import { connect } from 'react-redux'
 
-import { setModal } from '../../actions'
+import ValidationError from '../../../../server/errors/ValidationError'
+import { setModal, login } from '../../actions'
 
 class Login extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            errors: null
+        };
+    }
+
+
+    login = () => {
+        this.props.login(this.refs.username.value, this.refs.password.value).catch(
+            err => {
+                if (err instanceof ValidationError)
+                    this.setState({errors: err.errors});
+                else
+                    throw err;
+            }
+        );
+    }
 
     render() {
         return (
@@ -30,10 +49,12 @@ class Login extends React.Component {
 
                 <div className="row">
                     <div className="col-xs-23 col-xs-offset-1">
+                        <p>{this.state.errors && this.state.errors.__global}</p>
+
                         <input autoFocus ref="username" type="text" placeholder="Identifiant" className="classic"/>
                         <input ref="password" type="password" placeholder="Password" className="classic"/>
                         <button 
-                            onClick={this.props.login}>
+                            onClick={this.login}>
                             Se connecter
                         </button>
                     </div>
@@ -43,12 +64,14 @@ class Login extends React.Component {
     }
 }
 
+var _setModalRegister = () => setModal(Register());
+
 export default connect(
     () => ({
         key: 'loginModal'
     }),
     {
-        goToRegisterModal: () => setModal(Register()),
-        login: () => console.log('lol')
+        goToRegisterModal: _setModalRegister,
+        login: login
     }
 )(Login);

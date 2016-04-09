@@ -5,7 +5,11 @@ block content
 
 append scripts
 	script.
-		SUB = '#{sub}';
+		window.__INITIAL_STATE__ = {
+
+		};
+
+		window.__IFRAMELY_HASH_KEY__ = '#{__IFRAMELY_HASH_KEY__}';
 
 		var fixed = document.getElementById('fixed');
 		window.addEventListener('scroll', function (e) {

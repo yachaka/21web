@@ -57,7 +57,8 @@ Preview.retrievePreview = function (url) {
 								author: json.meta.author,
 								author_url: json.meta.author_url,
 								provider: json.meta.site,
-								html: json.html
+								html: json.html,
+								json: json
 							});
 					});
 			}

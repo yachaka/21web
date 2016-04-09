@@ -1,7 +1,7 @@
 
-import { List } from 'immutable'
+import { List, Map } from 'immutable'
 
-import { SET_MODAL, CLOSE_MODAL, NEW_POSTS } from '../actions'
+import { SET_MODAL, CLOSE_MODAL, NEW_POSTS, USER_LOGGED_IN } from '../actions'
 import { combineReducers } from 'redux-immutable'
 
 export function modal(state = null, action) {
@@ -19,6 +19,15 @@ export function posts(state = List([]), action) {
 	switch (action.type) {
 		case NEW_POSTS:
 			return state.merge(action.posts);
+		default:
+			return state;
+	}
+}
+
+export function user(state = Map({anonymous: 1}), action) {
+	switch (action.type) {
+		case USER_LOGGED_IN:
+			return Map(action.user);
 		default:
 			return state;
 	}

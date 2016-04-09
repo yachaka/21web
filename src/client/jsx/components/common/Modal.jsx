@@ -9,7 +9,7 @@ let Modal = ({id, children, close}) => (
     	
     	<div className="close-modal row">
     		<p className="col-xs-23 col-xs-offset-1">
-        		<a href="javascript:void(0);" onClick={close}><img src="/img/close.png" alt="Fermer"/>Fermer</a>
+        		<a href="javascript:void(0);" onClick={close}><img src="/img/close.png" alt="Annuler"/>Annuler</a>
     		</p>
     	</div>
 

@@ -19,6 +19,6 @@ let Feed = ({posts}) => (
 
 export default connect(
 	state => ({
-		posts: state.get('posts') || []
+		posts: state.posts || []
 	})
 )(Feed);
