@@ -1,19 +1,50 @@
 
 var React = require('react')
     , Modal = require('../common/Modal.jsx')
-    , GoogleMapsLoader = require('google-maps');
 
 import debounce from 'debounce'
+import { GoogleMapLoader, GoogleMap } from 'react-google-maps'
 
 let Step1 = ({onChange}) => (
-
     <div className="row">
         <input className="col-md-15 col-xs-23 col-xs-offset-1" type="text" placeholder="Entrez l'adresse web du post" onChange={onChange}/>
     </div>
+);
 
+let Step2 = () => (
+    <div className="row">
+        <textarea className="col-md-15 col-xs-23 col-xs-offset-1" placeholder="Titre"></textarea>
+    </div>
+);
+
+let MyMap = () => (
+    <GoogleMapLoader
+        containerElement={
+            <div
+                style={{
+                    height: "300px",
+                }}
+            />
+        }
+        googleMapElement={
+            <GoogleMap
+                defaultZoom={14}
+                defaultCenter={{lat: 48.8871464, lng: 2.2990585}}
+                onCenterChanged={(e) => console.log('Center changed')}
+                >
+            </GoogleMap>
+        }
+        />
 );
 
 class SharePost extends React.Component {
+
+    state = {
+        step: 1,
+        url: '',
+        title: '',
+        coords: null
+    }
 
     constructor(props) {
         super(props)
@@ -21,6 +52,9 @@ class SharePost extends React.Component {
             console.log(v);
         }, 1000);
         this.onChangeValue = (e) => {
+            this.setState({
+                url: e.target.value
+            });
             this.debouncedOnChange(e.target.value);
         };
     }
@@ -99,6 +133,8 @@ class SharePost extends React.Component {
                 </div>
 
                 <Step1 onChange={this.onChangeValue}/>
+                <MyMap/>
+                {this.state.url != '' ? <Step2/> : null}
 
             </Modal>
         );
