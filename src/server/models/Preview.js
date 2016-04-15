@@ -1,54 +1,25 @@
 
-var reqwest = require('reqwest');
+import cfg from '@config'
+import Model from '@core/Model'
 
-var objection = require('objection')
-	, Model = require('objection').Model
-	, User = require('./User')
-	, ValidateObjectionBridge = require('../ValidateObjectionBridge');
+import MakeIframelyRequest from '@MakeIframelyRequest'
 
-var IFRAMELY_API_KEY = 'dd617885f41ea9e7690ce7';
-var IFRAMELY_API_URL = 'http://iframe.ly/api/iframely';
+export default class Preview extends Model {
 
-function Preview() {
-	Model.apply(this, arguments);
-}
+	static get tableName() {
+		return 'previews'
+	}
 
-Model.extend(Preview);
-
-Preview.tableName = 'previews';
-// Post.schema = require('../../shared/schemas/PostSchema');
-// Post.prototype.$validate = ValidateObjectionBridge;
-// Post.relationMappings = {
-// 	user: {
-// 		relation: Model.OneToOneRelation,
-// 		modelClass: User,
-// 		join: {
-// 			from: 'posts.user_id',
-// 			to: 'users.id'
-// 		}
-// 	}
-// };
-
-Preview.retrievePreview = function (url) {
-	return Preview.query()
+	static retrievePreview(forUrl) {
+		return Preview.query()
 		.first()
-		.where({url: url})
+		.where('url', forUrl)
 		.then(function (preview) {
 
-			if (preview)
+			if (preview) /* Preview found */
 				return preview;
-			else {
-				return reqwest({
-						url: IFRAMELY_API_URL,
-						method: 'get',
-						data: [
-							{name: 'url', value: url},
-							{name: 'api_key', value: IFRAMELY_API_KEY},
-							{name: 'media', value: true}, // Prefer Media-only previews, @see Iframely API Docs
-							{name: 'omit_script', value: true} // Omit script embed.js as it is loaded in base page @see Iframely API Docs
-						],
-						type: 'json'
-					})
+			else { /* Generating one */
+				return MakeIframelyRequest(forUrl)
 					.then(function (json) {
 						return Preview.query()
 							.insert({
@@ -63,11 +34,10 @@ Preview.retrievePreview = function (url) {
 					});
 			}
 		});
-};
+	}
 
-
-Preview.prototype.$beforeInsert = function () {
-  this.issued = new Date().toISOString();
-};
-
-module.exports = Preview;
+	/* Hooks */
+	beforeInsert() {
+		this.issued = new Date().toISOString();
+	}
+}

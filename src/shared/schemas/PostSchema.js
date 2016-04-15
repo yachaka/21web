@@ -3,7 +3,7 @@ module.exports = {
         presence: true,
         url: true
     },
-    text: {
+    title: {
         presence: true
     }
 };

@@ -2,9 +2,8 @@
 var BaseError = require('./BaseError');
 
 function NotFoundError(message) {
-	BaseError.call(this, 'NotFoundError');
+	BaseError.call(this, 404);
 
-	this.code = 400;
 	this.message = message;
 }
 

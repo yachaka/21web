@@ -18,13 +18,12 @@ util.inherits(AnonymousStrategy, Strategy);
 
 
 AnonymousStrategy.prototype.authenticate = function (req) {
-	console.log('In anonymous', req.cookies, req.path);
 	var self = this;
 	if (req.user) {
 		this.pass();
 		return ;
 	}
-
+	
 	function verified(err, user) {
 		if (err) { 
 			console.log(err.stack);

@@ -59,7 +59,7 @@ import DevTools from './DevTools'
 
 let history = syncHistoryWithStore(browserHistory, Store);
 
-const App = ({subName, user, openLoginModal, modal, children}) => {
+const App = ({user, openLoginModal, modal, children, params}) => {
     let userDOM = user.get('anonymous') ? 
             <p>Vous êtes anonyme. <a onClick={openLoginModal}>Login</a></p> :
             <div id="loggedUser">
@@ -71,16 +71,16 @@ const App = ({subName, user, openLoginModal, modal, children}) => {
                 </p>
             </div>;
 
+            // <DevTools/>
     return (
         <div>
-            <DevTools/>
             <div id="header">
                 <div id="fixed">
                     <div id="l" className="block">
                         <img src="/img/locate-l.png"/>
                     </div>
                     <div className="sub-name block">
-                        {subName}
+                        {params.sub}
                     </div>
                     <div className="user block">
                         {userDOM}
@@ -98,7 +98,7 @@ const App = ({subName, user, openLoginModal, modal, children}) => {
 
                 <div className="row">
                     <h1 id="subTitle" className="col-xs-23 col-xs-offset-1">
-                        {subName}
+                        {params.sub}
                     </h1>
                 </div>
                 
@@ -112,9 +112,11 @@ const App = ({subName, user, openLoginModal, modal, children}) => {
                 </div>
             </div>
 
-             <ReactCSSTransitionGroup id="modals" component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+            <div id="modals">
+            {modal}</div>
+             {/*<ReactCSSTransitionGroup id="modals" component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={300}>
                 {modal}
-            </ReactCSSTransitionGroup>
+            </ReactCSSTransitionGroup>*/}
 
             {children}
             
@@ -125,7 +127,6 @@ const App = ({subName, user, openLoginModal, modal, children}) => {
 let _setLoginModal = () => setModal(<Login/>);
 let ConnectedApp = connect(
     (state, ownProps) => ({
-        subName: ownProps.params.sub,
         user: state.user,
         modal: state.modal
     }),

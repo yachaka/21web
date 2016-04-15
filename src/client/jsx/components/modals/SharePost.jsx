@@ -2,61 +2,95 @@
 var React = require('react')
     , Modal = require('../common/Modal.jsx')
 
+import ReactDOM from 'react-dom'
 import debounce from 'debounce'
 import { GoogleMapLoader, GoogleMap } from 'react-google-maps'
+import classNames from 'classnames'
+import { connect } from 'react-redux'
 
-let Step1 = ({onChange}) => (
-    <div className="row">
-        <input className="col-md-15 col-xs-23 col-xs-offset-1" type="text" placeholder="Entrez l'adresse web du post" onChange={onChange}/>
-    </div>
-);
+import request from '../../request'
 
-let Step2 = () => (
-    <div className="row">
-        <textarea className="col-md-15 col-xs-23 col-xs-offset-1" placeholder="Titre"></textarea>
-    </div>
-);
+import { sharePost } from '../../actions'
 
-let MyMap = () => (
-    <GoogleMapLoader
-        containerElement={
-            <div
-                style={{
-                    height: "300px",
-                }}
-            />
-        }
-        googleMapElement={
-            <GoogleMap
-                defaultZoom={14}
-                defaultCenter={{lat: 48.8871464, lng: 2.2990585}}
-                onCenterChanged={(e) => console.log('Center changed')}
-                >
-            </GoogleMap>
-        }
-        />
-);
+function isUrl(url) {
+    if (url.match(/^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,4}(\/\S*)?$/))
+        return true;
+    return false;
+}
+
+function normalizeUrl(url) {
+    if (url.substr(0, 8) != 'https://' && url.substr(0, 7) != 'http://')
+        return 'http://'+url;
+    return url;
+}
 
 class SharePost extends React.Component {
 
     state = {
-        step: 1,
         url: '',
-        title: '',
-        coords: null
+        coords: null,
+        preview: null,
+
+        fetching: false
     }
 
     constructor(props) {
         super(props)
         this.debouncedOnChange = debounce((v) => {
-            console.log(v);
+            this.setState({
+                url: v
+            });
         }, 1000);
         this.onChangeValue = (e) => {
-            this.setState({
-                url: e.target.value
-            });
             this.debouncedOnChange(e.target.value);
         };
+
+        /* Binds */
+        this.mapCenterChanged = this.mapCenterChanged.bind(this);
+        this.share = this.share.bind(this);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.url != this.state.url && isUrl(this.state.url))
+            this.fetchPreview();
+
+        if (prevState.preview != this.state.preview && this.state.preview)
+            window.iframely.load(ReactDOM.findDOMNode(this.refs.preview).firstChild);
+    }
+
+    fetchPreview() {
+        this.setState({
+            fetching: true
+        });
+
+        request
+            .get('http://iframe.ly/api/iframely?url='+ encodeURI(normalizeUrl(this.state.url)) + '&key=e788d1ee1f6a783106da3dbaa5b1f2f6')
+            .then((res) => {
+                this.setState({
+                    preview: res.body,
+                    fetching: false
+                });
+            });
+    }
+
+    mapCenterChanged() {
+        let c = this.refs.map.getCenter();
+
+        this.setState({
+            coords: {
+                lat: c.lat(),
+                lng: c.lng()
+            }
+        });
+    }
+
+    share() {
+        this.props.share({
+            url: this.state.url,
+            title: this.refs.title.value,
+            lat: this.state.coords.lat,
+            lng: this.state.coords.lng
+        });
     }
 
     componentDidMount() {
@@ -132,9 +166,65 @@ class SharePost extends React.Component {
                     </div>
                 </div>
 
-                <Step1 onChange={this.onChangeValue}/>
-                <MyMap/>
-                {this.state.url != '' ? <Step2/> : null}
+                <div className="row">
+                    <div className="col-md-15 col-xs-23 col-xs-offset-1">
+                        <input className="classic url" type="text" placeholder="Collez l'adresse web du post" onChange={this.onChangeValue}/>
+                        <img className={classNames('spinner', {active: this.state.fetching})} src="/img/spinner.gif" alt="Chargement..."/>
+                    </div>
+                </div>
+
+                <div className={classNames('part-2', {active: this.state.preview != null})}>
+                    {/*******
+                    *    Preview 
+                    **/}
+                    {this.state.preview ?
+                        <div className="row picker-preview">
+                            <div ref="preview" className="col-xs-23 col-xs-offset-1" style={{maxWidth: '450px'}} dangerouslySetInnerHTML={{__html: this.state.preview.html}}>
+                            </div>
+                        </div>
+                        : null}
+
+                    {/*******
+                    *    Titre 
+                    **/}
+                    <div className="row">
+                        <div className="col-md-15 col-xs-23 col-xs-offset-1">
+                            <textarea ref="title" className="classic" placeholder="Titre"></textarea>
+                        </div>
+                    </div>
+                    
+                    {/*******
+                    *    Map 
+                    **/}
+                    <div className="row">
+                        <div className="col-md-15 col-xs-23 col-xs-offset-1" style={{height: '340px'}}>
+                            <GoogleMapLoader
+                                containerElement={
+                                    <div
+                                        style={{
+                                            height: "100%"
+                                        }}
+                                    />
+                                }
+                                googleMapElement={
+                                    <GoogleMap
+                                        ref="map"
+                                        defaultZoom={14}
+                                        defaultCenter={{lat: 48.8871464, lng: 2.2990585}}
+                                        onCenterChanged={this.mapCenterChanged}
+                                        >
+                                    </GoogleMap>
+                                }
+                                />
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-xs-23 col-xs-offset-1">
+                            <button onClick={this.share}>Share</button>
+                        </div>
+                    </div>
+                </div>
 
             </Modal>
         );
@@ -160,5 +250,11 @@ class SharePost extends React.Component {
                     </div>
                 </div>
                 */
+let ConnectedSharePost = connect(
+    null,
+    {
+        share: sharePost
+    }
+)(SharePost);
 
-module.exports = () => <SharePost key="sharePostModal"/>;
+module.exports = () => <ConnectedSharePost key="sharePostModal"/>;

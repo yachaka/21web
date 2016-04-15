@@ -8,20 +8,72 @@ var React = require('react')
 
 import { connect } from 'react-redux'
 
-import ValidationError from '../../../../server/errors/ValidationError'
-import { setModal, login } from '../../actions'
+import ValidationError from '../../../../shared/errors/ValidationError'
+import { setModal, closeModal, login } from '../../actions'
 
-class Login extends React.Component {
+let ErrorComponent = Base => class extends Base {
     constructor(props) {
         super(props)
         this.state = {
-            errors: null
+            errors: {},
+            ...this.state
         };
+
+        this.setErrors = this.setErrors.bind(this);
+        this.resetErrors = this.resetErrors.bind(this);
+    }
+
+    setErrors(errors) {
+        this.setState({
+            errors: errors
+        });
+    }
+
+    resetErrors() {
+        this.setState({
+            errors: {}
+        });
+    }
+}
+
+// class VError extends React.Component {
+//     static contextTypes = {
+//         errors: React.PropTypes.objectOf(
+//             React.PropTypes.arrayOf(
+//                 React.PropTypes.string
+//             )
+//         )
+//     };
+
+//     static propTypes = {
+
+//     };
+
+//     render() {
+//         if ()
+//         return <p>{JSON.stringify(this.context.errors)}</p>;
+//     }
+// }
+
+class InlineError extends React.Component {
+    render() {
+
+        if (this.props.error)
+            return (<p className="inline-error">{this.props.error}</p>);
+        return null;
+    }
+}
+
+
+class Login extends ErrorComponent(React.Component) {
+    constructor(props) {
+        super(props)
     }
 
 
     login = () => {
-        this.props.login(this.refs.username.value, this.refs.password.value).catch(
+        this.props.login(this.refs.username.value, this.refs.password.value).then(
+            user => this.props.closeMe(),
             err => {
                 if (err instanceof ValidationError)
                     this.setState({errors: err.errors});
@@ -49,10 +101,10 @@ class Login extends React.Component {
 
                 <div className="row">
                     <div className="col-xs-23 col-xs-offset-1">
-                        <p>{this.state.errors && this.state.errors.__global}</p>
+                        <InlineError error={this.state.errors.__global}/>
 
-                        <input autoFocus ref="username" type="text" placeholder="Identifiant" className="classic"/>
-                        <input ref="password" type="password" placeholder="Password" className="classic"/>
+                        <input autoFocus ref="username" type="text" placeholder="Identifiant" className="classic" onChange={this.resetErrors}/>
+                        <input ref="password" type="password" placeholder="Password" className="classic" onChange={this.resetErrors}/>
                         <button 
                             onClick={this.login}>
                             Se connecter
@@ -72,6 +124,7 @@ export default connect(
     }),
     {
         goToRegisterModal: _setModalRegister,
+        closeMe: closeModal,
         login: login
     }
 )(Login);

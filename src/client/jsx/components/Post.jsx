@@ -99,7 +99,7 @@ var Post = React.createClass({
             			<div className="col-md-12">
 							<p className="time"> 9 heures</p>
 							<p className="title">
-								<a href={this.props.data.get('url')}>{this.props.data.get('text')}</a>
+								<a href={this.props.data.get('url')}>{this.props.data.get('title')}</a>
 							</p>
 							<p className="from-and-shared">
 								{getHost(this.props.data.get('url'))} partagé par <span className="shared-username">{this.props.data.get('user') ? this.props.data.get('user').get('username') : '[utilisateur supprimé]'}</span><img className="avatar" src="https://pbs.twimg.com/profile_images/378800000767456340/d2013134969a6586afd0e9eab6b0449b.jpeg" />
@@ -109,7 +109,7 @@ var Post = React.createClass({
 
 					<div className="row preview">
 						<div className="col-xs-24 col-md-12">
-							<div ref="preview" className="true-preview" dangerouslySetInnerHTML={{__html: this.props.data.get('preview').get('html')}}></div>
+							<div ref="preview" className="true-preview" dangerouslySetInnerHTML={{__html: /*this.props.data.get('preview').get('html')*/''}}></div>
 						</div>
 
 						<a href={this.props.data.get('preview').get('canonical')} className="see-more hidden-xs hidden-sm">

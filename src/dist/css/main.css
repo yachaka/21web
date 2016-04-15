@@ -17,6 +17,8 @@ a:hover {
 input[type=text].classic, input[type=password].classic { display: block; max-width: 300px; width: 100%; padding: 8px; font-size: 17px; margin-bottom: 10px; border-radius: 3px; border: 1px solid #bbb;}
 textarea.classic { padding: 8px; font-size: 17px; border-radius: 3px; border: 1px solid #bbb; width: 100%; }
 
+.inline-error { color:red; padding: 8px 16px 8px 8px; border-bottom: 1px solid red; margin-bottom: 10px; display: inline-block;}
+
 /**************/
 
 body {/*background: url('/img/logos-cut-orig.png') top left repeat-y;*/ background-color: #ffffff;}
@@ -99,7 +101,7 @@ body.modal-active { overflow: hidden; }
 /********	
 * MODALS
 **/
-#modals .modal { position: fixed; top: 0; left: 2px; bottom: 0; right: -2px; background-color: rgba(255, 255, 255, 0.96); z-index: 20; padding-top: 60px;}
+#modals .modal { position: fixed; top: 0; left: 2px; bottom: 0; right: -2px; background-color: rgba(255, 255, 255, 0.96); z-index: 20; padding-top: 60px; padding-bottom: 60px; overflow: auto;}
 	#modals .modal .close-modal {margin-bottom: 45px; font-size: 16px;}
 		#modals .modal .close-modal a { color: black; }
 		#modals .modal .close-modal img { vertical-align: middle; display: inline-block; margin-right: 6px; }
@@ -133,7 +135,12 @@ body.modal-active { overflow: hidden; }
 		#sharePostModal h2 .light-blue { color:#00C4C1;}
 		#sharePostModal h2 .deep-blue { color:#005CC4;}
 
-	#sharePostModal #map { height: 500px; }
+	#sharePostModal input.url { display: inline-block; margin-right: 10px; }
+	#sharePostModal .spinner { vertical-align: middle; opacity: 0; }
+		#sharePostModal .spinner.active { opacity: 1; transition: all 150ms ease-in; }
+
+	#sharePostModal .part-2 { opacity: 0; }
+		#sharePostModal .part-2.active { opacity: 1; transition: all 250ms ease-in; }
 
 /********	
 * FEED

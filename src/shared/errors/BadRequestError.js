@@ -2,9 +2,7 @@
 var BaseError = require('./BaseError');
 
 function BadRequestError(message) {
-	BaseError.call(this, 'BadRequestError');
-
-	this.code = 400;
+	BaseError.call(this, 400);
 	this.message = message;
 }
 

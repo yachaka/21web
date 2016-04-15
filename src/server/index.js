@@ -1,124 +1,91 @@
+// Root directory as module search path, @see https://github.com/yachaka/local-modules-as-globals
+import 'local-modules-as-globals/register'
+
+import md5 from 'md5'
 
 import cfg from './config'
+import { Post, User, Token, Preview, Sub } from '@models'
 
 var path = require('path')
 	, reqwest = require('reqwest');
 
-import md5 from 'md5'
 
-var expressS = require('express')
-	, express = expressS()
-	, consolidate = require('consolidate')
-	, session = require('express-session')
-	, cookieParser = require('cookie-parser')
-	, bodyParser = require('body-parser')
-	, escapeRegExp = require('escape-string-regexp')
+import expressjs from 'express'
+import express from '@config/express'
 
-	, passport = require('passport')
-	, AnonymousStrategy = require('./strategies/AnonymousStrategy')
+var Responses = require('./responses');
 
-	, objection = require('objection')
-	, Model = objection.Model
-	, Knex = require('knex')
+import { BaseError, ValidationError, NotFoundError, UnauthorizedError, BadRequestError } from '../shared/errors'
 
-	, Responses = require('./responses')
-	, ValidationError = require('./errors/ValidationError')
-	, NotFoundError = require('./errors/NotFoundError')
-	, UnauthorizedError = require('./errors/UnauthorizedError')
-	, BadRequestError = require('./errors/BadRequestError')
-
-	, UserRanks = require('./auth/ranks');
-
-var Post = require('./models/Post')
-	, User = require('./models/User')
-	, Token = require('./models/Token')
-	, Preview = require('./models/Preview')
-	, Sub = require('./models/Sub');
+var UserRanks = require('./auth/ranks');
 
 var ReCaptchaMiddleware = require('./middlewares/ReCaptcha')('6LfbVBoTAAAAAN2gkqo5ZhN6t2drnY5zZo-RN9Tb');
 
-/**
-* KNEX Query Build: database connection
-**/
-var knex = Knex({
-	client: 'mysql',
-	connection: {
-		host: 'climbing7.com',
-		user: 'arcodep',
-		password: '-TAPCLPuX4+6',
-		database: 'arcodep_21'
-	}
-});
-
-Model.knex(knex);
-
-/*******
-* View Engine configuration (MustacheJS)
-*******/
-express.engine('jade', consolidate.jade);
-express.set('view engine', 'jade');
-express.set('views', path.join(__dirname, '../client/views'));
-
-/*******
-* Authentification STRATEGIES
-*******/
-passport.serializeUser(function(user, done) {
-	done(null, user);
-});
-passport.deserializeUser(function(user, done) {
-	done(null, user);
-});
-
-passport.use(new AnonymousStrategy({}, function (connectToken, done) {
-	Token.query()
-		.first()
-		.where({
-			type: 'connect',
-			value: connectToken
-		})
-		.then(function (token) {
-			if (!token)
-				return null;
-			
-			return User.query()
-				.first()
-				.eager('tokens')
-				.where('id', token.user_id);
-		})
-		.then(function (user) {
-			done(null, user);
-		})
-		.catch(done);
-}, function (ip, done) {
-	User.query()
-		.first()
-		.where({unclaimed: true, last_ip_connected: ip})
-		.eager('tokens')
-		.then(function (user) {
-			done(null, user);
-		})
-		.catch(done);
-}));
-
-/********
-* MIDDLEWARES
-********/
-express.use(expressS.static(path.join(__dirname, '../client/dist/')));
-express.use(cookieParser());
-express.use(bodyParser.urlencoded({ extended: false }));
-express.use(session({secret: '21Locate sisi les potos', resave: false, saveUninitialized: true}));
-express.use(passport.initialize());
-express.use(passport.session());
-express.use(passport.authenticate('anonymous'));
-express.use(function (req, res, next) {
-	console.log(req.xhr);
-	res.locals.user = req.user;
+/*********
+* Routes
+***************/
+const SubRouter = expressjs.Router({mergeParams: true});
+express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
+SubRouter.use(function (req, res, next) {
+	console.log(req.user);
 	next();
 });
-/*******************/
+/***** Entry point ****/
+SubRouter.get('/', function (req, res, next) {
+	res.render('index', {
+		sub: req.params.sub,
+		__IFRAMELY_HASH_KEY__: md5(cfg.IFRAMELY_API_KEY)
+	});
+});
+/**** GET /posts ***/
+SubRouter.get('/posts', function (req, res) {
+	Sub.query()
+		.first()
+		.where('name', req.params.sub)
+		.then(function (sub) {
+			if (!sub)
+				return [];
 
+			return sub.$relatedQuery('posts')
+				.eager('[user, preview]');
+		})
+		.then(function (posts) {
+			res.json({
+				posts: posts
+			});
+		});
+});
 
+/***** Add a post *****/
+express.post('/posts', needAuthentifiedUserMiddleware, function (req, res) {
+	console.log(req.body);
+	var data = {
+		user_id: req.user.id,
+		url: req.body.url,
+		title: req.body.title,
+		lat: parseFloat(req.body.lat),
+		lng: parseFloat(req.body.lng)
+	};
+	Post.query()
+		.insert(data)
+		.then(function (newPost) {
+			var json = {
+				postId: newPost.id,
+				_clientIdentifier: req.body._clientIdentifier
+			};
 
+			if (req.userJustGotCreated)
+				json.newUser = req.user;
+
+			res.json(Responses.Success(json));
+		})
+		.catch(function (err) {
+			console.log(err.stack);
+			res.json({
+				errors: err.data
+			});
+		});
+});
 
 function needAuthentifiedUserMiddleware(req, res, next) {
 	if (req.user.anonymous) {
@@ -145,7 +112,6 @@ function requiredPostParamsMiddleware(params) {
 }
 
 express.post('/login',
-	requiredPostParamsMiddleware(['username', 'password']),
 	function (req, res, next) {
 
 		User.query()
@@ -156,7 +122,8 @@ express.post('/login',
 				if (!user)
 					return next(new ValidationError({__global: ['Utilisateur ou mot de passe incorrect']}));
 				req.login(user, function (err) {
-					if (err) return res.json(Responses.SomethingError(err.name, err.message));
+					if (err)
+						return next(new InternalServerError(err));
 					return res.json(Responses.Success({user: user}));
 				});
 			})
@@ -250,7 +217,7 @@ var needRankOnSubMiddleware = function (rankNeeded) {
 	};
 };
 
-var AdminRouter = expressS.Router();
+var AdminRouter = expressjs.Router();
 AdminRouter.use(needAuthentifiedUserMiddleware);
 AdminRouter.get('/', function (req, res) {
 	res.send('Index');
@@ -261,75 +228,7 @@ AdminRouter.get('/:sub([a-zA-Z0-9]+)', fetchSubMiddleware, needRankOnSubMiddlewa
 
 express.use('/admin', AdminRouter);
 
-var SubRouter = expressS.Router({mergeParams: true});
-express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
-SubRouter.use(function (req, res, next) {
-	console.log('hiho');
-	next();
-});
-SubRouter.get('/', function (req, res, next) {
-// oEmbedPreviewGenerator('https://www.instagram.com/p/BDOqXXAMVlQ/');
-	// generatePreview('https://www.facebook.com/B2OUF/videos/926159704167131/', function (preview) {
-	// 	console.log('got preview!', preview);
-	// });
-
-	// console.log('Path ', req.path, ', user: ', req.user);
-	// Post.query()
-	// 	.then(function (posts) {
-	// 		posts.forEach(function (post) {
-	// 			Preview.retrievePreview(post.url)
-	// 				.then(function (preview) {
-	// 					Post.query()
-	// 						.patch({
-	// 							preview_id: preview.id
-	// 						})
-	// 						.where({id: post.id})
-	// 						.then(function(rows) {
-	// 							console.log(rows);
-	// 						});
-	// 				});
-	// 		});
-	// 	});
-	// Preview.retrievePreview('https://www.instagram.com/p/BDOgng1PrJW/')
-	// 	.then(function (preview) {
-	// 		console.log('got preview!', preview);
-	// 	})
-	// 	.catch(next);
-// res.send('Ok!');
-	res.render('index', {
-		sub: req.params.sub,
-		__IFRAMELY_HASH_KEY__: md5(cfg.IFRAMELY_API_KEY)
-	});
-	// res.sendStatus(200);
-	// res.sendFile(path.join(__dirname, '../client/index.html'));
-});
-
-SubRouter.get('/posts', function (req, res) {
-	Sub.query()
-		.first()
-		.where('name', req.params.sub)
-		.then(function (sub) {
-			if (!sub)
-				return [];
-
-			return sub.$relatedQuery('posts')
-				.eager('[user, preview]');
-		})
-		.then(function (posts) {
-			res.json({
-				posts: posts
-			});
-		});
-});
-
-
 express.use(function (err, req, res, next) {
-	
-	if (err instanceof ValidationError) {
-		res.json(Responses.ValidationError(err));
-	}
-	console.error(err);
-	console.error(err.stack)
-	res.status(500).send('Something broke!');
+	res.status(err.code).json(err.toJSON());
 });
 express.listen(8080);

@@ -1,10 +1,7 @@
 
-// import request from 'request-promise'
-import superagent from 'superagent'
-import superagentPromisePlugin from 'superagent-promise-plugin'
-const request = superagentPromisePlugin.patch(superagent);
+import request from './request'
 
-import {commonErrorsHandler, default as wrap} from './Request'
+import {commonErrorsHandler, default as wrap} from './WrappedRequest'
 
 /*****
 * Modals
@@ -37,12 +34,26 @@ export function newPosts(posts) {
 	}
 }
 
+export function sharePost(post) {
+	return function (dispatch) {
+		return wrap(
+			request.post('/posts')
+			.type('form')
+			.accept('json')
+			.send(post)
+		);
+	}
+}
+
 /*******
 * Users
 ****/
 export const LOGIN = 'LOGIN';
 export const USER_LOGGED_IN = 'USER_LOGGED_IN';
-
+/*
+* @throws error: an error defined in /shared/errors
+* @returns logged user data
+*/	
 export function login(username, password) {
 	return function (dispatch)  {
 		return wrap(
