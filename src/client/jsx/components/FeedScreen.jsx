@@ -4,9 +4,7 @@ var React = require('react')
     , AppStateCreator = require('../actions/NavigationCreator')
     , Creator = require('../actions/Creator')
 
-    , Screen = require('./common/Screen.jsx')
-    , ShareStepOne = require('./modals/ShareStepOne.jsx')
-    , ShareStepTwo = require('./modals/ShareStepTwo.jsx');
+    , Screen = require('./common/Screen.jsx');
 
 import { connect } from 'react-redux'
 import { setModal } from '../actions'

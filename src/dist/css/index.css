@@ -1,0 +1,10 @@
+
+.container { position: absolute; top: 50%; left: 50%; transform: translateY(-74%) translateX(-50%); }
+
+h1.title, .presentation, .sub { text-align: center; }
+	h1.title img { width: 240px; }
+
+.presentation { font-size: 42px; line-height: 54px; color: #999; margin-top: 0; }
+
+.sub { height: 200px; border: 1px solid black; border-radius: 3px; position: relative; }
+	.sub .post { position: absolute; width: 300px; height: 300px; background-color: #999; border: 1px solid white;}

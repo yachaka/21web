@@ -1,26 +1,57 @@
-extends ./layouts/base.jade
+doctype html
+html
+	head
+		block title
+			title Locate
+		block css
+			link(rel="stylesheet", type="text/css", href="/css/bootstrap.min.css")
+			link(rel="stylesheet", type="text/css", href="/css/index.css")
+	body.container
+		div.row
+			div.col-xs-24
+				h1.title
+					img(src="/img/locate.png")
+				p.presentation.
+					Commencez à localiser les posts des réseaux sociaux sur Paris
+		div.row
+			div.col-xs-8
+				div.sub
+					div.post(data-lat="48.8861843", data-lng="2.3072124")
+						| Post1<br/>
+						span.km
+					div.post(data-lat="48.8741614", data-lng="2.2996593")
+						| Post2<br/>
+						span.km
+					div.post(data-lat="48.8781694", data-lng="2.2834373")
+						| Post3<br/>
+						span.km
+					div.post(data-lat="48.8883854", data-lng="2.2899604")
+						| Post4<br/>
+						span.km
+					div.post(data-lat="48.89211", data-lng="2.3029208")
+						| Post5<br/>
+						span.km
+					div.post(data-lat="48.8678949", data-lng="2.335279")
+						| Post6<br/>
+						span.km
+					div.post(data-lat="48.8555288", data-lng="2.3266101")
+						| Post7<br/>
+						span.km
+					div.post(data-lat="48.8593123", data-lng="2.3125339")
+						| Post8<br/>
+						span.km
+					div.post(data-lat="48.8699274", data-lng="2.3151088")
+						| Post9<br/>
+						span.km
+					p.
+						skate
+			div.col-xs-8
+				div.sub
+					p.
+						techno
+			div.col-xs-8
+				div.sub
+					p.
+						MaPetiteSoirée
 
-block content
-	div(id="app", class="container")
-
-append scripts
-	script.
-		window.__INITIAL_STATE__ = {
-
-		};
-
-		window.__IFRAMELY_HASH_KEY__ = '#{__IFRAMELY_HASH_KEY__}';
-
-		var fixed = document.getElementById('fixed');
-		window.addEventListener('scroll', function (e) {
-			
-			if (document.body.scrollTop > 155 && fixed.className == '') {
-				fixed.className = 'visible';
-			} else if (document.body.scrollTop <= 155 && fixed.className == 'visible') {
-				fixed.className = '';
-			}
-		});
-	//- div(id="welcome")
-	//- 	button(type="button", class="close", aria-label="Close")
-	//- 		span(aria-hidden="true") &times;
-	//- 	| Bienvenue sur Locate#skate.<br/>Commencez à localiser les posts de skate sur Paris dès maintenant.
+	script(src="/js/index.js")

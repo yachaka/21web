@@ -15,9 +15,11 @@ a:hover {
 }
 
 input[type=text].classic, input[type=password].classic { display: block; max-width: 300px; width: 100%; padding: 8px; font-size: 17px; margin-bottom: 10px; border-radius: 3px; border: 1px solid #bbb;}
+input[type=text].error, input[type=password].error { border-color: red; }
 textarea.classic { padding: 8px; font-size: 17px; border-radius: 3px; border: 1px solid #bbb; width: 100%; }
 
 .inline-error { color:red; padding: 8px 16px 8px 8px; border-bottom: 1px solid red; margin-bottom: 10px; display: inline-block;}
+.simple-inline-error { color:red; padding: 8px 8px 6px 0; margin-bottom: 10px; display: inline-block;}
 
 /**************/
 
@@ -139,8 +141,11 @@ body.modal-active { overflow: hidden; }
 	#sharePostModal .spinner { vertical-align: middle; opacity: 0; }
 		#sharePostModal .spinner.active { opacity: 1; transition: all 150ms ease-in; }
 
-	#sharePostModal .part-2 { opacity: 0; }
-		#sharePostModal .part-2.active { opacity: 1; transition: all 250ms ease-in; }
+	#sharePostModal .part-2 { opacity: 0; transform: translateY(100px);}
+		#sharePostModal .part-2.active { opacity: 1; transform: translateY(0px); transition: all 450ms cubic-bezier(.08,.58,.25,.96); }
+
+	#sharePostModal .picker-preview { margin-bottom: 12px; }
+		#sharePostModal .picker-preview > div { background: url('/img/spinner-on-bbb.gif') center center no-repeat #bbb; }
 
 /********	
 * FEED

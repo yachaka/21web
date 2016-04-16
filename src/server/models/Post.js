@@ -2,10 +2,31 @@
 import Model from '@core/Model'
 import { User, Preview } from '@models'
 
+import Schemas from './schemas'
+
 export default class Post extends Model {
 
 	static get tableName() {
 		return 'posts'
+	}
+
+	static get schema() {
+		return {
+			user_id: Schemas.unsignedInteger,
+			url: {
+				presence: true,
+				url: true
+			},
+			title: {},
+			lat: {
+				presence: true,
+				numericality: true
+			},
+			lng: {
+				presence: true,
+				numericality: true
+			}
+		}
 	}
 
 	static get relationMappings() {
@@ -41,9 +62,26 @@ export default class Post extends Model {
 		};
 	}
 
+	/* Static to create a post + link it to a sub/subs */
+	static createPostInSubs(post, subs) {
+		return Post
+			.query()
+			.insert(post)
+			.then((post) => {
+				return post
+					.$relatedQuery('subs')
+					.relate(subs)
+					.return(post);
+			});
+	}
+
 	/* Hooks */
-	beforeInsert() {
+	$beforeInsert() {
 		this.date = new Date().toISOString();
+		return Preview.retrievePreview(this.url)
+			.then((preview) => {
+				this.preview_id = preview.id;
+			});
 	}
 }
 /*

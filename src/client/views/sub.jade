@@ -1,0 +1,26 @@
+extends ./layouts/app.jade
+
+block content
+	div(id="app", class="container")
+
+append scripts
+	script.
+		window.__INITIAL_STATE__ = {
+
+		};
+
+		window.__IFRAMELY_HASH_KEY__ = '#{__IFRAMELY_HASH_KEY__}';
+
+		var fixed = document.getElementById('fixed');
+		window.addEventListener('scroll', function (e) {
+			
+			if (document.body.scrollTop > 155 && fixed.className == '') {
+				fixed.className = 'visible';
+			} else if (document.body.scrollTop <= 155 && fixed.className == 'visible') {
+				fixed.className = '';
+			}
+		});
+	//- div(id="welcome")
+	//- 	button(type="button", class="close", aria-label="Close")
+	//- 		span(aria-hidden="true") &times;
+	//- 	| Bienvenue sur Locate#skate.<br/>Commencez à localiser les posts de skate sur Paris dès maintenant.

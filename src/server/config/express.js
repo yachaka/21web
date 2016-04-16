@@ -27,9 +27,16 @@ express.use(bodyParser.urlencoded({ extended: false })); 											/* Form body
 express.use(session({secret: '21Locate sisi les potos', resave: false, saveUninitialized: true}));	/* Session */
 express.use(passport.initialize());																	/* PassportJS */
 express.use(passport.session());																	/* Passport Session */
-express.use(passport.authenticate('anonymous'));													/* Passport AnonymousStrategy(custom) */
+// express.use(passport.authenticate('anonymous'));													/* Passport AnonymousStrategy(custom) */
 express.use(function (req, res, next) {																/* Setting user local for view */
-	console.log(req.xhr);
-	res.locals.user = req.user;
-	next();
+	
+	/* TMP  DEVVV */
+	var User = require('@models/User');
+	User.query()
+	.first()
+	.where('id', 42)
+	.then((user) => {
+		res.locals.user = user;
+		req.login(user, next);
+	});
 });

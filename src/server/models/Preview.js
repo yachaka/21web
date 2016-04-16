@@ -10,6 +10,23 @@ export default class Preview extends Model {
 		return 'previews'
 	}
 
+	static get jsonAttributes() {
+		return ['json'];
+	}
+
+	static get relationMappings() {
+		return {
+			posts: {
+				relation: Model.OneToManyRelation,
+				modelClass: __dirname + '/Post',
+				join: {
+					from: 'previews.id',
+					to: 'posts.preview_id'
+				}
+			}
+		}
+	}
+
 	static retrievePreview(forUrl) {
 		return Preview.query()
 		.first()
@@ -37,7 +54,7 @@ export default class Preview extends Model {
 	}
 
 	/* Hooks */
-	beforeInsert() {
+	$beforeInsert() {
 		this.issued = new Date().toISOString();
 	}
 }

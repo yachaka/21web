@@ -12,16 +12,22 @@ import request from '../../request'
 
 import { sharePost } from '../../actions'
 
-function isUrl(url) {
+function _isUrl(url) {
     if (url.match(/^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,4}(\/\S*)?$/))
         return true;
     return false;
 }
 
-function normalizeUrl(url) {
+function _normalizeUrl(url) {
     if (url.substr(0, 8) != 'https://' && url.substr(0, 7) != 'http://')
         return 'http://'+url;
     return url;
+}
+
+function _showError(url) {
+    if (url === '' || _isUrl(url))
+        return false;
+    return true;
 }
 
 class SharePost extends React.Component {
@@ -42,16 +48,21 @@ class SharePost extends React.Component {
             });
         }, 1000);
         this.onChangeValue = (e) => {
+            this.setState({
+                url: '',
+                preview: null
+            });
             this.debouncedOnChange(e.target.value);
         };
 
         /* Binds */
         this.mapCenterChanged = this.mapCenterChanged.bind(this);
         this.share = this.share.bind(this);
+        /*******/
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.url != this.state.url && isUrl(this.state.url))
+        if (prevState.url != this.state.url && _isUrl(this.state.url))
             this.fetchPreview();
 
         if (prevState.preview != this.state.preview && this.state.preview)
@@ -64,7 +75,7 @@ class SharePost extends React.Component {
         });
 
         request
-            .get('http://iframe.ly/api/iframely?url='+ encodeURI(normalizeUrl(this.state.url)) + '&key=e788d1ee1f6a783106da3dbaa5b1f2f6')
+            .get('http://iframe.ly/api/iframely?url='+ encodeURI(_normalizeUrl(this.state.url)) + '&key=e788d1ee1f6a783106da3dbaa5b1f2f6')
             .then((res) => {
                 this.setState({
                     preview: res.body,
@@ -90,7 +101,7 @@ class SharePost extends React.Component {
             title: this.refs.title.value,
             lat: this.state.coords.lat,
             lng: this.state.coords.lng
-        });
+        }, [this.props.params.sub]);
     }
 
     componentDidMount() {
@@ -168,7 +179,10 @@ class SharePost extends React.Component {
 
                 <div className="row">
                     <div className="col-md-15 col-xs-23 col-xs-offset-1">
-                        <input className="classic url" type="text" placeholder="Collez l'adresse web du post" onChange={this.onChangeValue}/>
+
+                        {_showError(this.state.url) ? <p className="simple-inline-error">L'URL entrée ne correspond pas à une URL valide.</p> : null}
+
+                        <input className={classNames('classic url', {error: _showError(this.state.url)})} type="text" placeholder="Collez l'adresse web du post" onChange={this.onChangeValue}/>
                         <img className={classNames('spinner', {active: this.state.fetching})} src="/img/spinner.gif" alt="Chargement..."/>
                     </div>
                 </div>
@@ -178,8 +192,8 @@ class SharePost extends React.Component {
                     *    Preview 
                     **/}
                     {this.state.preview ?
-                        <div className="row picker-preview">
-                            <div ref="preview" className="col-xs-23 col-xs-offset-1" style={{maxWidth: '450px'}} dangerouslySetInnerHTML={{__html: this.state.preview.html}}>
+                        <div className="row">
+                            <div ref="preview" className="picker-preview col-xs-23 col-xs-offset-1" style={{maxWidth: '450px'}} dangerouslySetInnerHTML={{__html: this.state.preview.html}}>
                             </div>
                         </div>
                         : null}
@@ -250,11 +264,10 @@ class SharePost extends React.Component {
                     </div>
                 </div>
                 */
-let ConnectedSharePost = connect(
+export default connect(
     null,
     {
         share: sharePost
-    }
+    },
+    (stateProps, dispatchProps, ownProps) => Object.assign({key: 'sharePostModal'}, ownProps, stateProps, dispatchProps)
 )(SharePost);
-
-module.exports = () => <ConnectedSharePost key="sharePostModal"/>;

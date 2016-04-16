@@ -72,6 +72,9 @@ const App = ({user, openLoginModal, modal, children, params}) => {
             </div>;
 
             // <DevTools/>
+    let WithRouteModal = modal ?
+        React.cloneElement(modal, {params: params}) :
+        modal;
     return (
         <div>
             <div id="header">
@@ -113,9 +116,9 @@ const App = ({user, openLoginModal, modal, children, params}) => {
             </div>
 
             <div id="modals">
-            {modal}</div>
+            {WithRouteModal}</div>
              {/*<ReactCSSTransitionGroup id="modals" component="div" transitionName="modal" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={300}>
-                {modal}
+                {WithRouteModal}
             </ReactCSSTransitionGroup>*/}
 
             {children}

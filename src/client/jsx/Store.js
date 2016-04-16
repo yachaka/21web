@@ -9,7 +9,7 @@ import DevTools from './DevTools'
 
 // Dev
 import React from 'react'
-import Login from './components/modals/Login.jsx'
+import SharePost from './components/modals/SharePost.jsx'
 
 export default createStore(
     combineReducers({
@@ -17,7 +17,7 @@ export default createStore(
         routing: routerReducer
     }),
     {
-    	modal: <Login/>
+    	modal: <SharePost/>
     },
     compose(
     	applyMiddleware(thunk),

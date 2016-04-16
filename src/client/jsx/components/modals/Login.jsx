@@ -119,12 +119,11 @@ class Login extends ErrorComponent(React.Component) {
 var _setModalRegister = () => setModal(Register());
 
 export default connect(
-    () => ({
-        key: 'loginModal'
-    }),
+    null,
     {
         goToRegisterModal: _setModalRegister,
         closeMe: closeModal,
         login: login
-    }
+    },
+    (stateProps, dispatchProps, ownProps) => Object.assign({key: 'loginModal'}, ownProps, stateProps, dispatchProps)
 )(Login);

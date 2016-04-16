@@ -3,12 +3,12 @@ import * as errors from '../../shared/errors'
 
 export default function wrapped(promise) {
 	return promise
-		.catch((res) => {
-			if (res.body && res.body.state) {
-				if (errors[res.body.state])
-					throw errors[res.body.state].fromJSON(res.body);
+		.catch((err) => {
+			if (err.response.body && err.response.body.state) {
+				if (errors[err.response.body.state])
+					throw errors[err.response.body.state].fromJSON(err.response.body);
 			}
-			throw res;
+			throw err;
 		});
 }
 

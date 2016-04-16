@@ -34,13 +34,18 @@ export function newPosts(posts) {
 	}
 }
 
-export function sharePost(post) {
+export function sharePost(post, toSubs) {
 	return function (dispatch) {
+		let sent = {
+			...post,
+			subs: toSubs
+		};
+
 		return wrap(
 			request.post('/posts')
 			.type('form')
 			.accept('json')
-			.send(post)
+			.send(sent)
 		);
 	}
 }

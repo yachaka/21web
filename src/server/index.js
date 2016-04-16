@@ -24,15 +24,20 @@ var ReCaptchaMiddleware = require('./middlewares/ReCaptcha')('6LfbVBoTAAAAAN2gkq
 /*********
 * Routes
 ***************/
+
+express.get('/', function (req, res) {
+	res.render('index');
+});
+
 const SubRouter = expressjs.Router({mergeParams: true});
 express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
 SubRouter.use(function (req, res, next) {
 	console.log(req.user);
 	next();
 });
-/***** Entry point ****/
+/***** Sub entry point ****/
 SubRouter.get('/', function (req, res, next) {
-	res.render('index', {
+	res.render('sub', {
 		sub: req.params.sub,
 		__IFRAMELY_HASH_KEY__: md5(cfg.IFRAMELY_API_KEY)
 	});
@@ -57,7 +62,7 @@ SubRouter.get('/posts', function (req, res) {
 });
 
 /***** Add a post *****/
-express.post('/posts', needAuthentifiedUserMiddleware, function (req, res) {
+express.post('/posts', needAuthentifiedUserMiddleware, requiredPostParamsMiddleware(['url', 'lat', 'lng', 'subs']), function (req, res, next) {
 	console.log(req.body);
 	var data = {
 		user_id: req.user.id,
@@ -66,25 +71,20 @@ express.post('/posts', needAuthentifiedUserMiddleware, function (req, res) {
 		lat: parseFloat(req.body.lat),
 		lng: parseFloat(req.body.lng)
 	};
-	Post.query()
-		.insert(data)
-		.then(function (newPost) {
-			var json = {
-				postId: newPost.id,
-				_clientIdentifier: req.body._clientIdentifier
-			};
 
-			if (req.userJustGotCreated)
-				json.newUser = req.user;
+	let subs = (typeof req.body.subs === 'string') ? [req.body.subs] : req.body.subs;
 
-			res.json(Responses.Success(json));
+	Sub.query()
+		.where('name', subs)
+		.then((subs) => {
+			return Post.createPostInSubs(data, subs.map((sub) => sub.id));
 		})
-		.catch(function (err) {
-			console.log(err.stack);
-			res.json({
-				errors: err.data
-			});
-		});
+		.then((post) => {
+			res.json(Responses.Success({
+				newPost: post
+			}));
+		})
+		.catch(next);
 });
 
 function needAuthentifiedUserMiddleware(req, res, next) {
@@ -99,14 +99,15 @@ function requiredPostParamsMiddleware(params) {
 		throw new Error('`params` argument must be an Array in requiredPostParamsMiddleware.');
 
 	return function (req, res, next) {
+		let missing = [];
+
 		for (var i = 0; i < params.length; i++) {
-			if (!req.body[params[i]]) {
-				console.error('Missing body parameters to POST request', params, req.body);
-				return res.status(400).json({
-					error: 'Missing body parameters to POST request'
-				});
-			}
+			if (!req.body[params[i]])
+				missing.push(params[i]);
 		}
+
+		if (missing.length > 0)
+			return next(new BadRequestError('Missing parameters in req.body: ' + missing.join(', ')));
 		next();
 	}
 }
@@ -229,6 +230,8 @@ AdminRouter.get('/:sub([a-zA-Z0-9]+)', fetchSubMiddleware, needRankOnSubMiddlewa
 express.use('/admin', AdminRouter);
 
 express.use(function (err, req, res, next) {
-	res.status(err.code).json(err.toJSON());
+	if (typeof err.toJSON === 'function')
+		res.status(err.code).json(err.toJSON());
+	next(err);
 });
 express.listen(8080);
