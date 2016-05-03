@@ -16,9 +16,6 @@ export default createStore(
         ...reducers,
         routing: routerReducer
     }),
-    {
-    	modal: <SharePost/>
-    },
     compose(
     	applyMiddleware(thunk),
     	DevTools.instrument()

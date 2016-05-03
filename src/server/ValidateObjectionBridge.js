@@ -1,11 +1,13 @@
 
-var Validator = require('validate.js')
-	, objection = require('objection');
+var objection = require('objection');
 
-  import { ValidationError } from '../shared/errors/ValidationError'
+import Validator from '@config/validatejs'
+import { ValidationError } from '../shared/errors/ValidationError'
 
 module.exports = function (objectToValidate, options) {
   // This makes revalidation possible: `someModel.$validate()`.
+  if (!objectToValidate)
+    return null;
   if (options.patch || options.skipValidation)
   	return objectToValidate;
 

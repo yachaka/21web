@@ -180,8 +180,8 @@ class SharePost extends React.Component {
                 <div className="row">
                     <div className="col-md-15 col-xs-23 col-xs-offset-1">
 
-                        {_showError(this.state.url) ? <p className="simple-inline-error">L'URL entrée ne correspond pas à une URL valide.</p> : null}
-
+                        {_showError(this.state.url) ? <p className="simple-inline-error">L'URL entrée ne correspond pas à une URL valide.<br/>Example d'URL valide : https://www.instagram.com/p/BE8oN30ACf7/?taken-by=nikesb</p> : null}
+                        <p className="help">Partagez une adresse web ▾</p>
                         <input className={classNames('classic url', {error: _showError(this.state.url)})} type="text" placeholder="Collez l'adresse web du post" onChange={this.onChangeValue}/>
                         <img className={classNames('spinner', {active: this.state.fetching})} src="/img/spinner.gif" alt="Chargement..."/>
                     </div>

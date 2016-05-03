@@ -91,7 +91,7 @@ var Post = React.createClass({
         return (
             <div className={className}>
             	<div className="distance col-xs-22 col-xs-offset-1 col-md-2 col-md-offset-1" style={{color: color}}>
-            		A {Math.round(distanceN)}km
+            		A {Math.round(distanceN)} km
             	</div>
 
             	<div className="inner col-xs-22 col-xs-offset-1 col-md-21 col-md-offset-0">

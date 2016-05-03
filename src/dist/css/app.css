@@ -153,7 +153,7 @@ body.modal-active { overflow: hidden; }
 #feedScreen #feed { }
 	#feedScreen #feed .post {  border-bottom: 1px solid #ddd; padding: 20px 0;}
 	#feedScreen #feed .post .top { margin-bottom: 15px;}
-		#feedScreen #feed .post .distance { font-size: 20px; line-height: 40px; color: #999;}
+		#feedScreen #feed .post .distance { font-size: 22px; line-height: 32px; color: #999;}
 
 		#feedScreen #feed .post .time { color: #777; line-height: 32px; font-size: 13px; float: right;}
 
@@ -245,6 +245,8 @@ body.modal-active { overflow: hidden; }
 		.circle .inner-line.bottom-middle { left: 27px; bottom: 20px;}
 
 .marker {background-image : url('https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi.png'); width: 22px; height: 40px;}
+
+p.help { font-size: 16px; line-height: 18px; color: #666; margin-bottom: 8px; }
 
 
 

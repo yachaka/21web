@@ -50946,9 +50946,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = (0, _redux.createStore)((0, _redux.combineReducers)(_extends({}, reducers, {
     routing: _ImmutableReactReduxRouter2.default
-})), {
-    modal: _react2.default.createElement(_SharePost2.default, null)
-}, (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), _DevTools2.default.instrument()));
+})), (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), _DevTools2.default.instrument()));
 
 },{"./DevTools":655,"./components/modals/SharePost.jsx":677,"./reducers":681,"./reducers/Immutable+ReactReduxRouter":680,"react":490,"redux":638,"redux-thunk":632}],658:[function(require,module,exports){
 'use strict';
@@ -51807,7 +51805,7 @@ var Post = React.createClass({
 				{ className: 'distance col-xs-22 col-xs-offset-1 col-md-2 col-md-offset-1', style: { color: color } },
 				'A ',
 				Math.round(distanceN),
-				'km'
+				' km'
 			),
 			React.createElement(
 				'div',
@@ -52550,8 +52548,15 @@ var SharePost = function (_React$Component) {
                         _showError(this.state.url) ? React.createElement(
                             'p',
                             { className: 'simple-inline-error' },
-                            'L\'URL entrée ne correspond pas à une URL valide.'
+                            'L\'URL entrée ne correspond pas à une URL valide.',
+                            React.createElement('br', null),
+                            'Example d\'URL valide : https://www.instagram.com/p/BE8oN30ACf7/?taken-by=nikesb'
                         ) : null,
+                        React.createElement(
+                            'p',
+                            { className: 'help' },
+                            'Partagez une adresse web ▾'
+                        ),
                         React.createElement('input', { className: (0, _classnames2.default)('classic url', { error: _showError(this.state.url) }), type: 'text', placeholder: 'Collez l\'adresse web du post', onChange: this.onChangeValue }),
                         React.createElement('img', { className: (0, _classnames2.default)('spinner', { active: this.state.fetching }), src: '/img/spinner.gif', alt: 'Chargement...' })
                     )

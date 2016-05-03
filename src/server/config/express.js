@@ -31,12 +31,14 @@ express.use(passport.session());																	/* Passport Session */
 express.use(function (req, res, next) {																/* Setting user local for view */
 	
 	/* TMP  DEVVV */
-	var User = require('@models/User');
-	User.query()
-	.first()
-	.where('id', 42)
-	.then((user) => {
-		res.locals.user = user;
-		req.login(user, next);
-	});
+	// var User = require('@models/User');
+	// User.query()
+	// .first()
+	// .where('id', 42)
+	// .then((user) => {
+	// 	res.locals.user = user;
+	// 	req.login(user, next);
+	// });
+	res.locals.user = {};
+	next();
 });

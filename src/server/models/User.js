@@ -28,7 +28,6 @@ User.schema = {
 		}
 	},
 	password: {
-		presence: true,
 		length: {
 			minimum: 8,
 			maximum: 20

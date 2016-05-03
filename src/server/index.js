@@ -4,7 +4,7 @@ import 'local-modules-as-globals/register'
 import md5 from 'md5'
 
 import cfg from './config'
-import { Post, User, Token, Preview, Sub } from '@models'
+import { Post, User, Token, Preview, Sub, Account } from '@models'
 
 var path = require('path')
 	, reqwest = require('reqwest');
@@ -25,8 +25,8 @@ var ReCaptchaMiddleware = require('./middlewares/ReCaptcha')('6LfbVBoTAAAAAN2gkq
 * Routes
 ***************/
 
-express.get('/', function (req, res) {
-	res.render('index');
+express.get('/', function (req, res, next) {
+	// res.render('index');
 });
 
 const SubRouter = expressjs.Router({mergeParams: true});

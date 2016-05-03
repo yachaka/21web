@@ -40,6 +40,7 @@
     "mysql": "^2.10.2",
     "objection": "^0.4.0",
     "passport": "^0.3.2",
+    "passport-instagram": "^1.0.0",
     "passport-strategy": "^1.0.0",
     "random-string": "^0.1.2",
     "react": "^0.14.7",
