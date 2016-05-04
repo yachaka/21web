@@ -65,23 +65,19 @@ class InlineError extends React.Component {
 }
 
 
-class Login extends ErrorComponent(React.Component) {
-    constructor(props) {
-        super(props)
-    }
+class Login /*extends ErrorComponent(React.Component)*/ {
 
-
-    login = () => {
-        this.props.login(this.refs.username.value, this.refs.password.value).then(
-            user => this.props.closeMe(),
-            err => {
-                if (err instanceof ValidationError)
-                    this.setState({errors: err.errors});
-                else
-                    throw err;
-            }
-        );
-    }
+    // login = () => {
+    //     this.props.login(this.refs.username.value, this.refs.password.value).then(
+    //         user => this.props.closeMe(),
+    //         err => {
+    //             if (err instanceof ValidationError)
+    //                 this.setState({errors: err.errors});
+    //             else
+    //                 throw err;
+    //         }
+    //     );
+    // }
 
     render() {
         return (
@@ -89,17 +85,16 @@ class Login extends ErrorComponent(React.Component) {
 
                 <div className="top">
                     <div className="row">
-                        <h2 className="col-xs-23 col-xs-offset-1">Se connecter</h2>
-                    </div>
-
-                    <div className="row">
-                        <p className="col-xs-23 col-xs-offset-1 no-account">
-                            <a onClick={this.props.goToRegisterModal}>Pas encore de compte ?</a>
-                        </p>
+                        <div className="col-xs-23 col-xs-offset-1">
+                            <h2>Se connecter</h2>
+                            <div className="connect-instagram connect">
+                                <a href="/auth/instagram">Avec mon compte instagram</a>
+                                <a href="/auth/instagram"><img src="/img/instagram-icon.png" title="Se connecter avec Instagram" alt="Se connecter avec Instagram"/></a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div className="row">
+                {/*<div className="row">
                     <div className="col-xs-23 col-xs-offset-1">
                         <InlineError error={this.state.errors.__global}/>
 
@@ -110,20 +105,20 @@ class Login extends ErrorComponent(React.Component) {
                             Se connecter
                         </button>
                     </div>
-                </div>
+                </div>*/}
             </Modal>
         );
     }
 }
 
-var _setModalRegister = () => setModal(Register());
+// var _setModalRegister = () => setModal(Register());
 
 export default connect(
     null,
     {
-        goToRegisterModal: _setModalRegister,
-        closeMe: closeModal,
-        login: login
+        // goToRegisterModal: _setModalRegister,
+        closeMe: closeModal
+        // login: login
     },
     (stateProps, dispatchProps, ownProps) => Object.assign({key: 'loginModal'}, ownProps, stateProps, dispatchProps)
 )(Login);

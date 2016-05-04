@@ -50914,6 +50914,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // Dev
 
 
+var _immutable = require('immutable');
+
+var _immutable2 = _interopRequireDefault(_immutable);
+
 var _redux = require('redux');
 
 var _ImmutableReactReduxRouter = require('./reducers/Immutable+ReactReduxRouter');
@@ -50936,9 +50940,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _SharePost = require('./components/modals/SharePost.jsx');
+var _Login = require('./components/modals/Login.jsx');
 
-var _SharePost2 = _interopRequireDefault(_SharePost);
+var _Login2 = _interopRequireDefault(_Login);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -50946,9 +50950,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = (0, _redux.createStore)((0, _redux.combineReducers)(_extends({}, reducers, {
     routing: _ImmutableReactReduxRouter2.default
-})), (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), _DevTools2.default.instrument()));
+})), _immutable2.default.fromJS(window.__INITIAL_STATE__), (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), _DevTools2.default.instrument()));
 
-},{"./DevTools":655,"./components/modals/SharePost.jsx":677,"./reducers":681,"./reducers/Immutable+ReactReduxRouter":680,"react":490,"redux":638,"redux-thunk":632}],658:[function(require,module,exports){
+},{"./DevTools":655,"./components/modals/Login.jsx":675,"./reducers":681,"./reducers/Immutable+ReactReduxRouter":680,"immutable":217,"react":490,"redux":638,"redux-thunk":632}],658:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51708,10 +51712,6 @@ var React = require('react');
 var postTextParser = require('../helpers/PostTextParser'),
     classNames = require('classnames');
 
-var FluxContainerMixin = require('flux/utils').Mixin,
-    UserStore = require('../stores/UserStore'),
-    AppStateStore = require('../stores/AppStateStore');
-
 function htmlEntities(str) {
 	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
@@ -51774,24 +51774,19 @@ function mixColors(color1, color2, progress) {
 				*/
 var Post = React.createClass({
 	displayName: 'Post',
-
-	mixins: [FluxContainerMixin([UserStore, AppStateStore])],
-	statics: {
-		calculateState: function calculateState(prevState) {
-			return {
-				user: UserStore.user,
-				userLocation: { coords: {
-						latitude: 30,
-						longitude: 20
-					} }
-			};
-		}
+	getInitialState: function getInitialState() {
+		return {
+			userLocation: { coords: {
+					latitude: 30,
+					longitude: 20
+				} }
+		};
 	},
 	componentDidMount: function componentDidMount() {
 		window.iframely.load(this.refs.preview.firstChild);
 	},
 	render: function render() {
-		var className = classNames('post row', { 'my-post': this.state.user.id == this.props.data.get('user_id'), 'pending': this.props.data.get('pending'), 'bounceIn': this.props.data.get('justShared'), 'odd': this.props.odd });
+		var className = classNames('post row');
 
 		var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.get('lat'), this.props.data.get('lng'), 'K');
 		var progress = distanceN / 8;
@@ -51904,7 +51899,7 @@ var Post = React.createClass({
 
 module.exports = Post;
 
-},{"../helpers/PostTextParser":678,"../stores/AppStateStore":683,"../stores/UserStore":685,"classnames":68,"flux/utils":199,"react":490}],671:[function(require,module,exports){
+},{"../helpers/PostTextParser":678,"classnames":68,"react":490}],671:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -52184,23 +52179,9 @@ var InlineError = function (_React$Component) {
     return InlineError;
 }(React.Component);
 
-var Login = function (_ErrorComponent) {
-    _inherits(Login, _ErrorComponent);
-
-    function Login(props) {
+var Login /*extends ErrorComponent(React.Component)*/ = function () {
+    function Login() {
         _classCallCheck(this, Login);
-
-        var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Login).call(this, props));
-
-        _this3.login = function () {
-            _this3.props.login(_this3.refs.username.value, _this3.refs.password.value).then(function (user) {
-                return _this3.props.closeMe();
-            }, function (err) {
-                if (err instanceof _ValidationError2.default) _this3.setState({ errors: err.errors });else throw err;
-            });
-        };
-
-        return _this3;
     }
 
     _createClass(Login, [{
@@ -52216,39 +52197,27 @@ var Login = function (_ErrorComponent) {
                         'div',
                         { className: 'row' },
                         React.createElement(
-                            'h2',
+                            'div',
                             { className: 'col-xs-23 col-xs-offset-1' },
-                            'Se connecter'
-                        )
-                    ),
-                    React.createElement(
-                        'div',
-                        { className: 'row' },
-                        React.createElement(
-                            'p',
-                            { className: 'col-xs-23 col-xs-offset-1 no-account' },
                             React.createElement(
-                                'a',
-                                { onClick: this.props.goToRegisterModal },
-                                'Pas encore de compte ?'
+                                'h2',
+                                null,
+                                'Se connecter'
+                            ),
+                            React.createElement(
+                                'div',
+                                { className: 'connect-instagram connect' },
+                                React.createElement(
+                                    'a',
+                                    { href: '/auth/instagram' },
+                                    'Avec mon compte instagram'
+                                ),
+                                React.createElement(
+                                    'a',
+                                    { href: '/auth/instagram' },
+                                    React.createElement('img', { src: '/img/instagram-icon.png', title: 'Se connecter avec Instagram', alt: 'Se connecter avec Instagram' })
+                                )
                             )
-                        )
-                    )
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'row' },
-                    React.createElement(
-                        'div',
-                        { className: 'col-xs-23 col-xs-offset-1' },
-                        React.createElement(InlineError, { error: this.state.errors.__global }),
-                        React.createElement('input', { autoFocus: true, ref: 'username', type: 'text', placeholder: 'Identifiant', className: 'classic', onChange: this.resetErrors }),
-                        React.createElement('input', { ref: 'password', type: 'password', placeholder: 'Password', className: 'classic', onChange: this.resetErrors }),
-                        React.createElement(
-                            'button',
-                            {
-                                onClick: this.login },
-                            'Se connecter'
                         )
                     )
                 )
@@ -52257,16 +52226,14 @@ var Login = function (_ErrorComponent) {
     }]);
 
     return Login;
-}(ErrorComponent(React.Component));
+}();
 
-var _setModalRegister = function _setModalRegister() {
-    return (0, _actions.setModal)(Register());
-};
+// var _setModalRegister = () => setModal(Register());
 
 exports.default = (0, _reactRedux.connect)(null, {
-    goToRegisterModal: _setModalRegister,
-    closeMe: _actions.closeModal,
-    login: _actions.login
+    // goToRegisterModal: _setModalRegister,
+    closeMe: _actions.closeModal
+    // login: login
 }, function (stateProps, dispatchProps, ownProps) {
     return Object.assign({ key: 'loginModal' }, ownProps, stateProps, dispatchProps);
 })(Login);

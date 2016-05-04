@@ -12,6 +12,7 @@ var path = require('path')
 
 import expressjs from 'express'
 import express from '@config/express'
+import passport from '@config/passport'
 
 var Responses = require('./responses');
 
@@ -26,13 +27,13 @@ var ReCaptchaMiddleware = require('./middlewares/ReCaptcha')('6LfbVBoTAAAAAN2gkq
 ***************/
 
 express.get('/', function (req, res, next) {
-	// res.render('index');
+	res.render('index');
 });
 
 const SubRouter = expressjs.Router({mergeParams: true});
 express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
 SubRouter.use(function (req, res, next) {
-	console.log(req.user);
+	console.log('Logged user', req.user);
 	next();
 });
 /***** Sub entry point ****/
@@ -59,6 +60,13 @@ SubRouter.get('/posts', function (req, res) {
 				posts: posts
 			});
 		});
+});
+
+/***** Instagram authentification */
+express.get('/auth/instagram', passport.authenticate('instagram'));
+express.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/'}), function (req, res) {
+	console.log(req.user);
+	res.send('Logged in!');
 });
 
 /***** Add a post *****/

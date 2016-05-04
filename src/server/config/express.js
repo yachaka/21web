@@ -39,6 +39,6 @@ express.use(function (req, res, next) {																/* Setting user local for
 	// 	res.locals.user = user;
 	// 	req.login(user, next);
 	// });
-	res.locals.user = {};
+	res.locals.user = req.user || {};
 	next();
 });

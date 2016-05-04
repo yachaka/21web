@@ -2,11 +2,7 @@
 var React = require('react');
 
 var postTextParser = require('../helpers/PostTextParser')
-	, classNames = require('classnames')
-
-var FluxContainerMixin = require('flux/utils').Mixin
-	, UserStore = require('../stores/UserStore')
-	, AppStateStore = require('../stores/AppStateStore');
+	, classNames = require('classnames');
 
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -65,24 +61,20 @@ function mixColors(color1, color2, progress) {
 				<p className="comments">24 comments</p>
 				*/
 var Post = React.createClass({
-    mixins: [FluxContainerMixin([UserStore, AppStateStore])],
-    statics: {
-        calculateState: function (prevState) {
-            return {
-                user: UserStore.user,
-                userLocation: {coords: {
-                	latitude: 30,
-                	longitude: 20
-                }}
-            };
-        }
+    getInitialState() {
+        return {
+            userLocation: {coords: {
+            	latitude: 30,
+            	longitude: 20
+            }}
+        };
     },
     componentDidMount() {
         window.iframely.load(this.refs.preview.firstChild); 
     },
 
     render() {
-    	var className = classNames('post row', {'my-post': this.state.user.id == this.props.data.get('user_id'), 'pending': this.props.data.get('pending'), 'bounceIn': this.props.data.get('justShared'), 'odd': this.props.odd});
+    	var className = classNames('post row');
 
     	var distanceN = distance(this.state.userLocation.coords.latitude, this.state.userLocation.coords.longitude, this.props.data.get('lat'), this.props.data.get('lng'), 'K');
     	var progress = distanceN / 8;

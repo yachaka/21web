@@ -121,10 +121,13 @@ body.modal-active { overflow: hidden; }
 * LOGIN MODAL
 **/
 #loginModal {}
-	#loginModal h2 { margin-bottom: 10px; }
-	#loginModal .no-account { font-size: 18px; }
+	#loginModal h2 { margin-bottom: 20px; }
 
-	#loginModal {}
+	#loginModal .connect {}
+		#loginModal .connect a { display: block; float: left; clear: both; font-size: 18px; }
+		#loginModal .connect img:hover { filter: brightness(1.08); -webkit-filter: brightness(1.08); }
+		#loginModal .connect img:active { filter: brightness(0.96); -webkit-filter: brightness(0.96); }
+
 
 /********	
 * SHARE MODAL
