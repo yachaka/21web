@@ -18,7 +18,7 @@ let FeedScreen = ({locateAPost}) => (
 
         <div className="row">
             <div className="col-xs-12">
-	            <button className="startShare" onClick={locateAPost}>Localisez un post</button>
+	            <a id="locateButton" onClick={locateAPost}>Localisez un post</a>
             </div>
         </div>
     </div>

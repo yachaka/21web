@@ -13,12 +13,18 @@ import DevTools from './DevTools'
 import React from 'react'
 import Login from './components/modals/Login.jsx'
 
+const initialState = {};
+
+for (let k in window.__INITIAL_STATE__) {
+	initialState[k] = Immutable.fromJS(window.__INITIAL_STATE__[k]);
+}
+
 export default createStore(
     combineReducers({
         ...reducers,
         routing: routerReducer
     }),
-    Immutable.fromJS(window.__INITIAL_STATE__),
+   	initialState,
     compose(
     	applyMiddleware(thunk),
     	DevTools.instrument()

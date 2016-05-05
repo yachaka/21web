@@ -1,6 +1,7 @@
 // Root directory as module search path, @see https://github.com/yachaka/local-modules-as-globals
 import 'local-modules-as-globals/register'
 
+import url from 'url'
 import md5 from 'md5'
 
 import cfg from './config'
@@ -31,7 +32,6 @@ express.get('/', function (req, res, next) {
 });
 
 const SubRouter = expressjs.Router({mergeParams: true});
-express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
 SubRouter.use(function (req, res, next) {
 	console.log('Logged user', req.user);
 	next();
@@ -63,10 +63,24 @@ SubRouter.get('/posts', function (req, res) {
 });
 
 /***** Instagram authentification */
-express.get('/auth/instagram', passport.authenticate('instagram'));
+express.get('/auth/instagram', (req, res, next) => {
+	let str = url.format({
+		    protocol: req.protocol,
+		    host: req.get('host'),
+		    pathname: '/auth/instagram/callback'
+		    // query: {
+		    // 	redirect: req.query.redirect
+		    // }
+		});
+	passport.authenticate('instagram', {
+		callbackURL: str
+	})(req, res, next);
+});
 express.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/'}), function (req, res) {
-	console.log(req.user);
-	res.send('Logged in!');
+	if (req.query.redirect)
+		res.redirect(req.query.redirect);
+	else
+		res.send('Logged in!');
 });
 
 /***** Add a post *****/
@@ -186,20 +200,6 @@ express.post('/claim/:token',
 			.catch(next);
 });
 
-var T = function (req, res, next) {
-	if (req.params.number > 1) {
-		console.log('trueee')
-		return next('route');
-	}
-	next();
-};
-express.get('/:number([0-9]+)', T, (req, res) => {console.log('handled');res.send('foo uno');});
-express.get('/:number([0-9]+)/bar', T, (req, res) => res.send('bar uno'));
-
-express.get('/:number([0-9]+)', (req, res) => res.send('foo 2nd'));
-express.get('/:number([0-9]+)/bar', (req, res) => res.send('bar 2nd'));
-
-
 var fetchSubMiddleware = function (req, res, next) {
 	if (!req.params.sub)
 		return next(new BadRequestError('fetchSubMiddleware: Expected to find a `sub` params. Path: '+req.path));
@@ -242,4 +242,5 @@ express.use(function (err, req, res, next) {
 		res.status(err.code).json(err.toJSON());
 	next(err);
 });
+express.use('/:sub([a-zA-Z0-9]+)', SubRouter);
 express.listen(8080);

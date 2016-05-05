@@ -1,8 +1,6 @@
 
 var Dispatcher = require('../Dispatcher')
-	, ActionsType = require('../actions')
-
-    , PostsStore = require('../stores/PostsStore');
+	, ActionsType = require('../actions');
 
 import { connect } from 'react-redux';
 

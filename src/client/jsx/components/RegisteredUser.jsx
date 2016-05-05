@@ -1,6 +1,5 @@
 
-var React = require('react')
-    , ClaimAccount = require('./ClaimAccount.jsx');
+var React = require('react');
 
 var RegisteredUser = React.createClass({
     displayName: 'RegisteredUser',

@@ -42,7 +42,7 @@ body.modal-active { overflow: hidden; }
 		#header #fixed .block { float:left; padding: 15px; /*background-color: rgba(255, 255, 255, 0.8);*/background-color: rgba(0, 0, 0, 0.8); margin-right: 1px; overflow: hidden; color: white;}
 
 		#header #fixed #l {}
-			#header #fixed #l img { height: 45px; }
+			#header #fixed #l img { height: 35px; }
 
 	#header #logo { height: 50px; }
 
@@ -54,13 +54,15 @@ body.modal-active { overflow: hidden; }
 #app { background: url('/img/background-line.png') 0px top repeat-y; overflow: hidden; padding-top: 40px; margin: auto; min-height: 100vh; position: relative;}
 	#app #subTitle { color: #E83838; font-size: 38px; line-height: 42px; font-weight: normal;}
 
+#locateButton { display: block; text-indent: -9999em; position: fixed; bottom: 20px; left: 50%; margin-left: -53px; background-image: url('/img/locate-button.png'); width: 106px; height: 106px; }
+
 /*********
 * Logged User
 *****/
-#app #loggedUser { overflow: hidden; height: 48px;}
+#app #loggedUser { overflow: hidden; height: 37px;}
 	#app #loggedUser .avatar { float:left; margin-right: 20px;}
 		#app #loggedUser .avatar img { width: 48px; height: 48px; border-radius: 24px;}
-	#app #loggedUser .username { padding-top: 7px; font-size: 17px; float: left; margin-right: 20px;}
+	#app #loggedUser .username { font-size: 17px; float: left; margin-right: 20px;}
 
 /*	#app #loggedUser .connect-form { float: left; margin-top: 9px; }
 		#app #loggedUser .connect-form input { font-size: 14px; padding: 6px; border-radius: 3px; border: 1px solid #ccc; margin-right: 10px;}
@@ -147,8 +149,13 @@ body.modal-active { overflow: hidden; }
 	#sharePostModal .part-2 { opacity: 0; transform: translateY(100px);}
 		#sharePostModal .part-2.active { opacity: 1; transform: translateY(0px); transition: all 450ms cubic-bezier(.08,.58,.25,.96); }
 
-	#sharePostModal .picker-preview { margin-bottom: 12px; }
-		#sharePostModal .picker-preview > div { background: url('/img/spinner-on-bbb.gif') center center no-repeat #bbb; }
+	#sharePostModal .picker-preview/*, #sharePostModal #noPreview*/  {margin-bottom: 12px;}
+	
+	#sharePostModal .picker-preview > div { background: url('/img/spinner-on-bbb.gif') center center no-repeat #bbb; }
+	/*#sharePostModal #noPreview { background-color: #999; color: white; height: 100px; line-height: 100px; text-align: center; }*/
+
+	#sharePostModal #googleMap { position: relative; }
+		#sharePostModal #googleMap #pin { position: absolute; left: 50%; top: 50%; margin-top: -32px; margin-left: -16px; z-index: 20; }
 
 /********	
 * FEED

@@ -88,8 +88,8 @@ class Login /*extends ErrorComponent(React.Component)*/ {
                         <div className="col-xs-23 col-xs-offset-1">
                             <h2>Se connecter</h2>
                             <div className="connect-instagram connect">
-                                <a href="/auth/instagram">Avec mon compte instagram</a>
-                                <a href="/auth/instagram"><img src="/img/instagram-icon.png" title="Se connecter avec Instagram" alt="Se connecter avec Instagram"/></a>
+                                <a href={"/auth/instagram?redirect=" + this.props.location.pathname}>Avec mon compte instagram</a>
+                                <a href={"/auth/instagram?redirect=" + this.props.location.pathname}><img src="/img/instagram-icon.png" title="Se connecter avec Instagram" alt="Se connecter avec Instagram"/></a>
                             </div>
                         </div>
                     </div>

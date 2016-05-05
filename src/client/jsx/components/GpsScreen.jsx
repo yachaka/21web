@@ -1,19 +1,15 @@
 
 var React = require('react')
-    , FluxContainerMixin = require('flux/utils').Mixin
-
 	, Creator = require('../actions/Creator')
 	
-    , UserStore = require('../stores/UserStore')
     , k = require('../k');
 
 var GpsScreen = React.createClass({
-	mixins: [FluxContainerMixin([UserStore])],
     statics: {
         calculateState: function (prevState) {
             return {
                 // location: k.LocationState('UNKNOWN_ERROR')
-                location: UserStore.location
+                location: {}
             };
         }
     },

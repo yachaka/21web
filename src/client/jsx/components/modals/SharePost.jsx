@@ -65,7 +65,7 @@ class SharePost extends React.Component {
         if (prevState.url != this.state.url && _isUrl(this.state.url))
             this.fetchPreview();
 
-        if (prevState.preview != this.state.preview && this.state.preview)
+        if (prevState.preview != this.state.preview && this.state.preview && this.state.preview.html)
             window.iframely.load(ReactDOM.findDOMNode(this.refs.preview).firstChild);
     }
 
@@ -182,22 +182,28 @@ class SharePost extends React.Component {
 
                         {_showError(this.state.url) ? <p className="simple-inline-error">L'URL entrée ne correspond pas à une URL valide.<br/>Example d'URL valide : https://www.instagram.com/p/BE8oN30ACf7/?taken-by=nikesb</p> : null}
                         <p className="help">Partagez une adresse web ▾</p>
-                        <input className={classNames('classic url', {error: _showError(this.state.url)})} type="text" placeholder="Collez l'adresse web du post" onChange={this.onChangeValue}/>
+                        <input autoFocus className={classNames('classic url', {error: _showError(this.state.url)})} type="text" placeholder="Collez l'adresse web du post" onChange={this.onChangeValue}/>
                         <img className={classNames('spinner', {active: this.state.fetching})} src="/img/spinner.gif" alt="Chargement..."/>
                     </div>
                 </div>
 
-                <div className={classNames('part-2', {active: this.state.preview != null})}>
+                <div className={classNames('part-2', {active: this.state.preview === null})}>
                     {/*******
                     *    Preview 
                     **/}
                     {this.state.preview ?
                         <div className="row">
-                            <div ref="preview" className="picker-preview col-xs-23 col-xs-offset-1" style={{maxWidth: '450px'}} dangerouslySetInnerHTML={{__html: this.state.preview.html}}>
+                            <div className="col-xs-23 col-xs-offset-1" style={{maxWidth: '450px'}}>
+                            {1 ? 
+                                <div ref="preview" className="picker-preview" dangerouslySetInnerHTML={{__html: this.state.preview.html}}>
+                                </div> : 
+                                <p id="noPreview">
+                                    Pas d'aperçu disponible.
+                                </p>
+                            }
                             </div>
                         </div>
                         : null}
-
                     {/*******
                     *    Titre 
                     **/}
@@ -211,7 +217,9 @@ class SharePost extends React.Component {
                     *    Map 
                     **/}
                     <div className="row">
-                        <div className="col-md-15 col-xs-23 col-xs-offset-1" style={{height: '340px'}}>
+                        <div className="col-md-15 col-xs-23 col-xs-offset-1">
+                            <div id="googleMap" style={{height: '340px'}}>
+                                <img id="pin" src="/img/pin-32x32.png"/>
                             <GoogleMapLoader
                                 containerElement={
                                     <div
@@ -226,10 +234,12 @@ class SharePost extends React.Component {
                                         defaultZoom={14}
                                         defaultCenter={{lat: 48.8871464, lng: 2.2990585}}
                                         onCenterChanged={this.mapCenterChanged}
+                                        disableDefaultUI={true}
                                         >
                                     </GoogleMap>
                                 }
                                 />
+                            </div>
                         </div>
                     </div>
 

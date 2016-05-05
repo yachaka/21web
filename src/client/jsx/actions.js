@@ -53,7 +53,6 @@ export function sharePost(post, toSubs) {
 /*******
 * Users
 ****/
-export const LOGIN = 'LOGIN';
 export const USER_LOGGED_IN = 'USER_LOGGED_IN';
 /*
 * @throws error: an error defined in /shared/errors
@@ -81,6 +80,18 @@ export function userLoggedIn(user) {
 	return {
 		type: USER_LOGGED_IN,
 		user: user
+	}
+}
+
+export function logout() {
+	return function (dispatch) {
+		return wrap(
+			request.get('/logout')
+		)
+		.then((res) => {
+			dispatch(userLoggedIn({}));
+			return res;
+		});
 	}
 }
 

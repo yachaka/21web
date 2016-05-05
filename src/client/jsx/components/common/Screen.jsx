@@ -1,9 +1,6 @@
 
 var React = require('react')
-	, ReactCSSTransitionGroup = require('react-addons-css-transition-group')
-    , FluxContainerMixin = require('flux/utils').Mixin
-
-    , AppStateStore = require('../../stores/AppStateStore');
+	, ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 var Screen = React.createClass({
 	propTypes: {
@@ -16,11 +13,10 @@ var Screen = React.createClass({
 	    };
 	},
 
-	mixins: [FluxContainerMixin([AppStateStore])],
 	statics: {
         calculateState: function (prevState) {
             return {
-                modalShown: AppStateStore.modal
+                modalShown: null
             };
         }
     },
